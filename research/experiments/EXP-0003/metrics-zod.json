@@ -1,0 +1,44 @@
+{
+  "label": "zod",
+  "nodes": 3707,
+  "edges": 53090,
+  "kindCounts": {
+    "PROJECT": 1,
+    "FILE": 490,
+    "MODULE": 406,
+    "VARIABLE": 1000,
+    "FUNCTION": 1456,
+    "CLASS": 54,
+    "METHOD": 300
+  },
+  "imports": {
+    "total": 1067,
+    "byResolution": {
+      "EXTERNAL": 499,
+      "RESOLVED": 568
+    },
+    "internalResolved": 568,
+    "external": 499,
+    "unresolved": 0
+  },
+  "calls": {
+    "total": 45586,
+    "byResolution": {
+      "RESOLVED": 10749,
+      "AMBIGUOUS": 12766,
+      "UNRESOLVED": 22071
+    },
+    "resolved": 10749,
+    "ambiguous": 12766,
+    "unresolved": 22071
+  },
+  "indexResolution": {
+    "importsTotal": 1067,
+    "resolvedInternal": 568,
+    "external": 499,
+    "unresolved": 0,
+    "ambiguous": 0,
+    "internalResolutionRate": 1
+  },
+  "files": 490
+}

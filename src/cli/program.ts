@@ -2,6 +2,8 @@ import { Command } from "commander";
 
 import {
   entityGraphView,
+  exploreCallers,
+  exploreCalls,
   exploreChildren,
   exploreDependencies,
   exploreDependents,
@@ -14,14 +16,17 @@ import {
   listFiles,
   listImports,
   loadModel,
+  searchModel,
   summarizeProject,
+  type SelectPredicate,
 } from "../application/explore.js";
+import { formatQueryResult, runQuery, runQueryFromFile } from "../application/query.js";
 import { getDiagnostics } from "../application/diagnostics.js";
 import { indexProject } from "../application/index-project.js";
 import { initProject } from "../application/init.js";
 import { getStatus } from "../application/status.js";
 import { FfvsError } from "../core/domain/errors.js";
-import type { RelationKind } from "../core/domain/types.js";
+import type { EntityKind, RelationKind } from "../core/domain/types.js";
 import {
   formatDiagnostics,
   formatEntityList,
@@ -41,11 +46,23 @@ interface JsonOption {
   json?: boolean;
 }
 
+interface FilterOptions extends JsonOption {
+  name?: string;
+  path?: string;
+}
+
 function parseKinds(raw?: string): RelationKind[] | undefined {
   if (!raw) {
     return undefined;
   }
   return raw.split(",").map((part) => part.trim().toUpperCase()) as RelationKind[];
+}
+
+function toPredicate(options: FilterOptions): SelectPredicate {
+  return {
+    ...(options.name !== undefined ? { name: options.name, nameMode: "contains" as const } : {}),
+    ...(options.path !== undefined ? { path: options.path, pathMode: "contains" as const } : {}),
+  };
 }
 
 export function createProgram(): Command {
@@ -54,7 +71,7 @@ export function createProgram(): Command {
   program
     .name("ffvs")
     .description("FFVS — local-first CLI for exploring software projects as semantic structures")
-    .version("0.4.0");
+    .version("0.6.0");
 
   program
     .command("init")
@@ -74,40 +91,64 @@ export function createProgram(): Command {
     .command("index")
     .description("Index a directory and build a semantic software graph under .ffvs/")
     .argument("[path]", "Directory to index relative to the FFVS project", ".")
-    .action(async (scanPath: string) => {
-      const result = await indexProject(process.cwd(), scanPath);
-      const languageSummary =
-        result.index.languages.length === 0
-          ? "no known languages detected"
-          : result.index.languages.map((l) => `${l.language}=${l.fileCount}`).join(", ");
+    .option(
+      "--exclude <pattern>",
+      "Exclude path/directory (repeatable; also persisted in config)",
+      (value: string, previous: string[]) => [...previous, value],
+      [] as string[],
+    )
+    .option(
+      "--include <pattern>",
+      "Restrict indexing to matching path prefixes (repeatable)",
+      (value: string, previous: string[]) => [...previous, value],
+      [] as string[],
+    )
+    .action(
+      async (
+        scanPath: string,
+        options: { exclude?: string[]; include?: string[] },
+      ) => {
+        const result = await indexProject(process.cwd(), scanPath, {
+          ...(options.exclude?.length ? { exclude: options.exclude } : {}),
+          ...(options.include?.length ? { include: options.include } : {}),
+        });
+        const languageSummary =
+          result.index.languages.length === 0
+            ? "no known languages detected"
+            : result.index.languages.map((l) => `${l.language}=${l.fileCount}`).join(", ");
 
-      console.log(`Indexed ${result.index.files.length} files (${languageSummary})`);
-      console.log(`Project: ${result.projectRoot}`);
-      console.log(`Scan root: ${result.scanRoot}`);
-      console.log(`Wrote .ffvs/index.json and .ffvs/graph.json`);
-      console.log(`Graph: ${result.graph.nodes.length} nodes, ${result.graph.edges.length} edges`);
+        console.log(`Indexed ${result.index.files.length} files (${languageSummary})`);
+        console.log(`Project: ${result.projectRoot}`);
+        console.log(`Scan root: ${result.scanRoot}`);
+        console.log(`Wrote .ffvs/index.json and .ffvs/graph.json`);
+        console.log(`Graph: ${result.graph.nodes.length} nodes, ${result.graph.edges.length} edges`);
 
-      const interesting = result.index.entities.filter((e) =>
-        ["FUNCTION", "CLASS", "METHOD", "MODULE"].includes(e.kind),
-      );
-      if (interesting.length > 0) {
-        console.log(
-          `Entities: ${interesting.map((e) => `${e.kind.toLowerCase()}=${e.count}`).join(", ")}`,
+        const interesting = result.index.entities.filter((e) =>
+          ["FUNCTION", "CLASS", "METHOD", "MODULE"].includes(e.kind),
         );
-      }
-      if (result.index.parseErrors.length > 0) {
-        console.log(`Parse errors: ${result.index.parseErrors.length}`);
-      }
-      if (result.index.resolution) {
-        const rate =
-          result.index.resolution.internalResolutionRate === null
-            ? "n/a"
-            : `${(result.index.resolution.internalResolutionRate * 100).toFixed(1)}%`;
-        console.log(
-          `Imports: resolved=${result.index.resolution.resolvedInternal} external=${result.index.resolution.external} unresolved=${result.index.resolution.unresolved} ambiguous=${result.index.resolution.ambiguous} (internal rate ${rate})`,
-        );
-      }
-    });
+        if (interesting.length > 0) {
+          console.log(
+            `Entities: ${interesting.map((e) => `${e.kind.toLowerCase()}=${e.count}`).join(", ")}`,
+          );
+        }
+        const calls = result.graph.edges.filter((e) => e.kind === "CALLS").length;
+        if (calls > 0) {
+          console.log(`CALLS edges: ${calls}`);
+        }
+        if (result.index.parseErrors.length > 0) {
+          console.log(`Parse errors: ${result.index.parseErrors.length}`);
+        }
+        if (result.index.resolution) {
+          const rate =
+            result.index.resolution.internalResolutionRate === null
+              ? "n/a"
+              : `${(result.index.resolution.internalResolutionRate * 100).toFixed(1)}%`;
+          console.log(
+            `Imports: resolved=${result.index.resolution.resolvedInternal} external=${result.index.resolution.external} unresolved=${result.index.resolution.unresolved} ambiguous=${result.index.resolution.ambiguous} (internal rate ${rate})`,
+          );
+        }
+      },
+    );
 
   program
     .command("status")
@@ -125,6 +166,12 @@ export function createProgram(): Command {
       console.log(`Created: ${status.config.createdAt}`);
       console.log(`Last indexed: ${status.config.lastIndexedAt ?? "(never)"}`);
       console.log(`Index root: ${status.config.indexRoot}`);
+      if (status.config.include?.length) {
+        console.log(`Include: ${status.config.include.join(", ")}`);
+      }
+      if (status.config.exclude?.length) {
+        console.log(`Exclude: ${status.config.exclude.join(", ")}`);
+      }
 
       if (!status.index) {
         console.log(`Files: (not indexed yet — run \`ffvs index .\`)`);
@@ -189,11 +236,13 @@ export function createProgram(): Command {
 
   program
     .command("files")
-    .description("List indexed files")
+    .description("List indexed files (FILTER with --name / --path)")
+    .option("--name <substring>", "Filter by file name substring")
+    .option("--path <substring>", "Filter by path substring")
     .option("--json", "Emit JSON", false)
-    .action(async (options: JsonOption) => {
+    .action(async (options: FilterOptions) => {
       const model = await loadModel(process.cwd());
-      const files = listFiles(model.index);
+      const files = listFiles(model.index, toPredicate(options));
       if (options.json) {
         printJson(files);
         return;
@@ -203,11 +252,13 @@ export function createProgram(): Command {
 
   program
     .command("functions")
-    .description("List extracted functions")
+    .description("List extracted functions (FILTER with --name / --path)")
+    .option("--name <substring>", "Filter by name substring")
+    .option("--path <substring>", "Filter by path substring")
     .option("--json", "Emit JSON", false)
-    .action(async (options: JsonOption) => {
+    .action(async (options: FilterOptions) => {
       const model = await loadModel(process.cwd());
-      const nodes = listEntities(model.graph, "FUNCTION");
+      const nodes = listEntities(model.graph, "FUNCTION", toPredicate(options));
       if (options.json) {
         printJson(nodes);
         return;
@@ -217,17 +268,50 @@ export function createProgram(): Command {
 
   program
     .command("classes")
-    .description("List extracted classes")
+    .description("List extracted classes (FILTER with --name / --path)")
+    .option("--name <substring>", "Filter by name substring")
+    .option("--path <substring>", "Filter by path substring")
     .option("--json", "Emit JSON", false)
-    .action(async (options: JsonOption) => {
+    .action(async (options: FilterOptions) => {
       const model = await loadModel(process.cwd());
-      const nodes = listEntities(model.graph, "CLASS");
+      const nodes = listEntities(model.graph, "CLASS", toPredicate(options));
       if (options.json) {
         printJson(nodes);
         return;
       }
       console.log(formatEntityList(nodes, "Classes"));
     });
+
+  program
+    .command("search")
+    .description("SEARCH candidate entities by free-text (distinct from FILTER)")
+    .argument("<needle>", "Text to search in names, paths, and ids")
+    .option("--kind <kind>", "Restrict to entity kind (function, class, module, …)")
+    .option("--path <substring>", "Restrict to path substring")
+    .option("--limit <n>", "Max results", "50")
+    .option("--json", "Emit JSON", false)
+    .action(
+      async (
+        needle: string,
+        options: JsonOption & { kind?: string; path?: string; limit?: string },
+      ) => {
+        const model = await loadModel(process.cwd());
+        const kind = options.kind
+          ? (options.kind.toUpperCase() as EntityKind)
+          : undefined;
+        const nodes = searchModel(model.graph, {
+          needle,
+          ...(kind !== undefined ? { kind } : {}),
+          ...(options.path !== undefined ? { path: options.path } : {}),
+          limit: Number(options.limit ?? 50),
+        });
+        if (options.json) {
+          printJson(nodes);
+          return;
+        }
+        console.log(formatEntityList(nodes, `Search: ${needle}`));
+      },
+    );
 
   program
     .command("imports")
@@ -287,6 +371,36 @@ export function createProgram(): Command {
         return;
       }
       console.log(formatNeighborhood(result, "Dependents"));
+    });
+
+  program
+    .command("calls")
+    .description("List outgoing CALLS from a function/method")
+    .argument("<entity>", "Entity name or id")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const result = exploreCalls(model.graph, entity);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatNeighborhood(result, "Calls"));
+    });
+
+  program
+    .command("callers")
+    .description("List who CALLS an entity (CALLED_BY)")
+    .argument("<entity>", "Entity name or id")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const result = exploreCallers(model.graph, entity);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatNeighborhood(result, "Callers"));
     });
 
   program
@@ -354,7 +468,7 @@ export function createProgram(): Command {
     .command("relations")
     .description("List relations as first-class objects (optional entity filter)")
     .argument("[entity]", "Entity name or id")
-    .option("--kind <kinds>", "Comma-separated relation kinds (e.g. IMPORTS,CONTAINS)")
+    .option("--kind <kinds>", "Comma-separated relation kinds (e.g. IMPORTS,CALLS)")
     .option("--json", "Emit JSON", false)
     .action(async (entity: string | undefined, options: JsonOption & { kind?: string }) => {
       const model = await loadModel(process.cwd());
@@ -370,6 +484,35 @@ export function createProgram(): Command {
           result.entity ? (result.entity.name ?? result.entity.id) : null,
         ),
       );
+    });
+
+  program
+    .command("query")
+    .description("Execute an FFVS Query Language (DSL) pipeline against the indexed graph")
+    .argument("[query]", "DSL query string")
+    .option("-f, --file <path>", "Read query from file")
+    .option("--json", "Emit JSON", false)
+    .action(async (queryText: string | undefined, options: JsonOption & { file?: string }) => {
+      if (options.file) {
+        const ran = await runQueryFromFile(process.cwd(), options.file);
+        if (options.json) {
+          printJson(ran.json);
+          return;
+        }
+        console.log(formatQueryResult(ran.result));
+        return;
+      }
+      if (!queryText || queryText.trim() === "") {
+        throw new FfvsError(
+          'Missing query. Usage: ffvs query \'select functions where name contains "x" describe\'',
+        );
+      }
+      const ran = await runQuery(process.cwd(), queryText);
+      if (options.json) {
+        printJson(ran.json);
+        return;
+      }
+      console.log(formatQueryResult(ran.result));
     });
 
   program

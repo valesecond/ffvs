@@ -2,7 +2,13 @@ export type EntityKind =
   "PROJECT" | "FILE" | "MODULE" | "FUNCTION" | "CLASS" | "METHOD" | "VARIABLE";
 
 export type RelationKind =
-  "CONTAINS" | "IMPORTS" | "EXPORTS" | "DECLARES" | "EXTENDS" | "IMPLEMENTS";
+  | "CONTAINS"
+  | "IMPORTS"
+  | "EXPORTS"
+  | "DECLARES"
+  | "EXTENDS"
+  | "IMPLEMENTS"
+  | "CALLS";
 
 export interface SourceLocation {
   file: string;
@@ -84,6 +90,10 @@ export interface FfvsConfig {
   createdAt: string;
   lastIndexedAt: string | null;
   indexRoot: string;
+  /** Path prefixes to include (empty/absent = all). Posix relative paths. */
+  include?: string[];
+  /** Extra directory names or path substrings to exclude beyond defaults. */
+  exclude?: string[];
 }
 
 export const FFVS_DIR = ".ffvs";

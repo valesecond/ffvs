@@ -22,76 +22,85 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [x] Saída `--json`
 - [x] Fixtures + testes
 - [x] `docs/software-model.md`
-- [ ] Scanner com includes/excludes configuráveis
+- [x] Scanner com includes/excludes configuráveis (Phase 1.9)
 - [ ] Indexação incremental (quando justificada)
-- [ ] Resolução de imports de packages (opcional/experimental)
+- [ ] Resolução de imports de packages / tsconfig paths (opcional; pressão observada limitada)
 
 ## Phase 1.5 — Discover the Query Model
 
-- [x] API interna de navegação (`neighbors`, `path`, `ancestors`, …)
-- [x] Navegação reversa sem duplicar arestas
+- [x] API interna de navegação
 - [x] Comandos: `dependencies`/`deps`, `dependents`, `children`, `parents`, `path`, `impact`, `relations`
-- [x] JSON consistente (`EntityRef` / `RelationRef`)
-- [x] Fixtures: layered, diamond, cycle, isolated, inheritance
 - [x] `docs/query-model.md`, ADR-0008
-- [x] `research/related-work.md`, hipótese H5
-- [x] EXP-0002 real-repo exploration (`research/experiments/EXP-0002/`)
+- [x] EXP-0002
 
-## Phase 1.6 — Model fidelity (atual)
+## Phase 1.6 — Model fidelity
 
-Prioridade pós-EXP-0002 (evidência: imports quebrados em repos reais):
+- [x] Resolver de módulos + estados de resolução
+- [x] `ffvs diagnostics` / métricas
+- [x] Re-execução EXP-0002
 
-- [x] Resolver de módulos desacoplado (`src/core/resolver`)
-- [x] CJS extensionless + TS/ESM `.js`→`.ts` + directory/index
-- [x] Estados RESOLVED / EXTERNAL / UNRESOLVED / AMBIGUOUS
-- [x] Preferência MODULE sobre FILE no lookup
-- [x] `ffvs diagnostics` / `ffvs unresolved` + métricas em `status`
-- [x] Fixtures + testes de resolução
-- [x] Re-execução EXP-0002 nos mesmos commits (`rerun-phase-1.6.md`)
-- [ ] Includes/excludes de paths (docs/bench)
-- [ ] tsconfig paths / package exports (futuro)
+## Phase 1.7 — Selection & filtering
 
-## Phase 2 — Query (ainda sem DSL formal completa)
+- [x] `--name` / `--path` em `functions` / `classes` / `files`
+- [x] `src/core/query/select.ts` + ADR-0012
 
-**Ainda não iniciada.** EXP-0002 + Phase 1.6 mostram que fidelidade de IMPORTS era o gargalo; DSL continua adiada.
+## Phase 1.8 — Search
 
-- [ ] Motor de consulta sobre o grafo
-- [ ] Sintaxe experimental mínima (`find` / filtros), se ergonomia exigir
-- [ ] Documentar consultas recorrentes observadas em uso real
-- [ ] **Não** congelar DSL sem evidência de necessidade
+- [x] `ffvs search` + ADR-0013
+- [x] Distinção SEARCH vs FILTER documentada
 
-## Phase 3 — Software Intelligence
+## Phase 1.9 — Includes / excludes
 
-- [ ] Análise de dependências mais profunda
-- [ ] Callers / callees (best-effort)
-- [ ] Impact analysis inicial
-- [ ] Métricas simples
-- [ ] Sinais arquiteturais básicos
+- [x] `ffvs index --exclude` / `--include` + config
+- [x] ADR-0014
 
-## Phase 4 — History
+## Phase 2.0 — Call graph
 
-- [ ] Integração Git
-- [ ] Histórico / autoria por entidade
-- [ ] Consultas com janelas temporais
+- [x] Relação `CALLS` + `ffvs calls` / `ffvs callers`
+- [x] Estados RESOLVED / AMBIGUOUS / UNRESOLVED
+- [x] ADR-0015
 
-## Phase 5 — Runtime
+## Phase 2.1 — Model fidelity II
 
-- [ ] Modelo para serviços / processos
-- [ ] Ingestão opcional de traces
-- [ ] Correlação estático ↔ runtime (experimental)
+- [x] Correções de escopo (exclude path-safe)
+- [x] Pressão observada priorizada; tsconfig paths / package exports **adiados**
+- [x] Limitações documentadas
 
-## Phase 6 — Transformation
+## Phase 2.2–2.6 — Experiments & query formalization
 
-- [ ] Transformações seguras / dry-run
-- [ ] Validação e testes afetados
+- [x] EXP-0003 (re-run corpus)
+- [x] Composição observada (CLI only)
+- [x] `docs/query-model.md` + `docs/query-algebra.md`
+- [x] EXP-DSL-0001 (≥20 perguntas)
 
-## Phase 7 — Research
+## Phase 2.7–2.9 — Language specification
 
-- [ ] Benchmarks, experimentos, comparações, usabilidade, publicações (se houver evidência)
+- [x] `docs/language/*`
+- [x] Readiness → implementation in 0.6.0
 
-## Critério para avançar de fase
+## Phase 0.6.0 — Query Language v0.1
 
-1. Funcionalidade testada;
-2. Documentação atualizada;
-3. Limitações explícitas;
-4. Nenhum comando placeholder.
+- [x] Lexer / parser / AST / executor
+- [x] `ffvs query` + `--json` + `--file`
+- [x] SELECT / WHERE / SEARCH / TRAVERSE / DESCRIBE
+- [x] EXP-DSL-0002
+- [ ] PATH / IMPACT / richer describe (candidates for 0.7.0)
+
+```text
+Query Language v0.1 = SHIPPED (thin slice)
+Full DSL = NOT COMPLETE
+```
+
+## Phase 3+ (futuro)
+
+- [ ] DSL stages: path, impact (se evidência)
+- [ ] History / Git
+- [ ] Runtime signals
+- [ ] Multi-language adapters
+
+## Princípios permanentes
+
+1. Não adicionar feature sem hipótese ou evidência.
+2. Preferir profundidade a amplitude.
+3. Documentar limitações.
+4. CLI e DSL compartilham CORE.

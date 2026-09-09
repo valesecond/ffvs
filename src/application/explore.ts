@@ -19,6 +19,8 @@ import type {
   RelationKind,
   SemanticGraph,
 } from "../core/domain/types.js";
+import { selectFiles, selectNodes, type SelectPredicate } from "../core/query/select.js";
+import { searchEntities, type SearchOptions } from "../core/query/search.js";
 import {
   type EntityRef,
   type ImpactResult,
@@ -28,6 +30,8 @@ import {
   toEntityRef,
   toRelationRef,
 } from "./views.js";
+
+export type { SelectPredicate, SearchOptions };
 
 export interface LoadedModel {
   projectRoot: string;
@@ -83,16 +87,29 @@ export async function summarizeProject(startDir: string): Promise<ProjectSummary
   };
 }
 
-export function listEntities(graph: SemanticGraph, kind: EntityKind): GraphNode[] {
-  return findNodesByKind(graph, kind)
-    .filter(
-      (node) => node.properties["external"] !== true && node.properties["unresolved"] !== true,
-    )
-    .sort((a, b) => (a.name ?? a.id).localeCompare(b.name ?? b.id));
+export function listEntities(
+  graph: SemanticGraph,
+  kind: EntityKind,
+  predicate: SelectPredicate = {},
+): GraphNode[] {
+  const base = findNodesByKind(graph, kind).filter(
+    (node) => node.properties["external"] !== true && node.properties["unresolved"] !== true,
+  );
+  return selectNodes(base, predicate).sort((a, b) =>
+    (a.name ?? a.id).localeCompare(b.name ?? b.id),
+  );
 }
 
-export function listFiles(index: ProjectIndex): ProjectIndex["files"] {
-  return [...index.files].sort((a, b) => a.path.localeCompare(b.path));
+export function listFiles(
+  index: ProjectIndex,
+  predicate: SelectPredicate = {},
+): ProjectIndex["files"] {
+  return selectFiles(index.files, predicate).sort((a, b) => a.path.localeCompare(b.path));
+}
+
+/** SEARCH: find candidate entities by free-text needle (distinct from FILTER). */
+export function searchModel(graph: SemanticGraph, options: SearchOptions): GraphNode[] {
+  return searchEntities(graph, options);
 }
 
 export interface ImportRelationView {
@@ -548,6 +565,22 @@ function findOwningModule(graph: SemanticGraph, entityId: string): string | null
     }
   }
   return null;
+}
+
+/** Outgoing CALLS from a function/method (or module for top-level calls). */
+export function exploreCalls(graph: SemanticGraph, query: string): NeighborhoodResult {
+  const entity = resolveEntity(graph, query);
+  const kinds: RelationKind[] = ["CALLS"];
+  const edges = outgoingNeighbors(graph, entity.id, { kinds });
+  return neighborhood(graph, entity, "calls", edges, kinds);
+}
+
+/** Incoming CALLS — who calls this entity (CALLED_BY). */
+export function exploreCallers(graph: SemanticGraph, query: string): NeighborhoodResult {
+  const entity = resolveEntity(graph, query);
+  const kinds: RelationKind[] = ["CALLS"];
+  const edges = incomingNeighbors(graph, entity.id, { kinds });
+  return neighborhood(graph, entity, "callers", edges, kinds);
 }
 
 export type { GraphEdge, GraphNode, RelationKind };

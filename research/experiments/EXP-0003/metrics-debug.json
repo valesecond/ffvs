@@ -1,0 +1,42 @@
+{
+  "label": "debug",
+  "nodes": 113,
+  "edges": 273,
+  "kindCounts": {
+    "PROJECT": 1,
+    "FILE": 13,
+    "MODULE": 13,
+    "FUNCTION": 77,
+    "VARIABLE": 9
+  },
+  "imports": {
+    "total": 14,
+    "byResolution": {
+      "RESOLVED": 6,
+      "EXTERNAL": 8
+    },
+    "internalResolved": 6,
+    "external": 8,
+    "unresolved": 0
+  },
+  "calls": {
+    "total": 195,
+    "byResolution": {
+      "RESOLVED": 24,
+      "UNRESOLVED": 168,
+      "AMBIGUOUS": 3
+    },
+    "resolved": 24,
+    "ambiguous": 3,
+    "unresolved": 168
+  },
+  "indexResolution": {
+    "importsTotal": 14,
+    "resolvedInternal": 6,
+    "external": 8,
+    "unresolved": 0,
+    "ambiguous": 0,
+    "internalResolutionRate": 1
+  },
+  "files": 13
+}

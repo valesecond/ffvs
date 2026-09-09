@@ -69,36 +69,47 @@ Ver [`software-model.md`](./software-model.md).
 
 Entidades Phase 1: `PROJECT`, `FILE`, `MODULE`, `FUNCTION`, `CLASS`, `METHOD`, `VARIABLE`.
 
-Relações Phase 1: `CONTAINS`, `DECLARES`, `IMPORTS`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS`.
+Relações: `CONTAINS`, `DECLARES`, `IMPORTS`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS`, `CALLS`.
+
+Camada de consulta: `src/core/query` (FILTER/SEARCH) + `src/core/graph/navigate` + `src/application/explore`.
 
 ## Persistência local
 
 ```text
 .ffvs/
-├── config.json
-├── index.json      # v2: files, languages, entity stats, parse errors
-└── graph.json      # v2: nodes + edges
+├── config.json      # include/exclude opcionais
+├── index.json       # v2: files, languages, entity stats, parse errors, resolution
+└── graph.json       # v2: nodes + edges
 ```
 
 JSON permanece a escolha do MVP (ADR-0006).
 
-## Comandos CLI (Phase 1 / 1.5)
+## Comandos CLI (até pré-DSL)
 
 | Comando                                       | Papel                          |
 | --------------------------------------------- | ------------------------------ |
 | `init` / `index` / `status`                   | Ciclo de vida                  |
+| `index --include` / `--exclude`               | Controle do universo indexado  |
 | `inspect [entity]`                            | Resumo do projeto ou entidade  |
-| `files` / `functions` / `classes` / `imports` | Listagens                      |
-| `graph <entity>`                              | Relações incidentes            |
-| `dependencies` / `deps`                       | IMPORTS de saída (módulo)      |
-| `dependents`                                  | IMPORTS de entrada             |
-| `children` / `parents`                        | CONTAINS estrutural            |
-| `path <a> <b>`                                | Caminho mais curto via IMPORTS |
-| `impact <entity>`                             | Dependentes transitivos        |
-| `relations [entity]`                          | Arestas como objetos           |
-| `--json`                                      | Saída estruturada estável      |
+| `files` / `functions` / `classes`             | SELECT (+ `--name` / `--path`) |
+| `search <needle>`                             | SEARCH candidatos              |
+| `imports` / `graph`                           | Conveniências                  |
+| `dependencies` / `deps` / `dependents`        | TRAVERSE IMPORTS               |
+| `calls` / `callers`                           | TRAVERSE CALLS                 |
+| `children` / `parents`                        | CONTAINS                       |
+| `path` / `impact` / `relations`               | PATH / DERIVED / edges         |
+| `diagnostics`                                 | Incerteza de IMPORTS           |
+| `--json`                                      | Saída estruturada              |
 
-Não há DSL nesta fase (ADR-0004, ADR-0008).
+## Query interfaces
+
+Explore CLI verbs and `ffvs query` (Query Language v0.1) both call Query Core.
+
+```text
+ffvs query → language/{lexer,parser,executor} → query/* + graph/navigate → GRAPH
+```
+
+DSL is **read-only**.
 
 ## Extensibilidade de linguagem
 
@@ -113,8 +124,4 @@ O indexer depende do contrato, não de Babel.
 
 ## Limitações conscientes
 
-- Sem call graph (`CALLS`) confiável.
-- Imports de pacotes viram nós `external:*`, sem resolução de node_modules.
-- `extends`/`implements` cross-file são best-effort por nome.
-- Sem indexação incremental.
-- Sem type-aware analysis.
+Ver [`limitations.md`](./limitations.md).

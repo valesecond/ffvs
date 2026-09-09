@@ -31,6 +31,8 @@ export async function initProject(
     createdAt: now,
     lastIndexedAt: null,
     indexRoot: ".",
+    include: [],
+    exclude: [],
   };
 
   await store.writeConfig(projectRoot, config);

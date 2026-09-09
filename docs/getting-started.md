@@ -23,22 +23,22 @@ npx ffvs --help
 
 ```bash
 ffvs init
-ffvs index .
+ffvs index . --exclude fixtures
 ffvs inspect
-ffvs inspect UserService
-ffvs functions
-ffvs classes
-ffvs imports
+ffvs functions --name create --path src
+ffvs search UserService
+ffvs callers createUser
+ffvs calls total
 ffvs children Controller
 ffvs parents Database
-ffvs relations Service --kind IMPORTS
+ffvs relations Service --kind IMPORTS,CALLS
 ```
 
 Saída JSON:
 
 ```bash
-ffvs functions --json
-ffvs inspect UserService --json
+ffvs functions --name parse --json
+ffvs search parse --kind function --json
 ffvs path Controller Database --json
 ffvs impact Database --json
 ```
@@ -61,6 +61,17 @@ ffvs init
 ffvs index .
 ffvs inspect UserService
 ```
+
+Composição típica (sem DSL):
+
+```bash
+ffvs search resolve --kind function
+ffvs callers <id-from-search>
+```
+
+Documentação da linguagem: [`language/`](./language/) (`ffvs query`).
+
+Ainda faltam na DSL: `path`, `impact`, estágios `relations`.
 
 ## Testes
 

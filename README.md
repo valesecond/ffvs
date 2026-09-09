@@ -1,48 +1,23 @@
 # FFVS
 
-**FFVS** is an experimental, local-first toolkit for treating a software project as a queryable semantic structure — starting with a CLI and evolving toward an operational language for software.
+**FFVS** is an experimental, local-first toolkit for treating a software project as a queryable semantic structure — a CLI and a thin compositional query language over a local semantic graph.
 
-It is **not** a claim of superiority over existing analyzers or search tools. It is a long-term open-source and research-oriented effort to test whether a unified, compositional abstraction over code structure, relationships, history, and (later) runtime behavior is feasible and useful.
+## Current status (0.6.0)
 
-## The problem we explore
-
-Understanding a system usually means jumping between editors, static analyzers, dependency graphs, Git history, and observability tools. FFVS investigates a single local model and a CLI/language-oriented interface for consulting that model.
-
-Critical analysis: [`docs/analysis.md`](docs/analysis.md).  
-Software model: [`docs/software-model.md`](docs/software-model.md).
-
-## Working hypothesis
-
-> It is possible to build a unified, compositional abstraction to query and operate on source code, architecture, history, and behavior of software systems.
-
-Hypotheses: [`research/hypotheses.md`](research/hypotheses.md). They are not proven.
-
-## Conceptual model
-
-```text
-SOURCE CODE → PARSER → SOFTWARE MODEL → GRAPH → CLI EXPLORE → (future DSL)
-```
-
-```text
-CLI → Application → Core → Domain ← Adapters (fs, languages, storage)
-```
-
-## Current status (Phase 1.5)
-
-FFVS indexes JavaScript/TypeScript into a semantic graph and supports bidirectional exploration — without a DSL yet.
+Indexes JavaScript/TypeScript into a semantic graph with selection, search, scoped indexing, import fidelity, best-effort CALLS, and **FFVS Query Language v0.1**.
 
 ```bash
 ffvs init && ffvs index .
-ffvs inspect UserService
-ffvs dependencies Service
-ffvs dependents Repository
-ffvs path Controller Database
-ffvs impact Database
-ffvs children Controller
-ffvs relations Service --kind IMPORTS --json
+ffvs functions --path src --name resolve
+ffvs search safeParse --kind function
+ffvs query 'select functions where name contains "resolve" traverse callers describe'
+ffvs query 'search "safeParse" kind function traverse callers describe' --json
 ```
 
-Query patterns emerging from these verbs are documented in [`docs/query-model.md`](docs/query-model.md).
+Explore CLI and DSL share the same Query Core. The language is read-only and deliberately small.
+
+Language docs: [`docs/language/`](docs/language/).  
+Limitations: [`docs/limitations.md`](docs/limitations.md).
 
 ## Quick start
 
@@ -55,84 +30,15 @@ npm link
 
 ffvs init
 ffvs index .
-ffvs inspect
+ffvs query 'select modules describe'
 ```
-
-Try the fixture:
-
-```bash
-cd fixtures/basic-project
-ffvs init
-ffvs index .
-ffvs inspect UserService
-```
-
-See [Getting Started](docs/getting-started.md).
-
-## Example session
-
-```text
-$ ffvs index .
-Indexed 4 files (javascript=4)
-Entities: module=4, function=1, class=4, method=...
-
-$ ffvs inspect UserService
-UserService
-
-Type: Class
-File: UserService.js
-
-Methods
-├── constructor()
-├── create()
-├── update()
-└── delete()
-
-Imports
-├── ./UserRepository.js
-└── ./User.js
-
-Used by
-└── index.js
-```
-
-```bash
-ffvs functions --json
-ffvs classes --json
-```
-
-## Architecture
-
-See [`docs/architecture.md`](docs/architecture.md). Design decisions: [`docs/design-decisions/`](docs/design-decisions/).
-
-## Roadmap
-
-[`docs/roadmap.md`](docs/roadmap.md)
-
-## Language (proposal only)
-
-[`docs/language.md`](docs/language.md) — DSL deferred until explore ergonomics are better understood.
 
 ## Research
 
-- [`research/research-agenda.md`](research/research-agenda.md)
-- [`research/hypotheses.md`](research/hypotheses.md)
-- [`research/experiments.md`](research/experiments.md)
-- [`research/bibliography.md`](research/bibliography.md)
-- [`research/related-tools.md`](research/related-tools.md)
-
-## Contributing
-
-[`CONTRIBUTING.md`](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
-
-## Security
-
-[`SECURITY.md`](SECURITY.md)
+- [EXP-0003](research/experiments/EXP-0003/) — post FILTER/SEARCH/CALLS metrics  
+- [EXP-DSL-0001](research/experiments/EXP-DSL-0001/) — composition discovery  
+- [EXP-DSL-0002](research/experiments/EXP-DSL-0002/) — CLI vs DSL  
 
 ## License
 
-MIT — [`LICENSE`](LICENSE)
-
-## Name
-
-The project name is **FFVS**. No artificial expansion is defined here.
+MIT

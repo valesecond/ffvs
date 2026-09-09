@@ -10,6 +10,16 @@ once releases are cut.
 
 ### Added
 
+- **0.6.0** FFVS Query Language v0.1: lexer, parser, AST, executor, `ffvs query` (`--json`, `--file`).
+- Stages: `select`, `where`, `search`, `traverse`, `describe` (read-only).
+- ADR-0019; `docs/language/semantics.md`; EXP-DSL-0002.
+- Tests: `dsl-lexer-parser`, `dsl-executor`.
+
+- Phase 1.7–2.9 pre-DSL track: FILTER (`--name`/`--path`), `ffvs search`, index `--include`/`--exclude`, `CALLS` + `calls`/`callers`.
+- Core query helpers: `src/core/query/{select,search}.ts`.
+- ADRs 0012–0018; `docs/query-algebra.md`; `docs/language/*`; `docs/limitations.md`.
+- Experiments: EXP-0003, EXP-DSL-0001; fixture `fixtures/calls-basic/`.
+
 - Phase 1.6 module resolver (`RESOLVED`/`EXTERNAL`/`UNRESOLVED`/`AMBIGUOUS`).
 - CJS extensionless + TS ESM `.js`→`.ts` + directory/index resolution.
 - `ffvs diagnostics` / `ffvs unresolved` and resolution metrics on `status`/`index`.
@@ -37,7 +47,12 @@ once releases are cut.
 
 - Index/graph schema bumped to version 2.
 - Language adapter contract now returns structured `FileExtraction`.
-- Package version `0.3.0`.
+- Package version `0.6.0`.
+- Relation kind set includes `CALLS`.
+
+### Not included (deliberate)
+
+- PATH / IMPACT / RELATIONS DSL stages, boolean WHERE, aggregates, mutation.
 
 ## [0.1.0] — Phase 0 foundation
 

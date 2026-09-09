@@ -51,11 +51,28 @@ export interface IndexBuildResult {
   graph: SemanticGraph;
 }
 
-export async function buildProjectIndex(rootDir: string): Promise<IndexBuildResult> {
+export async function buildProjectIndex(
+  rootDir: string,
+  options: {
+    include?: string[];
+    exclude?: string[];
+  } = {},
+): Promise<IndexBuildResult> {
   const resolvedRoot = path.resolve(rootDir);
+  const skip = new Set(DEFAULT_SKIP_DIRS);
+  for (const name of options.exclude ?? []) {
+    const normalized = name.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+    // Only bare directory names go into the directory-name skip set.
+    if (normalized && !normalized.includes("/") && !normalized.includes("*")) {
+      skip.add(normalized);
+    }
+  }
+
   const scanned = await scanDirectory({
     rootDir: resolvedRoot,
-    skipDirectoryNames: DEFAULT_SKIP_DIRS,
+    skipDirectoryNames: skip,
+    ...(options.exclude !== undefined ? { excludePatterns: options.exclude } : {}),
+    ...(options.include !== undefined ? { includePatterns: options.include } : {}),
   });
 
   const files: IndexedFile[] = [];
@@ -271,7 +288,7 @@ export async function buildProjectIndex(rootDir: string): Promise<IndexBuildResu
     })),
     languages,
     entities,
-    skippedDirectoryNames: [...DEFAULT_SKIP_DIRS].sort(),
+    skippedDirectoryNames: [...skip].sort(),
     parseErrors,
     resolution,
   };
@@ -398,37 +415,99 @@ function resolveNamedRelations(
     if (!node.name) {
       continue;
     }
+    if (node.properties["external"] === true || node.properties["unresolved"] === true) {
+      continue;
+    }
     const list = byName.get(node.name) ?? [];
     list.push(node.id);
     byName.set(node.name, list);
   }
 
   for (const rel of pending) {
-    const candidates = byName.get(rel.toName) ?? [];
+    let candidates = byName.get(rel.toName) ?? [];
+
+    // Prefer callable entities for CALLS.
+    if (rel.kind === "CALLS") {
+      const callable = candidates.filter(
+        (id) => id.startsWith("function:") || id.startsWith("method:"),
+      );
+      if (callable.length > 0) {
+        candidates = callable;
+      }
+      if (rel.toName === "<dynamic>") {
+        const stubId = `unresolved-call:dynamic:${rel.from}`;
+        if (!graph.nodes.some((n) => n.id === stubId)) {
+          addNode(graph, {
+            id: stubId,
+            kind: "FUNCTION",
+            name: "<dynamic>",
+            location: null,
+            properties: { unresolved: true, callTarget: true },
+          });
+        }
+        addEdge(graph, "CALLS", rel.from, stubId, {
+          ...(rel.properties ?? {}),
+          resolution: "UNRESOLVED",
+          unresolved: true,
+        });
+        continue;
+      }
+    }
+
     if (candidates.length === 1) {
       const to = candidates[0]!;
       addEdge(graph, rel.kind, rel.from, to, {
         ...(rel.properties ?? {}),
         unresolved: false,
+        ...(rel.kind === "CALLS" ? { resolution: "RESOLVED" } : {}),
       });
     } else if (candidates.length === 0) {
-      // Keep a placeholder external-ish node for visibility of extends/implements names.
-      const stubId = `unresolved:${rel.toName}`;
+      const stubKind = rel.kind === "CALLS" ? "FUNCTION" : "CLASS";
+      const stubId =
+        rel.kind === "CALLS" ? `unresolved-call:${rel.toName}` : `unresolved:${rel.toName}`;
       if (!graph.nodes.some((n) => n.id === stubId)) {
         addNode(graph, {
           id: stubId,
-          kind: "CLASS",
+          kind: stubKind,
           name: rel.toName,
           location: null,
-          properties: { unresolved: true },
+          properties: {
+            unresolved: true,
+            ...(rel.kind === "CALLS" ? { callTarget: true } : {}),
+          },
         });
       }
       addEdge(graph, rel.kind, rel.from, stubId, {
         ...(rel.properties ?? {}),
         unresolved: true,
+        ...(rel.kind === "CALLS" ? { resolution: "UNRESOLVED" } : {}),
+      });
+    } else if (rel.kind === "CALLS") {
+      // Preserve ambiguity instead of guessing.
+      const stubId = `ambiguous-call:${rel.toName}`;
+      if (!graph.nodes.some((n) => n.id === stubId)) {
+        addNode(graph, {
+          id: stubId,
+          kind: "FUNCTION",
+          name: rel.toName,
+          location: null,
+          properties: {
+            unresolved: true,
+            ambiguous: true,
+            callTarget: true,
+            candidateIds: candidates,
+          },
+        });
+      }
+      addEdge(graph, "CALLS", rel.from, stubId, {
+        ...(rel.properties ?? {}),
+        resolution: "AMBIGUOUS",
+        unresolved: true,
+        ambiguous: true,
+        candidateIds: candidates,
       });
     }
-    // If ambiguous, skip rather than guess.
+    // Non-CALLS ambiguous: skip rather than guess (legacy EXTENDS/IMPLEMENTS behavior).
   }
 }
 

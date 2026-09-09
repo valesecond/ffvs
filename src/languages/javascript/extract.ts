@@ -450,13 +450,11 @@ export function extractFromJavaScript(source: string, filePath: string): FileExt
   // Collect all require("...") sites (including nested / expression forms).
   walkRequires(ast);
 
+  // CALLS: best-effort call graph (Phase 2.0). Not sound for dynamic JS.
+  walkCalls(ast, moduleLocalId, byNameLookup());
+
   // Resolve export-default-identifier and EXTENDS/IMPLEMENTS to local entities when possible.
-  const byName = new Map<string, string>();
-  for (const entity of entities) {
-    if (entity.name && !byName.has(entity.name)) {
-      byName.set(entity.name, entity.localId);
-    }
-  }
+  const byName = byNameLookup();
 
   for (const rel of relations) {
     if (rel.toLocalId) {
@@ -465,14 +463,162 @@ export function extractFromJavaScript(source: string, filePath: string): FileExt
     if (!rel.toName) {
       continue;
     }
+    // Do not force same-file binding for member/dynamic CALLS — indexer handles ambiguity.
+    if (rel.kind === "CALLS" && rel.properties?.["form"] !== "identifier") {
+      continue;
+    }
     const target = byName.get(rel.toName);
     if (target) {
       rel.toLocalId = target;
       if (rel.properties) {
-        rel.properties = { ...rel.properties, unresolved: false };
+        rel.properties = {
+          ...rel.properties,
+          unresolved: false,
+          ...(rel.kind === "CALLS" ? { resolution: "RESOLVED" } : {}),
+        };
       }
     }
   }
 
   return { entities, relations, imports };
+
+  function byNameLookup(): Map<string, string> {
+    const map = new Map<string, string>();
+    for (const entity of entities) {
+      if (entity.name && !map.has(entity.name)) {
+        map.set(entity.name, entity.localId);
+      }
+    }
+    return map;
+  }
+
+  function walkCalls(node: Node, enclosingLocalId: string, localByName: Map<string, string>): void {
+    let nextEnclosing = enclosingLocalId;
+
+    if (t.isFunctionDeclaration(node) && node.id) {
+      const localId = entities.find(
+        (e) =>
+          e.kind === "FUNCTION" &&
+          e.name === node.id!.name &&
+          e.location?.startLine === node.loc?.start.line,
+      )?.localId;
+      if (localId) {
+        nextEnclosing = localId;
+      }
+    } else if (
+      (t.isFunctionExpression(node) || t.isArrowFunctionExpression(node)) &&
+      node.loc
+    ) {
+      const match = entities.find(
+        (e) =>
+          e.kind === "FUNCTION" &&
+          e.location?.startLine === node.loc!.start.line &&
+          e.location.startColumn === node.loc!.start.column,
+      );
+      if (match) {
+        nextEnclosing = match.localId;
+      }
+    } else if (
+      (t.isClassMethod(node) || t.isClassPrivateMethod(node)) &&
+      node.loc
+    ) {
+      const match = entities.find(
+        (e) =>
+          e.kind === "METHOD" &&
+          e.location?.startLine === node.loc!.start.line &&
+          e.location.startColumn === node.loc!.start.column,
+      );
+      if (match) {
+        nextEnclosing = match.localId;
+      }
+    }
+
+    if (t.isCallExpression(node)) {
+      recordCall(node, nextEnclosing, localByName);
+    }
+
+    for (const key of t.VISITOR_KEYS[node.type] ?? []) {
+      const value = (node as unknown as Record<string, unknown>)[key];
+      if (Array.isArray(value)) {
+        for (const child of value) {
+          if (child && typeof child === "object" && "type" in child) {
+            walkCalls(child as Node, nextEnclosing, localByName);
+          }
+        }
+      } else if (value && typeof value === "object" && "type" in value) {
+        walkCalls(value as Node, nextEnclosing, localByName);
+      }
+    }
+  }
+
+  function recordCall(
+    node: t.CallExpression,
+    fromLocalId: string,
+    localByName: Map<string, string>,
+  ): void {
+    if (t.isIdentifier(node.callee) && node.callee.name === "require") {
+      return;
+    }
+
+    let calleeName: string | null = null;
+    let form: "identifier" | "member" | "other" = "other";
+
+    if (t.isIdentifier(node.callee)) {
+      calleeName = node.callee.name;
+      form = "identifier";
+    } else if (t.isMemberExpression(node.callee) && !node.callee.computed) {
+      if (t.isIdentifier(node.callee.property)) {
+        calleeName = node.callee.property.name;
+        form = "member";
+      }
+    } else if (t.isOptionalMemberExpression(node.callee) && !node.callee.computed) {
+      if (t.isIdentifier(node.callee.property)) {
+        calleeName = node.callee.property.name;
+        form = "member";
+      }
+    }
+
+    if (!calleeName) {
+      relations.push({
+        kind: "CALLS",
+        fromLocalId,
+        toName: "<dynamic>",
+        properties: {
+          resolution: "UNRESOLVED",
+          form: "other",
+          unresolved: true,
+        },
+      });
+      return;
+    }
+
+    const localTarget = localByName.get(calleeName);
+    if (localTarget && form === "identifier") {
+      relations.push({
+        kind: "CALLS",
+        fromLocalId,
+        toLocalId: localTarget,
+        properties: {
+          resolution: "RESOLVED",
+          form,
+          calleeName,
+          unresolved: false,
+        },
+      });
+      return;
+    }
+
+    // Cross-file / member: defer name resolution to indexer (may be AMBIGUOUS).
+    relations.push({
+      kind: "CALLS",
+      fromLocalId,
+      toName: calleeName,
+      properties: {
+        resolution: form === "member" ? "AMBIGUOUS" : "UNRESOLVED",
+        form,
+        calleeName,
+        unresolved: true,
+      },
+    });
+  }
 }

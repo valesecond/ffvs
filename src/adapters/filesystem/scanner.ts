@@ -13,10 +13,16 @@ export interface ScannedFile {
 export interface ScanOptions {
   rootDir: string;
   skipDirectoryNames?: Set<string>;
+  /** Extra directory names or path substrings to skip. */
+  excludePatterns?: string[];
+  /** If non-empty, only keep relative paths that match at least one prefix/substring. */
+  includePatterns?: string[];
 }
 
 export async function scanDirectory(options: ScanOptions): Promise<ScannedFile[]> {
   const skip = options.skipDirectoryNames ?? DEFAULT_SKIP_DIRS;
+  const excludePatterns = options.excludePatterns ?? [];
+  const includePatterns = options.includePatterns ?? [];
   const rootDir = path.resolve(options.rootDir);
   const results: ScannedFile[] = [];
 
@@ -32,7 +38,7 @@ export async function scanDirectory(options: ScanOptions): Promise<ScannedFile[]
       const absolutePath = path.join(current, entry.name);
 
       if (entry.isDirectory()) {
-        if (skip.has(entry.name)) {
+        if (skip.has(entry.name) || shouldExcludeDir(entry.name, absolutePath, rootDir, excludePatterns)) {
           continue;
         }
         await walk(absolutePath);
@@ -43,10 +49,18 @@ export async function scanDirectory(options: ScanOptions): Promise<ScannedFile[]
         continue;
       }
 
+      const relativePath = toPosix(path.relative(rootDir, absolutePath));
+      if (isExcludedPath(relativePath, excludePatterns)) {
+        continue;
+      }
+      if (includePatterns.length > 0 && !matchesAny(relativePath, includePatterns)) {
+        continue;
+      }
+
       const stat = await fs.stat(absolutePath);
       results.push({
         absolutePath,
-        relativePath: toPosix(path.relative(rootDir, absolutePath)),
+        relativePath,
         extension: path.extname(entry.name).toLowerCase(),
         sizeBytes: stat.size,
       });
@@ -56,6 +70,43 @@ export async function scanDirectory(options: ScanOptions): Promise<ScannedFile[]
   await walk(rootDir);
   results.sort((a, b) => a.relativePath.localeCompare(b.relativePath));
   return results;
+}
+
+function shouldExcludeDir(
+  name: string,
+  absolutePath: string,
+  rootDir: string,
+  patterns: string[],
+): boolean {
+  const relative = toPosix(path.relative(rootDir, absolutePath));
+  return patterns.some((pattern) => {
+    const p = normalizePattern(pattern);
+    return name === p || relative === p || relative.startsWith(`${p}/`);
+  });
+}
+
+function isExcludedPath(relativePath: string, patterns: string[]): boolean {
+  return patterns.some((pattern) => {
+    const p = normalizePattern(pattern);
+    return relativePath === p || relativePath.startsWith(`${p}/`) || relativePath.includes(`/${p}/`);
+  });
+}
+
+function matchesAny(relativePath: string, patterns: string[]): boolean {
+  return patterns.some((pattern) => {
+    const p = normalizePattern(pattern);
+    return relativePath === p || relativePath.startsWith(`${p}/`) || relativePath.includes(`/${p}`);
+  });
+}
+
+function normalizePattern(pattern: string): string {
+  return pattern
+    .replace(/\\/g, "/")
+    .replace(/^\.\//, "")
+    .replace(/\/\*\*$/, "")
+    .replace(/\*\*/g, "")
+    .replace(/\/\*$/, "")
+    .replace(/\/+$/, "");
 }
 
 function toPosix(p: string): string {
