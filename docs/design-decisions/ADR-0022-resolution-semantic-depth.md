@@ -22,12 +22,12 @@ CALLS and IMPORTS carry resolution states. Users need confident caller/callee ne
 
 ## Alternatives
 
-| Alternative | Why rejected |
-| ----------- | ------------ |
-| `where resolution` on entities | Wrong locus; invents entity attribute |
-| Silent resolved-only traverse | Hides uncertainty |
+| Alternative                      | Why rejected                                |
+| -------------------------------- | ------------------------------------------- |
+| `where resolution` on entities   | Wrong locus; invents entity attribute       |
+| Silent resolved-only traverse    | Hides uncertainty                           |
 | Change default `impact` to CALLS | Breaks CLI/DSL parity and prior experiments |
-| Full inspect-as-describe | Violates DESCRIBE ≠ INSPECT |
+| Full inspect-as-describe         | Violates DESCRIBE ≠ INSPECT                 |
 
 ## Consequences
 

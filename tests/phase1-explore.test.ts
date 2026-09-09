@@ -130,10 +130,10 @@ describe("CLI explore commands", () => {
       expect(await runCli(["node", "ffvs", "inspect", "UserService"])).toBe(0);
       const text = logs.join("\n");
       expect(text).toContain("UserService");
-      expect(text).toContain("Type: Class");
-      expect(text).toContain("Methods");
+      expect(text).toContain("CLASS");
+      expect(text).toContain("METHODS");
       expect(text).toContain("create()");
-      expect(text).toContain("Used by");
+      expect(text).toContain("USED BY");
 
       logs.length = 0;
       expect(await runCli(["node", "ffvs", "functions", "--json"])).toBe(0);

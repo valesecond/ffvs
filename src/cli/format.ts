@@ -1,3 +1,7 @@
+/**
+ * Human-facing formatters — thin adapters over src/cli/ui.
+ * --json never calls these.
+ */
 import type {
   EntityInspection,
   ImportRelationView,
@@ -11,307 +15,92 @@ import type {
   RelationRef,
 } from "../application/views.js";
 import type { GraphEdge, GraphNode, IndexedFile } from "../core/domain/types.js";
+import type { QueryResultSet } from "../core/language/result-set.js";
+import {
+  printJson as printJsonUi,
+  renderDiagnostics,
+  renderEntityList,
+  renderFilesFlat,
+  renderImpact,
+  renderImports,
+  renderInspection,
+  renderNeighborhood,
+  renderPath,
+  renderProjectSummary,
+  renderQuery,
+  renderRelationsList,
+} from "./ui/index.js";
 
 export function printJson(value: unknown): void {
-  console.log(JSON.stringify(value, null, 2));
+  printJsonUi(value);
 }
 
 export function formatProjectSummary(summary: ProjectSummary): string {
-  const lines = [
-    summary.name,
-    "",
-    `Root: ${summary.projectRoot}`,
-    `Indexed: ${summary.indexedAt}`,
-    `Files: ${summary.files}`,
-  ];
-
-  if (summary.languages.length > 0) {
-    lines.push(
-      `Languages: ${summary.languages.map((l) => `${l.language} (${l.fileCount})`).join(", ")}`,
-    );
-  }
-
-  lines.push("", "Entities");
-  for (const entity of summary.entities) {
-    lines.push(`├── ${entity.kind}: ${entity.count}`);
-  }
-
-  lines.push("", "Relations");
-  const edgeEntries = Object.entries(summary.edgeCounts).sort(([a], [b]) => a.localeCompare(b));
-  for (const [kind, count] of edgeEntries) {
-    lines.push(`├── ${kind}: ${count}`);
-  }
-
-  if (summary.parseErrors.length > 0) {
-    lines.push("", `Parse errors: ${summary.parseErrors.length}`);
-    for (const err of summary.parseErrors.slice(0, 5)) {
-      lines.push(`├── ${err.path}: ${err.message.split("\n")[0]}`);
-    }
-  }
-
-  return lines.join("\n");
+  return renderProjectSummary(summary);
 }
 
 export function formatEntityList(nodes: GraphNode[], kindLabel: string): string {
-  if (nodes.length === 0) {
-    return `No ${kindLabel} found.`;
-  }
-  const lines = [`${kindLabel} (${nodes.length})`, ""];
-  for (const node of nodes) {
-    const file = typeof node.properties["path"] === "string" ? node.properties["path"] : "";
-    const loc = node.location ? `:${node.location.startLine}` : "";
-    lines.push(`${node.name ?? "(anonymous)"}`);
-    lines.push(`  ${node.id}`);
-    if (file) {
-      lines.push(`  ${file}${loc}`);
-    }
-    lines.push("");
-  }
-  return lines.join("\n").trimEnd();
+  return renderEntityList(nodes, kindLabel);
 }
 
 export function formatFiles(files: IndexedFile[]): string {
-  if (files.length === 0) {
-    return "No files indexed.";
-  }
-  const lines = [`Files (${files.length})`, ""];
-  for (const file of files) {
-    const lang = file.language ?? "unknown";
-    lines.push(`${file.path}`);
-    lines.push(`  language=${lang} size=${file.sizeBytes}`);
-    lines.push("");
-  }
-  return lines.join("\n").trimEnd();
+  return renderFilesFlat(files);
 }
 
 export function formatImports(imports: ImportRelationView[]): string {
-  if (imports.length === 0) {
-    return "No import relations found.";
-  }
-  const lines = [`Imports (${imports.length})`, ""];
-  for (const item of imports) {
-    const mark = item.external ? " (external)" : "";
-    lines.push(`${item.fromName ?? item.from}`);
-    lines.push(`  └─ IMPORTS ${item.specifier ?? item.toName ?? item.to}${mark}`);
-    lines.push("");
-  }
-  return lines.join("\n").trimEnd();
+  return renderImports(imports);
 }
 
 export function formatInspection(view: EntityInspection): string {
-  const entity = view.entity;
-  const lines = [
-    entity.name ?? entity.id,
-    "",
-    `Type: ${titleCase(entity.kind)}`,
-    `Id: ${entity.id}`,
-  ];
-  if (view.file) {
-    const loc = entity.location ? `:${entity.location.startLine}` : "";
-    lines.push(`File: ${view.file}${loc}`);
-  }
-  if (entity.properties["exported"] === true) {
-    lines.push(`Exported: yes`);
-  }
-
-  if (view.extends.length > 0) {
-    lines.push("", "Extends");
-    for (const node of view.extends) {
-      lines.push(`├── ${node.name ?? node.id}`);
-    }
-  }
-
-  if (view.implements.length > 0) {
-    lines.push("", "Implements");
-    for (const node of view.implements) {
-      lines.push(`├── ${node.name ?? node.id}`);
-    }
-  }
-
-  if (view.methods.length > 0) {
-    lines.push("", "Methods");
-    for (const method of view.methods) {
-      lines.push(`├── ${method.name ?? method.id}()`);
-    }
-  } else if (entity.kind === "CLASS") {
-    lines.push("", "Methods", "├── (none)");
-  }
-
-  if (entity.kind === "MODULE" || entity.kind === "FILE") {
-    const members = view.contained.filter((n) => n.kind !== "METHOD");
-    if (members.length > 0) {
-      lines.push("", "Contains");
-      for (const member of members) {
-        lines.push(`├── ${member.kind}: ${member.name ?? member.id}`);
-      }
-    }
-  }
-
-  if (view.imports.length > 0) {
-    lines.push("", "Imports");
-    for (const item of view.imports) {
-      const label = item.specifier ?? item.toName ?? item.to;
-      lines.push(`├── ${label}${item.external ? " (external)" : ""}`);
-    }
-  }
-
-  if (view.usedBy.length > 0) {
-    lines.push("", "Used by");
-    for (const node of view.usedBy) {
-      const pathProp =
-        typeof node.properties["path"] === "string" ? node.properties["path"] : node.name;
-      lines.push(`├── ${pathProp ?? node.id}`);
-    }
-  }
-
-  if (view.exports.length > 0 && (entity.kind === "MODULE" || entity.kind === "FILE")) {
-    lines.push("", "Exports");
-    for (const node of view.exports) {
-      lines.push(`├── ${node.kind}: ${node.name ?? node.id}`);
-    }
-  }
-
-  return lines.join("\n");
+  return renderInspection(view);
 }
 
 export function formatGraphView(entity: GraphNode, edges: GraphEdge[], nodes: GraphNode[]): string {
   const byId = new Map(nodes.map((n) => [n.id, n]));
-  const lines = [`${entity.name ?? entity.id}`, `Type: ${entity.kind}`, "", "Relations", ""];
-  if (edges.length === 0) {
-    lines.push("(none)");
-    return lines.join("\n");
-  }
-  for (const edge of edges) {
-    const from = byId.get(edge.from);
-    const to = byId.get(edge.to);
-    const fromLabel = from?.name ?? edge.from;
-    const toLabel = to?.name ?? edge.to;
-    if (edge.from === entity.id) {
-      lines.push(`${fromLabel}`);
-      lines.push(`  └─ ${edge.kind} → ${toLabel}`);
-    } else {
-      lines.push(`${fromLabel}`);
-      lines.push(`  └─ ${edge.kind} → ${toLabel}  (incoming)`);
-    }
-    lines.push("");
-  }
-  return lines.join("\n").trimEnd();
+  const relations = edges.map((edge) => {
+    const from = byId.get(edge.from) ?? entity;
+    const to = byId.get(edge.to) ?? entity;
+    return {
+      id: edge.id,
+      kind: edge.kind,
+      from: {
+        id: from.id,
+        kind: from.kind,
+        name: from.name,
+        path: typeof from.properties["path"] === "string" ? from.properties["path"] : null,
+      },
+      to: {
+        id: to.id,
+        kind: to.kind,
+        name: to.name,
+        path: typeof to.properties["path"] === "string" ? to.properties["path"] : null,
+      },
+      properties: edge.properties ?? {},
+    } satisfies RelationRef;
+  });
+  return renderRelationsList(relations, entity.name ?? entity.id);
 }
 
 export function formatNeighborhood(result: NeighborhoodResult, title: string): string {
-  const entityLabel = result.entity.name ?? result.entity.id;
-  if (result.relations.length === 0) {
-    return `${title}: ${entityLabel}\n(none)`;
-  }
-  const lines = [`${title}: ${entityLabel}`, `Kinds: ${result.relationKinds.join(", ")}`, ""];
-  for (const rel of result.relations) {
-    const other =
-      rel.from.id === result.entity.id
-        ? (rel.to.name ?? rel.to.path ?? rel.to.id)
-        : (rel.from.name ?? rel.from.path ?? rel.from.id);
-    const arrow = rel.from.id === result.entity.id ? "→" : "←";
-    lines.push(`${rel.kind} ${arrow} ${other}`);
-  }
-  return lines.join("\n");
+  return renderNeighborhood(result, title);
 }
 
 export function formatRelationsList(relations: RelationRef[], entityLabel: string | null): string {
-  const header = entityLabel ? `Relations for ${entityLabel}` : `Relations (${relations.length})`;
-  if (relations.length === 0) {
-    return `${header}\n(none)`;
-  }
-  const lines = [header, ""];
-  for (const rel of relations) {
-    const from = rel.from.name ?? rel.from.path ?? rel.from.id;
-    const to = rel.to.name ?? rel.to.path ?? rel.to.id;
-    lines.push(`${from}`);
-    lines.push(`  └─ ${rel.kind} → ${to}`);
-    lines.push("");
-  }
-  return lines.join("\n").trimEnd();
+  return renderRelationsList(relations, entityLabel);
 }
 
 export function formatPathResult(result: PathExploreResult): string {
-  const from = result.from.name ?? result.from.path ?? result.from.id;
-  const to = result.to.name ?? result.to.path ?? result.to.id;
-  if (!result.found) {
-    return `No path from ${from} to ${to} via ${result.relationKinds.join("|")}`;
-  }
-  const lines = [`Path: ${from} → ${to}`, `Hops: ${result.relations.length}`, ""];
-  for (let i = 0; i < result.nodes.length; i += 1) {
-    const node = result.nodes[i]!;
-    lines.push(`${i === 0 ? "" : "  ↓ "}${node.name ?? node.path ?? node.id}`);
-    const edge = result.relations[i];
-    if (edge) {
-      lines.push(`  ${edge.kind}`);
-    }
-  }
-  return lines.join("\n");
+  return renderPath(result);
 }
 
 export function formatImpact(result: ImpactResult): string {
-  const entity = result.entity.name ?? result.entity.path ?? result.entity.id;
-  if (result.affected.length === 0) {
-    return `Impact: ${entity}\n(no dependents)`;
-  }
-  const lines = [
-    `Impact: ${entity}`,
-    `Transitive dependents via ${result.relationKinds.join(", ")}`,
-    `Affected: ${result.affected.length}`,
-    "",
-  ];
-  for (const item of result.affected) {
-    lines.push(`depth=${item.depth}  ${item.name ?? item.path ?? item.id}`);
-  }
-  return lines.join("\n");
+  return renderImpact(result);
 }
 
 export function formatDiagnostics(result: DiagnosticsResult): string {
-  const rate =
-    result.counts.internalResolutionRate === null
-      ? "n/a"
-      : `${(result.counts.internalResolutionRate * 100).toFixed(1)}%`;
-  const lines = [
-    "Resolution diagnostics",
-    "",
-    `Resolved internal: ${result.counts.resolvedInternal}`,
-    `External: ${result.counts.external}`,
-    `Unresolved: ${result.counts.unresolved}`,
-    `Ambiguous: ${result.counts.ambiguous}`,
-    `Internal resolution rate: ${rate}`,
-    "",
-  ];
-
-  const entries = [...result.unresolved, ...result.ambiguous];
-  if (entries.length === 0) {
-    lines.push("No unresolved or ambiguous relative imports.");
-    return lines.join("\n");
-  }
-
-  lines.push("UNRESOLVED / AMBIGUOUS REFERENCES", "");
-  for (const entry of entries.slice(0, 50)) {
-    lines.push(`${entry.fromPath ?? entry.fromModule}`);
-    lines.push(`  import "${entry.specifier}"  [${entry.status}]`);
-    if (entry.reason) {
-      lines.push(`  Reason: ${entry.reason}`);
-    }
-    if (entry.candidatesChecked.length > 0) {
-      lines.push(`  Candidates checked:`);
-      for (const c of entry.candidatesChecked.slice(0, 12)) {
-        lines.push(`    - ${c}`);
-      }
-    }
-    if (entry.ambiguousPaths.length > 0) {
-      lines.push(`  Ambiguous matches: ${entry.ambiguousPaths.join(", ")}`);
-    }
-    lines.push("");
-  }
-  if (entries.length > 50) {
-    lines.push(`… and ${entries.length - 50} more`);
-  }
-  return lines.join("\n").trimEnd();
+  return renderDiagnostics(result);
 }
 
-function titleCase(kind: string): string {
-  return kind.charAt(0) + kind.slice(1).toLowerCase();
+export function formatQueryResultUi(result: QueryResultSet, source?: string): string {
+  return renderQuery(result, source);
 }

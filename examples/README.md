@@ -1,24 +1,9 @@
 # Examples
 
-Small fixtures for manual exploration live primarily under `fixtures/`.
+## `demo/` — recommended first run
 
-## mini-js
+See [`demo/README.md`](./demo/README.md). Five-minute install → index → query loop.
 
-```bash
-cd examples/mini-js
-ffvs init
-ffvs index .
-ffvs inspect
-ffvs functions
-```
+## Other
 
-## basic-project (recommended Phase 1 demo)
-
-```bash
-cd fixtures/basic-project
-ffvs init
-ffvs index .
-ffvs inspect UserService
-ffvs imports
-ffvs graph UserController
-```
+Controlled cases also live under `fixtures/` (used by automated tests).

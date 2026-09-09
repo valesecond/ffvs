@@ -126,7 +126,7 @@ export function parseQuery(source: string): QueryAst {
     );
   }
 
-  return { languageVersion: "0.3", stages };
+  return { languageVersion: "1.0", stages };
 
   function parseSelect(): QueryStage {
     const tok = consume("SELECT", 'expected "select"');
@@ -212,10 +212,7 @@ export function parseQuery(source: string): QueryAst {
       });
     }
 
-    const value = consume(
-      "STRING",
-      `expected string after "${op === "eq" ? "=" : op}"`,
-    ).value;
+    const value = consume("STRING", `expected string after "${op === "eq" ? "=" : op}"`).value;
     return {
       type: "where",
       field,
@@ -298,7 +295,7 @@ export function parseQuery(source: string): QueryAst {
         "SEMANTIC",
         "resolution filter is not applicable to import impact (already resolved-internal)",
         { line: tok.line, column: tok.column },
-        'use: impact along calls [resolution …]',
+        "use: impact along calls [resolution …]",
       );
     }
     if (along === "calls" && resolution === undefined) {
@@ -325,7 +322,7 @@ export function parseQuery(source: string): QueryAst {
         "SEMANTIC",
         `unsupported path relation "${relTok.value}"`,
         { line: relTok.line, column: relTok.column },
-        "v0.3 path supports only: along imports",
+        "path supports only: along imports (Query Language 1.0)",
       );
     }
     return rel as PathAlongRelation;

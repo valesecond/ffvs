@@ -1,3 +1,4 @@
+import { createRequire } from "node:module";
 import { Command } from "commander";
 
 import {
@@ -20,12 +21,13 @@ import {
   summarizeProject,
   type SelectPredicate,
 } from "../application/explore.js";
-import { formatQueryResult, runQuery, runQueryFromFile } from "../application/query.js";
+import { runQuery, runQueryFromFile } from "../application/query.js";
 import { getDiagnostics } from "../application/diagnostics.js";
 import { indexProject } from "../application/index-project.js";
 import { initProject } from "../application/init.js";
 import { getStatus } from "../application/status.js";
 import { FfvsError } from "../core/domain/errors.js";
+import { LANGUAGE_VERSION } from "../core/language/index.js";
 import type { EntityKind, RelationKind } from "../core/domain/types.js";
 import {
   formatDiagnostics,
@@ -38,9 +40,22 @@ import {
   formatNeighborhood,
   formatPathResult,
   formatProjectSummary,
+  formatQueryResultUi,
   formatRelationsList,
   printJson,
 } from "./format.js";
+import {
+  renderCliError,
+  renderCommanderHelpBody,
+  renderIndexComplete,
+  renderInit,
+  renderStatus,
+  withSpinner,
+} from "./ui/index.js";
+import { startInteractiveExplorer } from "./interactive/index.js";
+
+const require = createRequire(import.meta.url);
+const PACKAGE_VERSION = (require("../../package.json") as { version: string }).version;
 
 interface JsonOption {
   json?: boolean;
@@ -70,8 +85,19 @@ export function createProgram(): Command {
 
   program
     .name("ffvs")
-    .description("FFVS — local-first CLI for exploring software projects as semantic structures")
-    .version("0.7.0");
+    .description("FFVS — Semantic Software Explorer")
+    .version(`FFVS ${PACKAGE_VERSION}`, "-V, --version", "Show version")
+    .addHelpText("before", `\n${renderCommanderHelpBody()}\n`)
+    .action(async () => {
+      await startInteractiveExplorer(process.cwd());
+    });
+
+  program
+    .command("explore")
+    .description("Start the Interactive Explorer (same as bare `ffvs`)")
+    .action(async () => {
+      await startInteractiveExplorer(process.cwd());
+    });
 
   program
     .command("init")
@@ -83,8 +109,7 @@ export function createProgram(): Command {
         force: options.force === true,
         ...(options.name !== undefined ? { name: options.name } : {}),
       });
-      console.log(`Initialized FFVS project in ${result.projectRoot}/.ffvs/`);
-      console.log(`Name: ${result.config.name}`);
+      console.log(renderInit(result.projectRoot, result.config.name));
     });
 
   program
@@ -103,52 +128,16 @@ export function createProgram(): Command {
       (value: string, previous: string[]) => [...previous, value],
       [] as string[],
     )
-    .action(
-      async (
-        scanPath: string,
-        options: { exclude?: string[]; include?: string[] },
-      ) => {
-        const result = await indexProject(process.cwd(), scanPath, {
+    .action(async (scanPath: string, options: { exclude?: string[]; include?: string[] }) => {
+      const started = Date.now();
+      const result = await withSpinner("Indexing project…", () =>
+        indexProject(process.cwd(), scanPath, {
           ...(options.exclude?.length ? { exclude: options.exclude } : {}),
           ...(options.include?.length ? { include: options.include } : {}),
-        });
-        const languageSummary =
-          result.index.languages.length === 0
-            ? "no known languages detected"
-            : result.index.languages.map((l) => `${l.language}=${l.fileCount}`).join(", ");
-
-        console.log(`Indexed ${result.index.files.length} files (${languageSummary})`);
-        console.log(`Project: ${result.projectRoot}`);
-        console.log(`Scan root: ${result.scanRoot}`);
-        console.log(`Wrote .ffvs/index.json and .ffvs/graph.json`);
-        console.log(`Graph: ${result.graph.nodes.length} nodes, ${result.graph.edges.length} edges`);
-
-        const interesting = result.index.entities.filter((e) =>
-          ["FUNCTION", "CLASS", "METHOD", "MODULE"].includes(e.kind),
-        );
-        if (interesting.length > 0) {
-          console.log(
-            `Entities: ${interesting.map((e) => `${e.kind.toLowerCase()}=${e.count}`).join(", ")}`,
-          );
-        }
-        const calls = result.graph.edges.filter((e) => e.kind === "CALLS").length;
-        if (calls > 0) {
-          console.log(`CALLS edges: ${calls}`);
-        }
-        if (result.index.parseErrors.length > 0) {
-          console.log(`Parse errors: ${result.index.parseErrors.length}`);
-        }
-        if (result.index.resolution) {
-          const rate =
-            result.index.resolution.internalResolutionRate === null
-              ? "n/a"
-              : `${(result.index.resolution.internalResolutionRate * 100).toFixed(1)}%`;
-          console.log(
-            `Imports: resolved=${result.index.resolution.resolvedInternal} external=${result.index.resolution.external} unresolved=${result.index.resolution.unresolved} ambiguous=${result.index.resolution.ambiguous} (internal rate ${rate})`,
-          );
-        }
-      },
-    );
+        }),
+      );
+      console.log(renderIndexComplete(result, { durationMs: Date.now() - started }));
+    });
 
   program
     .command("status")
@@ -160,53 +149,7 @@ export function createProgram(): Command {
         printJson(status);
         return;
       }
-      console.log(`FFVS project: initialized`);
-      console.log(`Root: ${status.projectRoot}`);
-      console.log(`Name: ${status.config.name}`);
-      console.log(`Created: ${status.config.createdAt}`);
-      console.log(`Last indexed: ${status.config.lastIndexedAt ?? "(never)"}`);
-      console.log(`Index root: ${status.config.indexRoot}`);
-      if (status.config.include?.length) {
-        console.log(`Include: ${status.config.include.join(", ")}`);
-      }
-      if (status.config.exclude?.length) {
-        console.log(`Exclude: ${status.config.exclude.join(", ")}`);
-      }
-
-      if (!status.index) {
-        console.log(`Files: (not indexed yet — run \`ffvs index .\`)`);
-        return;
-      }
-
-      console.log(`Files: ${status.index.files.length}`);
-      if (status.index.languages.length > 0) {
-        console.log(
-          `Languages: ${status.index.languages
-            .map((l) => `${l.language} (${l.fileCount})`)
-            .join(", ")}`,
-        );
-      }
-      console.log(`Graph nodes: ${status.graph?.nodes.length ?? 0}`);
-      console.log(`Graph edges: ${status.edgeCount}`);
-      console.log(`IMPORTS edges: ${status.importEdgeCount}`);
-      if (status.resolution) {
-        const rate =
-          status.resolution.internalResolutionRate === null
-            ? "n/a"
-            : `${(status.resolution.internalResolutionRate * 100).toFixed(1)}%`;
-        console.log(`Imports resolved (internal): ${status.resolution.resolvedInternal}`);
-        console.log(`Imports external: ${status.resolution.external}`);
-        console.log(`Imports unresolved: ${status.resolution.unresolved}`);
-        console.log(`Imports ambiguous: ${status.resolution.ambiguous}`);
-        console.log(`Internal resolution rate: ${rate}`);
-      }
-      if (Object.keys(status.nodeCounts).length > 0) {
-        console.log(
-          `Nodes by kind: ${Object.entries(status.nodeCounts)
-            .map(([kind, count]) => `${kind}=${count}`)
-            .join(", ")}`,
-        );
-      }
+      console.log(renderStatus(status));
     });
 
   program
@@ -296,9 +239,7 @@ export function createProgram(): Command {
         options: JsonOption & { kind?: string; path?: string; limit?: string },
       ) => {
         const model = await loadModel(process.cwd());
-        const kind = options.kind
-          ? (options.kind.toUpperCase() as EntityKind)
-          : undefined;
+        const kind = options.kind ? (options.kind.toUpperCase() as EntityKind) : undefined;
         const nodes = searchModel(model.graph, {
           needle,
           ...(kind !== undefined ? { kind } : {}),
@@ -435,7 +376,7 @@ export function createProgram(): Command {
 
   program
     .command("path")
-    .description("Find a shortest IMPORTS path between two entities")
+    .description("Shortest path via resolved-internal IMPORTS (not CALLS)")
     .argument("<from>", "Source entity")
     .argument("<to>", "Target entity")
     .option("--json", "Emit JSON", false)
@@ -451,7 +392,9 @@ export function createProgram(): Command {
 
   program
     .command("impact")
-    .description("List transitive dependents (who may be affected by changes)")
+    .description(
+      "Transitive dependents via IMPORTS. For CALL impact: ffvs query '… impact along calls'",
+    )
     .argument("<entity>", "Entity name or id")
     .option("--json", "Emit JSON", false)
     .action(async (entity: string, options: JsonOption) => {
@@ -488,10 +431,21 @@ export function createProgram(): Command {
 
   program
     .command("query")
-    .description("Execute an FFVS Query Language (DSL) pipeline against the indexed graph")
+    .description(
+      `Run a Query Language ${LANGUAGE_VERSION} pipeline (select/where/search/traverse/path/impact/describe)`,
+    )
     .argument("[query]", "DSL query string")
     .option("-f, --file <path>", "Read query from file")
-    .option("--json", "Emit JSON", false)
+    .option("--json", "Emit JSON ResultSet", false)
+    .addHelpText(
+      "after",
+      `
+Examples:
+  $ ffvs query 'select modules describe'
+  $ ffvs query 'search "UserService" traverse callers resolution resolved describe'
+  $ ffvs query 'select modules where name = "Database.js" impact describe'
+`,
+    )
     .action(async (queryText: string | undefined, options: JsonOption & { file?: string }) => {
       if (options.file) {
         const ran = await runQueryFromFile(process.cwd(), options.file);
@@ -499,12 +453,20 @@ export function createProgram(): Command {
           printJson(ran.json);
           return;
         }
-        console.log(formatQueryResult(ran.result));
+        console.log(formatQueryResultUi(ran.result));
         return;
       }
       if (!queryText || queryText.trim() === "") {
         throw new FfvsError(
-          'Missing query. Usage: ffvs query \'select functions where name contains "x" describe\'',
+          [
+            "Missing query.",
+            "",
+            "Usage:",
+            "  ffvs query 'select functions where name contains \"x\" describe'",
+            "  ffvs query --file path/to/query.ffvs",
+            "",
+            `Docs: docs/language/overview.md (Query Language ${LANGUAGE_VERSION})`,
+          ].join("\n"),
         );
       }
       const ran = await runQuery(process.cwd(), queryText);
@@ -512,7 +474,7 @@ export function createProgram(): Command {
         printJson(ran.json);
         return;
       }
-      console.log(formatQueryResult(ran.result));
+      console.log(formatQueryResultUi(ran.result, queryText));
     });
 
   program
@@ -540,11 +502,6 @@ export async function runCli(argv: string[]): Promise<number> {
     await program.parseAsync(argv);
     return 0;
   } catch (error) {
-    if (error instanceof FfvsError) {
-      console.error(`error: ${error.message}`);
-      return error.exitCode;
-    }
-
     if (
       typeof error === "object" &&
       error !== null &&
@@ -560,13 +517,15 @@ export async function runCli(argv: string[]): Promise<number> {
           "message" in error && typeof (error as { message?: unknown }).message === "string"
             ? (error as { message: string }).message
             : "Invalid command usage";
-        console.error(`error: ${message}`);
+        console.error(renderCliError(new FfvsError(message)));
         return 1;
       }
     }
 
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(`error: unexpected failure: ${message}`);
+    console.error(renderCliError(error));
+    if (error instanceof FfvsError) {
+      return error.exitCode;
+    }
     return 2;
   }
 }

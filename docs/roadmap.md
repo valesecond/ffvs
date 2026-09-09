@@ -91,19 +91,15 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [x] Shared core with CLI
 - [x] EXP-DSL-0004
 
-## Phase 0.8.0 — Semantic depth
+## Phase 1.0.0 — Product release
 
-- [x] Resolution-aware `traverse` (QL v0.3)
-- [x] Explicit `impact along calls` (default resolved)
-- [x] Minimal richer `describe` (module + lines)
-- [x] EXP-RESOLUTION / CALLS-IMPACT / DESCRIBE / SCOPE / DSL-0005
-- [x] Query `scope` stage investigated → **NOT JUSTIFIED**
-- [x] Roadmap [`docs/roadmap/ffvs-0.9.md`](./roadmap/ffvs-0.9.md)
+- [x] Scope + ADR-0024
+- [x] Query Language 1.0 docs
+- [x] README / quick-start / examples/demo
+- [x] JSON + storage docs
+- [x] External usability via demo
 
-```text
-Query Language v0.3 = SHIPPED (0.8.0)
-0.9.0 features = NOT IMPLEMENTED
-```
+Post-1.0 ideas remain in [`roadmap/ffvs-0.9.md`](./roadmap/ffvs-0.9.md) (evidence-gated; not a commitment to ship as 0.9).
 
 ## Princípios permanentes
 

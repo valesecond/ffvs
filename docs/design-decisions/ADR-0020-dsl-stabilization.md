@@ -19,16 +19,16 @@ Ship **0.6.1** as a stabilization release:
 
 ### Concrete decisions
 
-| Topic | Choice |
-| ----- | ------ |
-| ResultSet | entities + last-hop relations + optional descriptions + set-level diagnostics |
-| Duplicates | unique by entity/edge id |
-| Order | deterministic (`en` locale sorts) |
-| Empty | success with `[]` |
-| Traverse | replace set; defaults per `docs/language/traverse.md` |
-| CALLS | preserve resolution; tally in diagnostics |
-| JSON | documented contract; EntityRef/RelationRef compatible |
-| Read-only | enforced by design; tested |
+| Topic      | Choice                                                                        |
+| ---------- | ----------------------------------------------------------------------------- |
+| ResultSet  | entities + last-hop relations + optional descriptions + set-level diagnostics |
+| Duplicates | unique by entity/edge id                                                      |
+| Order      | deterministic (`en` locale sorts)                                             |
+| Empty      | success with `[]`                                                             |
+| Traverse   | replace set; defaults per `docs/language/traverse.md`                         |
+| CALLS      | preserve resolution; tally in diagnostics                                     |
+| JSON       | documented contract; EntityRef/RelationRef compatible                         |
+| Read-only  | enforced by design; tested                                                    |
 
 ## Alternatives
 

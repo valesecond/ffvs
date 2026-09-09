@@ -1,2 +1,6 @@
-path "Controller.js" "Database.js"
+# EXP-DSL-0006: IMPORTS → declares → CALLS (kind bridge; not exact Q01 intersect)
+search "types.ts" kind module
+traverse dependents
+traverse declares
+traverse calls resolution resolved
 describe

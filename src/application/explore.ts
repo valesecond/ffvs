@@ -258,8 +258,7 @@ export function inspectEntity(graph: SemanticGraph, query: string): EntityInspec
     null;
 
   const anchored = resolveModuleAnchor(graph, entity);
-  const moduleId =
-    anchored.kind === "MODULE" ? anchored.id : file ? `module:${file}` : null;
+  const moduleId = anchored.kind === "MODULE" ? anchored.id : file ? `module:${file}` : null;
   const methods = outgoing(graph, entity.id, "CONTAINS")
     .map((edge) => getNode(graph, edge.to))
     .filter((node): node is GraphNode => !!node && node.kind === "METHOD");

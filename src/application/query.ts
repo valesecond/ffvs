@@ -93,9 +93,7 @@ export function formatQueryResult(result: QueryResultSet): string {
         lines.push(`│     module: ${d.module}`);
       }
       if (d.startLine !== null) {
-        lines.push(
-          `│     loc: ${d.startLine}${d.endLine !== null ? `-${d.endLine}` : ""}`,
-        );
+        lines.push(`│     loc: ${d.startLine}${d.endLine !== null ? `-${d.endLine}` : ""}`);
       }
       lines.push(`│     relations: ${d.relationCount} (${d.edgeKinds.join(", ") || "none"})`);
     }
@@ -143,7 +141,9 @@ function toJsonPayload(allNodes: GraphNode[], result: QueryResultSet): QueryJson
     ...(result.descriptions !== undefined
       ? { descriptions: result.descriptions.map((d) => ({ ...d, edgeKinds: [...d.edgeKinds] })) }
       : {}),
-    ...(result.paths !== undefined ? { paths: result.paths.map((p) => ({ ...p, nodeIds: [...p.nodeIds] })) } : {}),
+    ...(result.paths !== undefined
+      ? { paths: result.paths.map((p) => ({ ...p, nodeIds: [...p.nodeIds] })) }
+      : {}),
     ...(result.impact !== undefined
       ? { impact: { ...result.impact, seedIds: [...result.impact.seedIds] } }
       : {}),

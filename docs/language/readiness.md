@@ -1,12 +1,12 @@
 # Language readiness
 
-## Current (FFVS 0.8.0)
+## Current (FFVS 1.0.0)
 
 ```text
-Query Language v0.3 — resolution-aware traverse + CALL impact
-Package: 0.8.0
+Query Language 1.0 — product-stable
+Package: 1.0.0
 ```
 
-v0.1/v0.2 surfaces remain stable; v0.3 adds opt-in resolution filters and explicit `impact along calls`.
+Former research versions v0.1–v0.3 are folded into Language 1.0 without removing validated stages.
 
-Evidence: EXP-DSL-0005, ADR-0022.
+Scope: [`docs/ffvs-1.0-scope.md`](../ffvs-1.0-scope.md) · ADR-0024.

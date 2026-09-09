@@ -1,4 +1,4 @@
-/** FFVS Query Language AST (v0.3). Execution-free. */
+/** FFVS Query Language AST (v1.0). Execution-free. */
 
 export type EntityKindName =
   | "functions"
@@ -100,15 +100,9 @@ export interface ImpactStage {
 }
 
 export type QueryStage =
-  | SelectStage
-  | WhereStage
-  | SearchStage
-  | TraverseStage
-  | DescribeStage
-  | PathStage
-  | ImpactStage;
+  SelectStage | WhereStage | SearchStage | TraverseStage | DescribeStage | PathStage | ImpactStage;
 
 export interface QueryAst {
-  languageVersion: "0.3";
+  languageVersion: "1.0";
   stages: QueryStage[];
 }

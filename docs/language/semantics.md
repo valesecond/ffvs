@@ -21,24 +21,24 @@ ResultSet
 
 ### Field meanings
 
-| Field | Meaning |
-| ----- | ------- |
-| `entities` | Unique entities in the current set (by node `id`) |
-| `relations` | Edges collected by the **last** `traverse`; cleared by `select` / `search` / `where` |
-| `descriptions` | Summaries materialised by `describe` only; cleared if a later stage mutates the set |
-| `diagnostics` | Whole-result metadata; `resolutionCounts` reflect current `relations` |
+| Field          | Meaning                                                                              |
+| -------------- | ------------------------------------------------------------------------------------ |
+| `entities`     | Unique entities in the current set (by node `id`)                                    |
+| `relations`    | Edges collected by the **last** `traverse`; cleared by `select` / `search` / `where` |
+| `descriptions` | Summaries materialised by `describe` only; cleared if a later stage mutates the set  |
+| `diagnostics`  | Whole-result metadata; `resolutionCounts` reflect current `relations`                |
 
 ### Stage effects
 
-| Stage | Transforms entities? | Relations | Descriptions |
-| ----- | -------------------- | --------- | ------------ |
-| `select` | **Replace** (new seed) | cleared | cleared |
-| `search` | **Replace** (new seed) | cleared | cleared |
-| `where` | **Filter** (subset, order preserved) | cleared | cleared |
-| `traverse` | **Replace** with unique neighbors | set to last-hop edges | cleared |
-| `path` | **Replace** with path nodes (ordered) | hop edges; `paths` metadata | cleared |
-| `impact` | **Replace** with transitive dependents | closure edges; `impact` metadata | cleared |
-| `describe` | unchanged | unchanged | materialised |
+| Stage      | Transforms entities?                   | Relations                        | Descriptions |
+| ---------- | -------------------------------------- | -------------------------------- | ------------ |
+| `select`   | **Replace** (new seed)                 | cleared                          | cleared      |
+| `search`   | **Replace** (new seed)                 | cleared                          | cleared      |
+| `where`    | **Filter** (subset, order preserved)   | cleared                          | cleared      |
+| `traverse` | **Replace** with unique neighbors      | set to last-hop edges            | cleared      |
+| `path`     | **Replace** with path nodes (ordered)  | hop edges; `paths` metadata      | cleared      |
+| `impact`   | **Replace** with transitive dependents | closure edges; `impact` metadata | cleared      |
+| `describe` | unchanged                              | unchanged                        | materialised |
 
 `traverse` does **not** union seeds with neighbors. Multi-hop: `traverse callers traverse calls` — second hop starts from first-hop results.
 
@@ -58,13 +58,13 @@ Edges are unique by edge `id`. Multiplicity is not preserved (entity-set semanti
 
 **Guaranteed deterministic** for observable outputs on a fixed index:
 
-| Collection | Order |
-| ---------- | ----- |
-| `entities` after select/traverse | `(name ?? id)`, then `id`, locale `en` |
-| `entities` after where | relative order of prior list (already sorted) |
-| `entities` after search | score desc, then name/id (`en`) |
-| `relations` | edge `id` ascending (`en`) |
-| `descriptions` | same order as `entities` |
+| Collection                       | Order                                         |
+| -------------------------------- | --------------------------------------------- |
+| `entities` after select/traverse | `(name ?? id)`, then `id`, locale `en`        |
+| `entities` after where           | relative order of prior list (already sorted) |
+| `entities` after search          | score desc, then name/id (`en`)               |
+| `relations`                      | edge `id` ascending (`en`)                    |
+| `descriptions`                   | same order as `entities`                      |
 
 Not undefined; not filesystem-dependent after the graph is loaded.
 
@@ -80,23 +80,23 @@ search "doesNotExist"
 
 ## SEARCH vs WHERE
 
-| | SEARCH | WHERE |
-| - | ------ | ----- |
-| Role | Find candidates (seed) | Restrict current set |
-| Needle case | **Insensitive** (lowercased) | **Sensitive** |
-| Matches | name / path / id scoring | `name` or `path` only |
-| Ops | implicit contains/prefix/eq scoring | `contains` / `eq`/`=` / `prefix` |
-| Limit | default 50 | none |
-| Optional | `kind`, `path` (path filter is case-sensitive contains) | — |
+|             | SEARCH                                                  | WHERE                            |
+| ----------- | ------------------------------------------------------- | -------------------------------- |
+| Role        | Find candidates (seed)                                  | Restrict current set             |
+| Needle case | **Insensitive** (lowercased)                            | **Sensitive**                    |
+| Matches     | name / path / id scoring                                | `name` or `path` only            |
+| Ops         | implicit contains/prefix/eq scoring                     | `contains` / `eq`/`=` / `prefix` |
+| Limit       | default 50                                              | none                             |
+| Optional    | `kind`, `path` (path filter is case-sensitive contains) | —                                |
 
 ## WHERE details
 
-| Predicate | Meaning |
-| --------- | ------- |
-| `name = "foo"` / `eq` | exact, case-sensitive |
-| `name contains "foo"` | substring, case-sensitive |
-| `name prefix "foo"` | prefix, case-sensitive |
-| same for `path` | path from `properties.path` or `location.file` |
+| Predicate             | Meaning                                        |
+| --------------------- | ---------------------------------------------- |
+| `name = "foo"` / `eq` | exact, case-sensitive                          |
+| `name contains "foo"` | substring, case-sensitive                      |
+| `name prefix "foo"`   | prefix, case-sensitive                         |
+| same for `path`       | path from `properties.path` or `location.file` |
 
 Path matching normalizes `\` → `/` on both sides (Windows/Unix). Empty needle `contains ""` matches any non-null string (JS `includes` semantics). No `AND`/`OR` keywords; sequential `where` stages ∧.
 
@@ -110,11 +110,11 @@ Edge `properties.resolution` preserved (`RESOLVED` \| `AMBIGUOUS` \| `UNRESOLVED
 
 ## DESCRIBE vs CLI INSPECT
 
-| | DSL `describe` | CLI `inspect` |
-| - | -------------- | ------------- |
-| Input | entire EntitySet | one entity (or project) |
+|        | DSL `describe`                                 | CLI `inspect`                                    |
+| ------ | ---------------------------------------------- | ------------------------------------------------ |
+| Input  | entire EntitySet                               | one entity (or project)                          |
 | Output | id, kind, name, path, relationCount, edgeKinds | full neighborhood (methods, imports, exports, …) |
-| Role | pipeline summary op | interactive deep dive |
+| Role   | pipeline summary op                            | interactive deep dive                            |
 
 `describe` is intentionally thinner. Richer describe is a **0.7 candidate**, not done here.
 
@@ -146,12 +146,12 @@ Stable fields:
 
 ## Errors
 
-| Kind | Examples |
-| ---- | -------- |
-| LEXICAL | bad char, bad escape, unterminated string |
-| PARSE | empty query, missing string, wrong keyword place |
-| SEMANTIC | unknown kind/relation; where/traverse/describe without seed |
-| EXECUTION | reserved |
+| Kind      | Examples                                                    |
+| --------- | ----------------------------------------------------------- |
+| LEXICAL   | bad char, bad escape, unterminated string                   |
+| PARSE     | empty query, missing string, wrong keyword place            |
+| SEMANTIC  | unknown kind/relation; where/traverse/describe without seed |
+| EXECUTION | reserved                                                    |
 
 Messages include `line` / `column`. No stack traces for these.
 
@@ -176,6 +176,6 @@ See [`uncertainty.md`](./uncertainty.md) and [`traverse.md`](./traverse.md).
 ## Versioning
 
 ```text
-FFVS package 0.8.0
-Query Language 0.3
+FFVS package 1.0.0
+Query Language 1.0
 ```

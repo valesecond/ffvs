@@ -6,13 +6,13 @@ Decide whether SCOPE is only an indexing concept or needs query-language syntax.
 
 ## Questions
 
-| ID | Question | Finding |
-| -- | -------- | ------- |
-| S01 | Entities in current scope? | = entities in indexed graph after include/exclude |
-| S02 | What was excluded? | Not stored as first-class “excluded set”; only skip list / config |
-| S03 | Restrict query to path? | Already: `where path contains "src/core"` / search path opt |
-| S04 | Index vs query scope? | Index defines universe; query filters within it |
-| S05 | Separate query scope stage? | Would re-state path filters; no new expressiveness in corpus |
+| ID  | Question                    | Finding                                                           |
+| --- | --------------------------- | ----------------------------------------------------------------- |
+| S01 | Entities in current scope?  | = entities in indexed graph after include/exclude                 |
+| S02 | What was excluded?          | Not stored as first-class “excluded set”; only skip list / config |
+| S03 | Restrict query to path?     | Already: `where path contains "src/core"` / search path opt       |
+| S04 | Index vs query scope?       | Index defines universe; query filters within it                   |
+| S05 | Separate query scope stage? | Would re-state path filters; no new expressiveness in corpus      |
 
 ## Evidence pressure
 

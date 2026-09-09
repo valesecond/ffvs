@@ -83,10 +83,7 @@ describe("0.6.1 ResultSet semantics", () => {
 
   it("empty results succeed with empty entities", async () => {
     const root = await makeGraphProject();
-    const missing = await runQuery(
-      root,
-      'select functions where name = "doesNotExist" describe',
-    );
+    const missing = await runQuery(root, 'select functions where name = "doesNotExist" describe');
     expect(missing.result.entities).toEqual([]);
     expect(missing.result.descriptions).toEqual([]);
 
@@ -110,12 +107,13 @@ describe("0.6.1 ResultSet semantics", () => {
     const d2 = await runQuery(root, 'select functions where name contains "mid"');
     expect(d2.result.entities.every((e) => (e.name ?? "").includes("mid"))).toBe(true);
 
-    const d3 = await runQuery(
-      root,
-      'select functions where name = "shared" traverse callers',
-    );
+    const d3 = await runQuery(root, 'select functions where name = "shared" traverse callers');
     expect(d3.result.relations.every((e) => e.kind === "CALLS")).toBe(true);
-    expect(d3.result.diagnostics.resolutionCounts.RESOLVED + d3.result.diagnostics.resolutionCounts.AMBIGUOUS + d3.result.diagnostics.resolutionCounts.UNRESOLVED).toBeGreaterThan(0);
+    expect(
+      d3.result.diagnostics.resolutionCounts.RESOLVED +
+        d3.result.diagnostics.resolutionCounts.AMBIGUOUS +
+        d3.result.diagnostics.resolutionCounts.UNRESOLVED,
+    ).toBeGreaterThan(0);
 
     const d4 = await runQuery(
       root,
@@ -125,19 +123,13 @@ describe("0.6.1 ResultSet semantics", () => {
     // relations are only from the *last* traverse (calls), not accumulated
     expect(d4.result.relations.every((e) => e.kind === "CALLS")).toBe(true);
 
-    const d5 = await runQuery(
-      root,
-      'search "shared" traverse callers traverse calls describe',
-    );
+    const d5 = await runQuery(root, 'search "shared" traverse callers traverse calls describe');
     expect(d5.result.descriptions?.length).toBe(d5.result.entities.length);
   });
 
   it("WHERE is case-sensitive; SEARCH needle is case-insensitive", async () => {
     const root = await makeGraphProject();
-    const whereUpper = await runQuery(
-      root,
-      'select functions where name = "Shared"',
-    );
+    const whereUpper = await runQuery(root, 'select functions where name = "Shared"');
     expect(whereUpper.result.entities).toHaveLength(0);
 
     const searchUpper = await runQuery(root, 'search "SHARED" kind function');
@@ -146,24 +138,15 @@ describe("0.6.1 ResultSet semantics", () => {
 
   it("path matching normalizes backslashes", async () => {
     const root = await makeGraphProject();
-    const posix = await runQuery(
-      root,
-      'select files where path contains "src/graph"',
-    );
+    const posix = await runQuery(root, 'select files where path contains "src/graph"');
     // In DSL strings, \\ is one backslash — normalized to / for matching.
-    const win = await runQuery(
-      root,
-      'select files where path contains "src\\\\graph"',
-    );
+    const win = await runQuery(root, 'select files where path contains "src\\\\graph"');
     expect(win.result.entities.map((e) => e.id)).toEqual(posix.result.entities.map((e) => e.id));
   });
 
   it("CALLS resolution states are preserved on edges and tallied", async () => {
     const root = await makeGraphProject();
-    const ran = await runQuery(
-      root,
-      'select functions where name = "a" traverse calls describe',
-    );
+    const ran = await runQuery(root, 'select functions where name = "a" traverse calls describe');
     for (const edge of ran.result.relations) {
       const res = edge.properties?.["resolution"];
       expect(["RESOLVED", "AMBIGUOUS", "UNRESOLVED", "EXTERNAL"]).toContain(res);
@@ -215,14 +198,14 @@ describe("0.6.1 error taxonomy", () => {
     { q: "", kind: "PARSE" },
     { q: "florb functions", kind: "PARSE" },
     { q: "select foobar", kind: "SEMANTIC" },
-    { q: "select functions where foo contains \"x\"", kind: "PARSE" },
-    { q: "select functions where name like \"x\"", kind: "PARSE" },
+    { q: 'select functions where foo contains "x"', kind: "PARSE" },
+    { q: 'select functions where name like "x"', kind: "PARSE" },
     { q: "select functions where name contains", kind: "PARSE" },
     { q: "select functions traverse", kind: "PARSE" },
     { q: "select functions traverse nonexistent", kind: "SEMANTIC" },
     { q: "select functions @", kind: "LEXICAL" },
     { q: 'search "oops', kind: "LEXICAL" },
-    { q: "where name contains \"x\"", kind: "PARSE" },
+    { q: 'where name contains "x"', kind: "PARSE" },
   ];
 
   for (const c of cases) {

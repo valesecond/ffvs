@@ -1,0 +1,14 @@
+# Never ship local indexes / generated graphs
+examples/demo/.ffvs
+examples/demo/.ffvs/**
+.ffvs
+.ffvs/**
+
+# Dev-only
+src/
+tests/
+fixtures/
+research/
+coverage/
+*.tsbuildinfo
+*.tgz

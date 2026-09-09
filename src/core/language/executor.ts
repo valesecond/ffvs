@@ -71,8 +71,7 @@ export function executeQuery(ast: QueryAst, ctx: ExecuteContext): QueryResultSet
         break;
       }
       case "search": {
-        const kind =
-          stage.kind && stage.kind !== "entities" ? KIND_MAP[stage.kind] : undefined;
+        const kind = stage.kind && stage.kind !== "entities" ? KIND_MAP[stage.kind] : undefined;
         state.entities = searchEntities(ctx.graph, {
           needle: stage.needle,
           ...(kind !== undefined ? { kind } : {}),
@@ -235,9 +234,7 @@ function applyPath(
     next.diagnostics.resolutionCounts = tallyResolutions(next.relations);
   }
   next.stagesApplied.push(
-    stage.from !== undefined
-      ? `path "${stage.from}" "${stage.to}"`
-      : `path "${stage.to}"`,
+    stage.from !== undefined ? `path "${stage.from}" "${stage.to}"` : `path "${stage.to}"`,
   );
   return { state: next, hasSeed: true };
 }

@@ -1,6 +1,6 @@
-# Grammar draft (EBNF) — Query Language v0.3
+# Grammar (EBNF) — Query Language 1.0
 
-Implemented in FFVS **0.8.0**.
+Implemented in FFVS **1.0.0**.
 
 ```ebnf
 query          = pipeline ;

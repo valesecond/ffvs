@@ -38,7 +38,10 @@ export async function scanDirectory(options: ScanOptions): Promise<ScannedFile[]
       const absolutePath = path.join(current, entry.name);
 
       if (entry.isDirectory()) {
-        if (skip.has(entry.name) || shouldExcludeDir(entry.name, absolutePath, rootDir, excludePatterns)) {
+        if (
+          skip.has(entry.name) ||
+          shouldExcludeDir(entry.name, absolutePath, rootDir, excludePatterns)
+        ) {
           continue;
         }
         await walk(absolutePath);
@@ -88,7 +91,9 @@ function shouldExcludeDir(
 function isExcludedPath(relativePath: string, patterns: string[]): boolean {
   return patterns.some((pattern) => {
     const p = normalizePattern(pattern);
-    return relativePath === p || relativePath.startsWith(`${p}/`) || relativePath.includes(`/${p}/`);
+    return (
+      relativePath === p || relativePath.startsWith(`${p}/`) || relativePath.includes(`/${p}/`)
+    );
   });
 }
 

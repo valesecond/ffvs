@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ffvs.dev/schemas/query-result.schema.json",
+  "title": "FFVS Query ResultSet JSON (1.0)",
+  "type": "object",
+  "required": ["languageVersion", "stagesApplied", "entities", "relations", "diagnostics"],
+  "properties": {
+    "languageVersion": { "type": "string", "const": "1.0" },
+    "stagesApplied": { "type": "array", "items": { "type": "string" } },
+    "entities": { "type": "array", "items": { "type": "object" } },
+    "relations": { "type": "array", "items": { "type": "object" } },
+    "descriptions": { "type": "array", "items": { "type": "object" } },
+    "paths": { "type": "array", "items": { "type": "object" } },
+    "impact": {
+      "type": "object",
+      "required": ["seedIds", "affectedCount", "relationKinds", "along"],
+      "properties": {
+        "seedIds": { "type": "array", "items": { "type": "string" } },
+        "affectedCount": { "type": "integer" },
+        "relationKinds": { "type": "array", "items": { "type": "string" } },
+        "along": { "enum": ["imports", "calls"] },
+        "resolution": {
+          "enum": ["RESOLVED", "AMBIGUOUS", "UNRESOLVED", "EXTERNAL"]
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "required": ["messages", "resolutionCounts"],
+      "properties": {
+        "messages": { "type": "array", "items": { "type": "string" } },
+        "resolutionCounts": { "type": "object" }
+      }
+    }
+  }
+}

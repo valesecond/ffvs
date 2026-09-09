@@ -11,8 +11,4 @@ export {
   resolveModuleAnchor,
   isResolvedInternalImport,
 } from "./path-impact.js";
-export {
-  edgeResolution,
-  matchesResolution,
-  type ResolutionState,
-} from "./resolution.js";
+export { edgeResolution, matchesResolution, type ResolutionState } from "./resolution.js";

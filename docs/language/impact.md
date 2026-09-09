@@ -37,12 +37,12 @@ SELECT/SEARCH/WHERE/PATH → IMPACT → DESCRIBE?
 
 ## ResultSet
 
-| Field | Content |
-| ----- | ------- |
-| `entities` | Affected nodes, sorted |
-| `relations` | `via` edges from closure |
-| `impact` | `{ seedIds, affectedCount, relationKinds, along, resolution? }` |
-| `diagnostics.resolutionCounts` | Tallied from those edges |
+| Field                          | Content                                                         |
+| ------------------------------ | --------------------------------------------------------------- |
+| `entities`                     | Affected nodes, sorted                                          |
+| `relations`                    | `via` edges from closure                                        |
+| `impact`                       | `{ seedIds, affectedCount, relationKinds, along, resolution? }` |
+| `diagnostics.resolutionCounts` | Tallied from those edges                                        |
 
 ## Uncertainty
 

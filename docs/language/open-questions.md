@@ -17,6 +17,8 @@ Still open (feed 0.9 evaluation — see `docs/roadmap/ffvs-0.9.md`):
 
 1. PATH over CALLS / mixed relations?
 2. Combined IMPORT+CALL impact (explicit dual-axis)?
-3. Dual-seed composition ergonomics (Q22)?
+3. Dual-seed / ResultSet intersection (EXP-DSL-0006 PARTIAL Q01/Q04)?
 4. AND/OR / pipes / aggregates — still unevidenced for implementation?
 5. Further DESCRIBE fields without collapsing into INSPECT?
+
+Resolved by EXP-DSL-0006: **cross-relation composition syntax** — NOT JUSTIFIED (sequential traverse + kind bridge suffice).

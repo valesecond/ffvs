@@ -55,15 +55,15 @@ Every indexed project is a directed labeled graph persisted at `.ffvs/graph.json
 
 ## Relation kinds
 
-| Kind         | Meaning                                                                                       |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| `CONTAINS`   | Structural nesting (project→file→module→members; class→method)                                |
-| `DECLARES`   | Module declares a top-level entity                                                            |
-| `IMPORTS`    | Module imports another module (resolved / external / unresolved / ambiguous)                  |
-| `EXPORTS`    | Module exports a declared entity                                                              |
-| `EXTENDS`    | Class extends another class (same-file best-effort; cross-file when resolvable by name)       |
-| `IMPLEMENTS` | Class implements an interface (TypeScript; name recorded)                                     |
-| `CALLS`      | Best-effort call edge (function/method/module → callee); see resolution on edge properties    |
+| Kind         | Meaning                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------ |
+| `CONTAINS`   | Structural nesting (project→file→module→members; class→method)                             |
+| `DECLARES`   | Module declares a top-level entity                                                         |
+| `IMPORTS`    | Module imports another module (resolved / external / unresolved / ambiguous)               |
+| `EXPORTS`    | Module exports a declared entity                                                           |
+| `EXTENDS`    | Class extends another class (same-file best-effort; cross-file when resolvable by name)    |
+| `IMPLEMENTS` | Class implements an interface (TypeScript; name recorded)                                  |
+| `CALLS`      | Best-effort call edge (function/method/module → callee); see resolution on edge properties |
 
 `CALLS` is intentionally incomplete for dynamic JavaScript. See [`limitations.md`](./limitations.md).
 

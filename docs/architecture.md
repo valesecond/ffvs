@@ -1,117 +1,63 @@
-# Arquitetura do FFVS
+# Arquitetura do FFVS (1.0)
 
-## Objetivo deste documento
+## Objetivo
 
-Definir a arquitetura atual (Phase 0–1) e os princípios que orientam evoluções futuras.
+Separar claramente produto estável de pesquisa. O núcleo 1.0 é um grafo semântico local + consultas read-only.
 
-## Princípio de camadas
-
-```text
-CLI
- ↓
-Application Layer   (init, index, status, explore)
- ↓
-Core Engine         (indexer, graph helpers)
- ↓
-Domain Model        (entidades e relações)
- ↓
-Adapters            (filesystem, storage, language parsers)
-```
-
-A CLI **não** contém lógica de negócio. Ela traduz argumentos em chamadas à Application Layer e formata saída (humana ou `--json`).
-
-## Fluxo Phase 1
+## Pipeline
 
 ```text
 SOURCE CODE
     ↓
-LanguageAdapter.extract()   (@babel/parser for JS/TS)
+PARSER (LanguageAdapter — JS/TS via Babel today)
     ↓
-FileExtraction (entities + relations + imports)
+SYNTAX / EXTRACTION (entities + provisional relations)
     ↓
-Indexer → SemanticGraph + ProjectIndex
+RESOLVER (module resolution; CALLS binding)
     ↓
-Persist .ffvs/{config,index,graph}.json
+SEMANTIC GRAPH  (.ffvs/graph.json)
     ↓
-Explore commands (inspect, files, functions, …)
+QUERY CORE      (select, search, navigate, path-impact)
+    ↓
+QUERY LANGUAGE  (lexer → parser → AST → executor)
+    ↓
+CLI             (format human / --json)
 ```
 
-## Estrutura do repositório
+Separations that must hold:
 
 ```text
-ffvs/
-├── src/
-│   ├── cli/                 # program + formatters
-│   ├── application/         # init, index, status, explore
-│   ├── core/
-│   │   ├── domain/          # types, graph helpers, errors
-│   │   ├── graph/           # navigation: path, ancestors, …
-│   │   └── indexer/         # buildProjectIndex
-│   ├── languages/
-│   │   ├── types.ts         # LanguageAdapter contract
-│   │   └── javascript/      # parse + extract (Babel)
-│   └── adapters/
-│       ├── filesystem/
-│       └── storage/
-├── fixtures/                # controlled sample projects
-├── tests/
-├── docs/
-├── research/
-├── examples/
-└── .github/workflows/
+CLI ≠ Core
+DSL ≠ Graph
+Parser ≠ Resolver
+research/ ≠ product docs for end users
 ```
 
-Pacote único TypeScript (ADR-0005). Parser JS/TS: `@babel/parser` (ADR-0007).
-
-## Modelo de domínio
-
-Ver [`software-model.md`](./software-model.md).
-
-Entidades Phase 1: `PROJECT`, `FILE`, `MODULE`, `FUNCTION`, `CLASS`, `METHOD`, `VARIABLE`.
-
-Relações: `CONTAINS`, `DECLARES`, `IMPORTS`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS`, `CALLS`.
-
-Camada de consulta: `src/core/query` (FILTER/SEARCH) + `src/core/graph/navigate` + `src/application/explore`.
-
-## Persistência local
+## Camadas
 
 ```text
-.ffvs/
-├── config.json      # include/exclude opcionais
-├── index.json       # v2: files, languages, entity stats, parse errors, resolution
-└── graph.json       # v2: nodes + edges
+CLI
+ ↓
+Application     init, index, status, explore, query, diagnostics
+ ↓
+Core            domain, graph, indexer, resolver, query, language
+ ↓
+Adapters        filesystem, storage, languages/*
 ```
 
-JSON permanece a escolha do MVP (ADR-0006).
+## Persistência
 
-## Comandos CLI (até pré-DSL)
+Ver [`storage.md`](./storage.md).
 
-| Comando                                       | Papel                          |
-| --------------------------------------------- | ------------------------------ |
-| `init` / `index` / `status`                   | Ciclo de vida                  |
-| `index --include` / `--exclude`               | Controle do universo indexado  |
-| `inspect [entity]`                            | Resumo do projeto ou entidade  |
-| `files` / `functions` / `classes`             | SELECT (+ `--name` / `--path`) |
-| `search <needle>`                             | SEARCH candidatos              |
-| `imports` / `graph`                           | Conveniências                  |
-| `dependencies` / `deps` / `dependents`        | TRAVERSE IMPORTS               |
-| `calls` / `callers`                           | TRAVERSE CALLS                 |
-| `children` / `parents`                        | CONTAINS                       |
-| `path` / `impact` / `relations`               | PATH / DERIVED / edges         |
-| `diagnostics`                                 | Incerteza de IMPORTS           |
-| `--json`                                      | Saída estruturada              |
+## CLI (1.0)
 
-## Query interfaces
+Lifecycle: `init` `index` `status` `diagnostics`
 
-Explore CLI verbs and `ffvs query` (Query Language v0.1) both call Query Core.
+Explore: `inspect` `files` `functions` `classes` `imports` `dependencies`/`deps` `dependents` `calls` `callers` `children` `parents` `search` `path` `impact` `relations` `graph`
 
-```text
-ffvs query → language/{lexer,parser,executor} → query/* + graph/navigate → GRAPH
-```
+Query: `query` (Query Language **1.0**)
 
-DSL is **read-only**.
-
-## Extensibilidade de linguagem
+## Extensibilidade de linguagem (futuro)
 
 ```text
 LanguageAdapter
@@ -120,8 +66,8 @@ LanguageAdapter
   extract(source, path) → FileExtraction
 ```
 
-O indexer depende do contrato, não de Babel.
+O indexer depende do contrato — não de Babel. Plugins não existem no 1.0; o ponto de extensão já está isolado.
 
-## Limitações conscientes
+## Limitações
 
-Ver [`limitations.md`](./limitations.md).
+[`limitations.md`](./limitations.md) · [`ffvs-1.0-scope.md`](./ffvs-1.0-scope.md)

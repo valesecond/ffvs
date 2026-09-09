@@ -28,10 +28,10 @@ select modules where name = "Controller.js" path to "Database.js" describe
 
 ## Composition
 
-| Form | Source | Target |
-| ---- | ------ | ------ |
-| `path "A" "B"` / `path from "A" to "B"` | lookup A | lookup B |
-| `path "B"` / `path to "B"` | current ResultSet (exactly one module-anchored entity) | lookup B |
+| Form                                    | Source                                                 | Target   |
+| --------------------------------------- | ------------------------------------------------------ | -------- |
+| `path "A" "B"` / `path from "A" to "B"` | lookup A                                               | lookup B |
+| `path "B"` / `path to "B"`              | current ResultSet (exactly one module-anchored entity) | lookup B |
 
 After PATH:
 
@@ -53,13 +53,13 @@ Reuses `computePath` → `findPath` (BFS), same as CLI `ffvs path`:
 
 ## Empty / missing / ambiguous
 
-| Case | Behavior |
-| ---- | -------- |
-| No path | `found=false`, `entities=[]`, success |
-| Same source/target | `found=true`, `length=0` |
-| Unknown name | SEMANTIC error |
-| Ambiguous name | SEMANTIC error (lists candidates) |
-| Multiple sources for `path "T"` | SEMANTIC error |
+| Case                            | Behavior                              |
+| ------------------------------- | ------------------------------------- |
+| No path                         | `found=false`, `entities=[]`, success |
+| Same source/target              | `found=true`, `length=0`              |
+| Unknown name                    | SEMANTIC error                        |
+| Ambiguous name                  | SEMANTIC error (lists candidates)     |
+| Multiple sources for `path "T"` | SEMANTIC error                        |
 
 ## Uncertainty
 

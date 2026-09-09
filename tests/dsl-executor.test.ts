@@ -45,13 +45,10 @@ afterEach(async () => {
 describe("DSL executor", () => {
   it("select + where + describe", async () => {
     const root = await makeProject();
-    const ran = await runQuery(
-      root,
-      'select functions where name contains "resolve" describe',
-    );
+    const ran = await runQuery(root, 'select functions where name contains "resolve" describe');
     expect(ran.result.entities.some((e) => e.name === "resolve")).toBe(true);
     expect(ran.result.descriptions?.length).toBeGreaterThan(0);
-    expect(ran.json.languageVersion).toBe("0.3");
+    expect(ran.json.languageVersion).toBe("1.0");
   });
 
   it("select + where + traverse callers", async () => {

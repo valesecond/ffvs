@@ -39,13 +39,13 @@ Observations: traverse **replaces** entity set; relations = last hop only; descr
 
 ### Empty-result cases (5)
 
-| Case | Outcome |
-| ---- | ------- |
-| `where name = "doesNotExist"` | `entities=[]`, success |
-| `search "doesNotExistZz"` | `entities=[]`, success |
-| traverse with no callers | `entities=[]`, success |
+| Case                           | Outcome                 |
+| ------------------------------ | ----------------------- |
+| `where name = "doesNotExist"`  | `entities=[]`, success  |
+| `search "doesNotExistZz"`      | `entities=[]`, success  |
+| traverse with no callers       | `entities=[]`, success  |
 | `where name = "Shared"` (case) | empty (WHERE sensitive) |
-| filter to empty then describe | `descriptions=[]` |
+| filter to empty then describe  | `descriptions=[]`       |
 
 **PASS** — empty ≠ error.
 
@@ -55,13 +55,13 @@ Lexical / parse / semantic taxonomy covered (empty query, unknown kind, unknown 
 
 ### CALLS uncertainty (5)
 
-| Check | Result |
-| ------ | ------ |
-| Edge `resolution` present | yes |
-| AMBIGUOUS ≠ coerced to RESOLVED | yes |
-| UNRESOLVED ≠ coerced to EXTERNAL | yes |
-| Tallies sum to relation count | yes |
-| Human + JSON expose counts | yes |
+| Check                            | Result |
+| -------------------------------- | ------ |
+| Edge `resolution` present        | yes    |
+| AMBIGUOUS ≠ coerced to RESOLVED  | yes    |
+| UNRESOLVED ≠ coerced to EXTERNAL | yes    |
+| Tallies sum to relation count    | yes    |
+| Human + JSON expose counts       | yes    |
 
 **PASS.**
 

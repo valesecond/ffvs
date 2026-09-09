@@ -14,11 +14,11 @@ CLI verbs discovered the query model. Multi-step intents required copying entity
 
 ## Status
 
-| Layer | Status |
-| ----- | ------ |
-| Spec | `docs/language/*` |
+| Layer          | Status                                |
+| -------------- | ------------------------------------- |
+| Spec           | `docs/language/*`                     |
 | Implementation | **v0.1 thin slice** in FFVS **0.6.0** |
-| Command | `ffvs query '…'` |
+| Command        | `ffvs query '…'`                      |
 
 CLI explore commands remain fully supported.
 

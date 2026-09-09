@@ -47,9 +47,9 @@ describe("DSL resolution-aware traverse", () => {
       'search "add" kind function traverse callers resolution resolved',
     );
     expect(all.result.relations.length).toBeGreaterThan(0);
-    expect(resolved.result.relations.every((e) => e.properties?.["resolution"] === "RESOLVED")).toBe(
-      true,
-    );
+    expect(
+      resolved.result.relations.every((e) => e.properties?.["resolution"] === "RESOLVED"),
+    ).toBe(true);
     expect(resolved.result.entities.length).toBeLessThanOrEqual(all.result.entities.length);
   });
 
@@ -60,7 +60,9 @@ describe("DSL resolution-aware traverse", () => {
 
 describe("DSL CALL impact", () => {
   it("parses impact along calls with default resolved", () => {
-    const stage = parse("select functions impact along calls").stages.find((s) => s.type === "impact");
+    const stage = parse("select functions impact along calls").stages.find(
+      (s) => s.type === "impact",
+    );
     expect(stage).toMatchObject({
       type: "impact",
       along: "calls",
@@ -80,10 +82,7 @@ describe("DSL CALL impact", () => {
 
   it("direct CALL impact finds callers", async () => {
     const root = await copyFixture("calls-impact-direct");
-    const ran = await runQuery(
-      root,
-      'search "target" kind function impact along calls describe',
-    );
+    const ran = await runQuery(root, 'search "target" kind function impact along calls describe');
     expect(ran.result.impact?.along).toBe("calls");
     expect(ran.result.impact?.resolution).toBe("RESOLVED");
     expect(ran.result.entities.some((e) => e.name === "caller")).toBe(true);
@@ -99,10 +98,7 @@ describe("DSL CALL impact", () => {
 
   it("ambiguous CALLS excluded from default CALL impact", async () => {
     const root = await copyFixture("calls-impact-ambiguous");
-    const resolved = await runQuery(
-      root,
-      'search "target" kind function impact along calls',
-    );
+    const resolved = await runQuery(root, 'search "target" kind function impact along calls');
     // Seeds are the two target functions; resolved CALL impact should not invent edges to them
     // from ambiguous caller (caller → ambiguous-call stub).
     const ambiguousImpact = await runQuery(
@@ -116,15 +112,18 @@ describe("DSL CALL impact", () => {
       root,
       'search "caller" kind function traverse calls resolution ambiguous',
     );
-    expect(fromCaller.result.relations.some((e) => e.properties?.["resolution"] === "AMBIGUOUS")).toBe(
-      true,
-    );
-    expect(resolved.json.languageVersion).toBe("0.3");
+    expect(
+      fromCaller.result.relations.some((e) => e.properties?.["resolution"] === "AMBIGUOUS"),
+    ).toBe(true);
+    expect(resolved.json.languageVersion).toBe("1.0");
   });
 
   it("unresolved CALL impact is opt-in", async () => {
     const root = await copyFixture("calls-impact-unresolved");
-    const none = await runQuery(root, 'search "caller" kind function traverse calls resolution resolved');
+    const none = await runQuery(
+      root,
+      'search "caller" kind function traverse calls resolution resolved',
+    );
     const unresolved = await runQuery(
       root,
       'search "caller" kind function traverse calls resolution unresolved',
@@ -136,7 +135,9 @@ describe("DSL CALL impact", () => {
   it("diamond CALL impact dedupes", async () => {
     const root = await copyFixture("calls-impact-diamond");
     const ran = await runQuery(root, 'search "shared" kind function impact along calls');
-    const callers = ran.result.entities.filter((e) => e.name === "left" || e.name === "right" || e.name === "top");
+    const callers = ran.result.entities.filter(
+      (e) => e.name === "left" || e.name === "right" || e.name === "top",
+    );
     const ids = new Set(ran.result.entities.map((e) => e.id));
     expect(ids.size).toBe(ran.result.entities.length);
     expect(callers.length).toBeGreaterThanOrEqual(2);

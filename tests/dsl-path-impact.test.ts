@@ -37,9 +37,9 @@ describe("DSL PATH", () => {
       to: "B",
       along: "imports",
     });
-    expect(parse('select modules path to "B" along imports').stages.some((s) => s.type === "path")).toBe(
-      true,
-    );
+    expect(
+      parse('select modules path to "B" along imports').stages.some((s) => s.type === "path"),
+    ).toBe(true);
     expect(parse('select modules where name = "A" path "B"').stages.map((s) => s.type)).toEqual([
       "select",
       "where",
@@ -120,13 +120,17 @@ describe("DSL IMPACT", () => {
 
   it("select → impact on Database includes upstream modules", async () => {
     const root = await copyFixture("layered");
-    const ran = await runQuery(
-      root,
-      'select modules where name = "Database.js" impact describe',
-    );
+    const ran = await runQuery(root, 'select modules where name = "Database.js" impact describe');
     expect(ran.result.impact?.affectedCount).toBeGreaterThan(0);
     expect(ran.result.entities.some((e) => e.name === "Database.js")).toBe(false);
-    expect(ran.result.entities.some((e) => String(e.name).includes("Repository") || String(e.name).includes("Service") || String(e.name).includes("Controller"))).toBe(true);
+    expect(
+      ran.result.entities.some(
+        (e) =>
+          String(e.name).includes("Repository") ||
+          String(e.name).includes("Service") ||
+          String(e.name).includes("Controller"),
+      ),
+    ).toBe(true);
   });
 
   it("diamond impact dedupes", async () => {
@@ -146,10 +150,7 @@ describe("DSL IMPACT", () => {
 
   it("impact on empty set yields empty", async () => {
     const root = await copyFixture("layered");
-    const ran = await runQuery(
-      root,
-      'select modules where name = "doesNotExist" impact describe',
-    );
+    const ran = await runQuery(root, 'select modules where name = "doesNotExist" impact describe');
     expect(ran.result.entities).toEqual([]);
     expect(ran.result.impact?.affectedCount).toBe(0);
   });

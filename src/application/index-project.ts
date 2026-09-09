@@ -33,9 +33,7 @@ export async function indexProject(
   const config = await store.readConfig(projectRoot);
 
   const exclude = mergeUnique(config.exclude ?? [], options.exclude ?? []);
-  const include = options.include?.length
-    ? options.include
-    : (config.include ?? []);
+  const include = options.include?.length ? options.include : (config.include ?? []);
 
   const { index, graph } = await buildProjectIndex(scanRoot, {
     ...(exclude.length > 0 ? { exclude } : {}),

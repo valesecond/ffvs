@@ -1,6 +1,6 @@
-/** FFVS Query Language (DSL) — version 0.3 (resolution-aware traverse + CALL impact). */
+/** FFVS Query Language (DSL) — version 1.0 (product-stable surface). */
 
-export const LANGUAGE_VERSION = "0.3" as const;
+export const LANGUAGE_VERSION = "1.0" as const;
 
 export type {
   QueryAst,

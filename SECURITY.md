@@ -2,26 +2,25 @@
 
 ## Supported versions
 
-FFVS is in early development (Phase 0). Security fixes are applied on the default branch as needed.
+| Version | Supported                     |
+| ------- | ----------------------------- |
+| 1.0.x   | Yes                           |
+| < 1.0   | Best-effort on default branch |
 
 ## Reporting a vulnerability
 
 Please **do not** open a public issue for security-sensitive reports.
 
-Prefer:
+Prefer GitHub private vulnerability reporting (when enabled) or contact maintainers privately via the repository’s published channel.
 
-1. GitHub Security Advisories / private vulnerability reporting on the repository (when enabled), or
-2. Contacting the maintainers privately through the channel published on the GitHub profile/repository.
+Include: description, reproduction, impact, and any suggested fix.
 
-Include:
+## Privacy & local operation
 
-- Description of the issue;
-- Steps to reproduce;
-- Impact assessment if known;
-- Whether a fix is suggested.
+FFVS **1.0** analyzes projects **locally**. Core workflows do not upload source to remote services and do not enable mandatory telemetry.
 
-We will acknowledge receipt when possible and work on a fix before any coordinated disclosure.
+Treat untrusted repositories like any local tooling: only index code you trust to execute tooling against.
 
-## Scope notes
+## Scope
 
-FFVS runs locally and reads project files to build an index. Treat untrusted repositories like any other local tooling: review what you index. The tool should not exfiltrate data to remote services as part of its core local workflow.
+Index/graph files under `.ffvs/` may contain structural metadata derived from your tree. Keep `.ffvs/` out of public commits when appropriate (see `docs/storage.md`).

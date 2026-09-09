@@ -6,12 +6,12 @@
 
 Applicable primarily to **IMPORTS** and **CALLS** edges:
 
-| State | Meaning |
-| ----- | ------- |
-| `RESOLVED` | Target bound with confidence (single candidate) |
-| `AMBIGUOUS` | Multiple plausible targets; FFVS refused to guess |
-| `UNRESOLVED` | No bindable target in the indexed graph |
-| `EXTERNAL` | Target outside the project / package boundary (imports) |
+| State        | Meaning                                                 |
+| ------------ | ------------------------------------------------------- |
+| `RESOLVED`   | Target bound with confidence (single candidate)         |
+| `AMBIGUOUS`  | Multiple plausible targets; FFVS refused to guess       |
+| `UNRESOLVED` | No bindable target in the indexed graph                 |
+| `EXTERNAL`   | Target outside the project / package boundary (imports) |
 
 Resolution is a **relation** property. It is **not** an entity attribute. Queries such as `where resolution = …` on functions are rejected.
 

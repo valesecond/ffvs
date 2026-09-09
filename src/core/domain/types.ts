@@ -2,13 +2,7 @@ export type EntityKind =
   "PROJECT" | "FILE" | "MODULE" | "FUNCTION" | "CLASS" | "METHOD" | "VARIABLE";
 
 export type RelationKind =
-  | "CONTAINS"
-  | "IMPORTS"
-  | "EXPORTS"
-  | "DECLARES"
-  | "EXTENDS"
-  | "IMPLEMENTS"
-  | "CALLS";
+  "CONTAINS" | "IMPORTS" | "EXPORTS" | "DECLARES" | "EXTENDS" | "IMPLEMENTS" | "CALLS";
 
 export interface SourceLocation {
   file: string;

@@ -12,6 +12,7 @@ export default tseslint.config(
       "fixtures/**",
       "coverage/**",
       "research/experiments/**/scripts/**",
+      "research/experiments/**/*.mjs",
     ],
   },
   {

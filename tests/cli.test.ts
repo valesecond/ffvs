@@ -91,6 +91,32 @@ describe("indexProject + getStatus", () => {
 });
 
 describe("CLI", () => {
+  it("reports package.json version", async () => {
+    const chunks: string[] = [];
+    const originalWrite = process.stdout.write.bind(process.stdout);
+    process.stdout.write = ((
+      chunk: string | Uint8Array,
+      encoding?: BufferEncoding | ((err?: Error | null) => void),
+      cb?: (err?: Error | null) => void,
+    ) => {
+      chunks.push(typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf8"));
+      if (typeof encoding === "function") {
+        encoding(null);
+        return true;
+      }
+      if (cb) {
+        cb(null);
+      }
+      return true;
+    }) as typeof process.stdout.write;
+    try {
+      const code = await runCli(["node", "ffvs", "--version"]);
+      expect(code).toBe(0);
+      expect(chunks.join("")).toMatch(/FFVS\s+1\.\d+\.\d+/);
+    } finally {
+      process.stdout.write = originalWrite;
+    }
+  });
   it("prints help", async () => {
     const chunks: string[] = [];
     const originalWrite = process.stdout.write.bind(process.stdout);

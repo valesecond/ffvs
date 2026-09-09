@@ -505,10 +505,7 @@ export function extractFromJavaScript(source: string, filePath: string): FileExt
       if (localId) {
         nextEnclosing = localId;
       }
-    } else if (
-      (t.isFunctionExpression(node) || t.isArrowFunctionExpression(node)) &&
-      node.loc
-    ) {
+    } else if ((t.isFunctionExpression(node) || t.isArrowFunctionExpression(node)) && node.loc) {
       const match = entities.find(
         (e) =>
           e.kind === "FUNCTION" &&
@@ -518,10 +515,7 @@ export function extractFromJavaScript(source: string, filePath: string): FileExt
       if (match) {
         nextEnclosing = match.localId;
       }
-    } else if (
-      (t.isClassMethod(node) || t.isClassPrivateMethod(node)) &&
-      node.loc
-    ) {
+    } else if ((t.isClassMethod(node) || t.isClassPrivateMethod(node)) && node.loc) {
       const match = entities.find(
         (e) =>
           e.kind === "METHOD" &&

@@ -149,7 +149,7 @@ describe("phase 1.5 CLI", () => {
 
       logs.length = 0;
       expect(await runCli(["node", "ffvs", "deps", "Service"])).toBe(0);
-      expect(logs.join("\n")).toContain("Dependencies");
+      expect(logs.join("\n").toLowerCase()).toContain("dependencies");
     } finally {
       console.log = original;
       process.chdir(previous);

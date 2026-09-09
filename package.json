@@ -1,7 +1,7 @@
 {
   "name": "ffvs",
-  "version": "0.8.0",
-  "description": "Local-first CLI for treating software projects as queryable semantic structures",
+  "version": "1.2.0",
+  "description": "Local-first CLI that turns JS/TS projects into queryable semantic graphs",
   "type": "module",
   "bin": {
     "ffvs": "./dist/cli/index.js"
@@ -18,7 +18,11 @@
     "dist",
     "README.md",
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "docs",
+    "schemas",
+    "examples/demo/README.md",
+    "examples/demo/src"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -42,10 +46,19 @@
     "software-graph"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valesecond/ffvs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/valesecond/ffvs/issues"
+  },
+  "homepage": "https://github.com/valesecond/ffvs#readme",
   "dependencies": {
     "@babel/parser": "^8.0.4",
     "@babel/types": "^8.0.4",
-    "commander": "^13.1.0"
+    "commander": "^13.1.0",
+    "ora": "^8.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

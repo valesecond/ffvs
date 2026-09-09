@@ -37,13 +37,8 @@ describe("DSL parser", () => {
     const ast = parseQuery(
       'select functions where name contains "resolve" traverse callers describe',
     );
-    expect(ast.languageVersion).toBe("0.3");
-    expect(ast.stages.map((s) => s.type)).toEqual([
-      "select",
-      "where",
-      "traverse",
-      "describe",
-    ]);
+    expect(ast.languageVersion).toBe("1.0");
+    expect(ast.stages.map((s) => s.type)).toEqual(["select", "where", "traverse", "describe"]);
   });
 
   it("parses search with kind", () => {
@@ -53,7 +48,12 @@ describe("DSL parser", () => {
 
   it("parses where name =", () => {
     const ast = parse('select modules where name = "common" describe');
-    expect(ast.stages[1]).toMatchObject({ type: "where", field: "name", op: "eq", value: "common" });
+    expect(ast.stages[1]).toMatchObject({
+      type: "where",
+      field: "name",
+      op: "eq",
+      value: "common",
+    });
   });
 
   it("errors on incomplete where", () => {

@@ -1,0 +1,3179 @@
+{
+  "stats": [
+    {
+      "name": "debug",
+      "root": "C:\\Users\\HP\\AppData\\Local\\Temp\\ffvs-exp-dsl-0006\\debug",
+      "files": 13,
+      "nodes": 113,
+      "edges": 273,
+      "entities": {
+        "MODULE": 13,
+        "FUNCTION": 77,
+        "METHOD": 0,
+        "CLASS": 0,
+        "FILE": 13
+      },
+      "IMPORTS": {
+        "RESOLVED": 6,
+        "AMBIGUOUS": 0,
+        "UNRESOLVED": 0,
+        "EXTERNAL": 8,
+        "unknown": 0,
+        "total": 14
+      },
+      "CALLS": {
+        "RESOLVED": 24,
+        "AMBIGUOUS": 3,
+        "UNRESOLVED": 168,
+        "EXTERNAL": 0,
+        "unknown": 0,
+        "total": 195
+      },
+      "parseErrors": 0
+    },
+    {
+      "name": "zod",
+      "root": "C:\\Users\\HP\\AppData\\Local\\Temp\\ffvs-exp-dsl-0006\\zod",
+      "files": 328,
+      "nodes": 3284,
+      "edges": 51398,
+      "entities": {
+        "MODULE": 346,
+        "FUNCTION": 1370,
+        "METHOD": 300,
+        "CLASS": 54,
+        "FILE": 328
+      },
+      "IMPORTS": {
+        "RESOLVED": 556,
+        "AMBIGUOUS": 0,
+        "UNRESOLVED": 0,
+        "EXTERNAL": 397,
+        "unknown": 0,
+        "total": 953
+      },
+      "CALLS": {
+        "RESOLVED": 10501,
+        "AMBIGUOUS": 12530,
+        "UNRESOLVED": 21514,
+        "EXTERNAL": 0,
+        "unknown": 0,
+        "total": 44545
+      },
+      "parseErrors": 6
+    },
+    {
+      "name": "commander",
+      "root": "C:\\Users\\HP\\AppData\\Local\\Temp\\ffvs-exp-dsl-0006\\commander",
+      "files": 219,
+      "nodes": 1168,
+      "edges": 11003,
+      "entities": {
+        "MODULE": 300,
+        "FUNCTION": 234,
+        "METHOD": 185,
+        "CLASS": 19,
+        "FILE": 219
+      },
+      "IMPORTS": {
+        "RESOLVED": 19,
+        "AMBIGUOUS": 0,
+        "UNRESOLVED": 107,
+        "EXTERNAL": 75,
+        "unknown": 0,
+        "total": 201
+      },
+      "CALLS": {
+        "RESOLVED": 3862,
+        "AMBIGUOUS": 297,
+        "UNRESOLVED": 5332,
+        "EXTERNAL": 0,
+        "unknown": 0,
+        "total": 9491
+      },
+      "parseErrors": 1
+    },
+    {
+      "name": "ffvs-self",
+      "root": "C:\\Users\\HP\\AppData\\Local\\Temp\\ffvs-exp-dsl-0006\\ffvs-self",
+      "files": 39,
+      "nodes": 395,
+      "edges": 2077,
+      "entities": {
+        "MODULE": 45,
+        "FUNCTION": 280,
+        "METHOD": 5,
+        "CLASS": 6,
+        "FILE": 39
+      },
+      "IMPORTS": {
+        "RESOLVED": 108,
+        "AMBIGUOUS": 0,
+        "UNRESOLVED": 0,
+        "EXTERNAL": 21,
+        "unknown": 0,
+        "total": 129
+      },
+      "CALLS": {
+        "RESOLVED": 364,
+        "AMBIGUOUS": 0,
+        "UNRESOLVED": 1027,
+        "EXTERNAL": 0,
+        "unknown": 0,
+        "total": 1391
+      },
+      "parseErrors": 0
+    }
+  ],
+  "seeds": {
+    "debug": {
+      "fn": {
+        "name": "log",
+        "id": "function:src/node.js:log",
+        "callersResolved": 6
+      },
+      "mod": {
+        "name": "common.js",
+        "id": "module:src/common.js",
+        "dependentsResolved": 2
+      }
+    },
+    "zod": {
+      "fn": {
+        "name": "toJSONSchema",
+        "id": "function:packages/zod/src/v4/core/json-schema-processors.ts:toJSONSchema",
+        "callersResolved": 366
+      },
+      "mod": {
+        "name": "util.ts",
+        "id": "module:packages/zod/src/v4/core/util.ts",
+        "dependentsResolved": 86
+      }
+    },
+    "commander": {
+      "fn": {
+        "name": "red",
+        "id": "function:tests/help.style.test.js:red",
+        "callersResolved": 46
+      },
+      "mod": {
+        "name": "error.js",
+        "id": "module:lib/error.js",
+        "dependentsResolved": 4
+      }
+    },
+    "ffvs-self": {
+      "fn": {
+        "name": "printJson",
+        "id": "function:src/cli/format.ts:printJson",
+        "callersResolved": 21
+      },
+      "mod": {
+        "name": "types.ts",
+        "id": "module:src/core/domain/types.ts",
+        "dependentsResolved": 22
+      }
+    }
+  },
+  "queries": {
+    "debug": {
+      "seeds": {
+        "fn": "log",
+        "mod": "common.js"
+      },
+      "Q01_naive": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependents traverse callers",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"common.js\"", "traverse dependents", "traverse callers"]
+      },
+      "Q01_bridge": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependents traverse declares",
+        "entities": 14,
+        "relations": 14,
+        "kinds": {
+          "FUNCTION": 12,
+          "VARIABLE": 2
+        },
+        "names": [
+          "formatArgs",
+          "formatArgs",
+          "getDate",
+          "init",
+          "load",
+          "load",
+          "localstorage",
+          "log",
+          "save",
+          "save",
+          "tty",
+          "useColors"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 14
+        },
+        "impact": null,
+        "stages": ["search \"common.js\"", "traverse dependents", "traverse declares"]
+      },
+      "Q01b_callers_of_fn": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"log\"", "traverse callers resolution resolved"]
+      },
+      "Q01c_callers_modules": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved traverse parents",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "FILE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 2
+        },
+        "impact": null,
+        "stages": ["search \"log\"", "traverse callers resolution resolved", "traverse parents"]
+      },
+      "Q02_callers_then_deps": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"log\"", "traverse callers resolution resolved"]
+      },
+      "Q02_via_module_deps": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"log\"", "traverse callers resolution resolved"]
+      },
+      "Q03_import_impact": {
+        "ok": true,
+        "source": "search \"common.js\" kind module impact describe",
+        "entities": 5,
+        "relations": 5,
+        "kinds": {
+          "MODULE": 5
+        },
+        "names": ["browser.js", "index.js", "node.js", "test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 5,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["module:src/common.js"],
+          "affectedCount": 5,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"common.js\"", "impact", "describe"]
+      },
+      "Q03_call_impact": {
+        "ok": true,
+        "source": "search \"log\" kind function impact along calls describe",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["function:src/node.js:log"],
+          "affectedCount": 2,
+          "relationKinds": ["CALLS"],
+          "along": "calls",
+          "resolution": "RESOLVED"
+        },
+        "stages": ["search \"log\"", "impact along calls resolution resolved", "describe"]
+      },
+      "Q04_callers": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"log\"", "traverse callers resolution resolved"]
+      },
+      "Q04_impact": {
+        "ok": true,
+        "source": "search \"common.js\" kind module impact",
+        "entities": 5,
+        "relations": 5,
+        "kinds": {
+          "MODULE": 5
+        },
+        "names": ["browser.js", "index.js", "node.js", "test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 5,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["module:src/common.js"],
+          "affectedCount": 5,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"common.js\"", "impact"]
+      },
+      "Q05_callers": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"log\"", "traverse callers resolution resolved"]
+      },
+      "Q06_one_hop": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"log\"", "traverse callers resolution resolved"]
+      },
+      "Q06_two_hop": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved traverse callers resolution resolved",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"log\"",
+          "traverse callers resolution resolved",
+          "traverse callers resolution resolved"
+        ]
+      },
+      "Q06_call_impact": {
+        "ok": true,
+        "source": "search \"log\" kind function impact along calls",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["function:src/node.js:log"],
+          "affectedCount": 2,
+          "relationKinds": ["CALLS"],
+          "along": "calls",
+          "resolution": "RESOLVED"
+        },
+        "stages": ["search \"log\"", "impact along calls resolution resolved"]
+      },
+      "Q07_deps": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependencies",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "MODULE": 1
+        },
+        "names": ["ms"],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 1,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"common.js\"", "traverse dependencies"]
+      },
+      "Q07_two_hop_deps": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependencies traverse dependencies",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"common.js\"", "traverse dependencies", "traverse dependencies"]
+      },
+      "Q07_impact": {
+        "ok": true,
+        "source": "search \"common.js\" kind module impact",
+        "entities": 5,
+        "relations": 5,
+        "kinds": {
+          "MODULE": 5
+        },
+        "names": ["browser.js", "index.js", "node.js", "test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 5,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["module:src/common.js"],
+          "affectedCount": 5,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"common.js\"", "impact"]
+      },
+      "Q07_dependents_two": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependents traverse dependents",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["index.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"common.js\"", "traverse dependents", "traverse dependents"]
+      },
+      "Q08_deps_declares_calls_resolved": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependents traverse declares",
+        "entities": 14,
+        "relations": 14,
+        "kinds": {
+          "FUNCTION": 12,
+          "VARIABLE": 2
+        },
+        "names": [
+          "formatArgs",
+          "formatArgs",
+          "getDate",
+          "init",
+          "load",
+          "load",
+          "localstorage",
+          "log",
+          "save",
+          "save",
+          "tty",
+          "useColors"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 14
+        },
+        "impact": null,
+        "stages": ["search \"common.js\"", "traverse dependents", "traverse declares"]
+      },
+      "Q09_composition": {
+        "ok": true,
+        "source": "select functions where name contains \"log\" traverse callers resolution resolved traverse calls resolution resolved",
+        "entities": 4,
+        "relations": 5,
+        "kinds": {
+          "VARIABLE": 3,
+          "FUNCTION": 1
+        },
+        "names": ["assert", "debug", "debug", "log"],
+        "resolution": {
+          "RESOLVED": 5,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "select functions",
+          "where name contains \"log\"",
+          "traverse callers resolution resolved",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q10_callers_then_deps_attempt": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "MODULE": 2
+        },
+        "names": ["test.js", "test.node.js"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"log\"", "traverse callers resolution resolved"]
+      },
+      "Q02_callers_dependencies": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved traverse dependencies",
+        "entities": 5,
+        "relations": 6,
+        "kinds": {
+          "MODULE": 5
+        },
+        "names": ["assert", "index.js", "node.js", "sinon", "util"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 4,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"log\"",
+          "traverse callers resolution resolved",
+          "traverse dependencies"
+        ]
+      },
+      "Q05_callers_dependencies": {
+        "ok": true,
+        "source": "search \"log\" kind function traverse callers resolution resolved traverse dependencies",
+        "entities": 5,
+        "relations": 6,
+        "kinds": {
+          "MODULE": 5
+        },
+        "names": ["assert", "index.js", "node.js", "sinon", "util"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 4,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"log\"",
+          "traverse callers resolution resolved",
+          "traverse dependencies"
+        ]
+      },
+      "Q01_dependents_declares_calls": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependents traverse declares traverse calls resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["getDate"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"common.js\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q01_dependents_calls_direct": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependents traverse calls resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["localstorage"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"common.js\"",
+          "traverse dependents",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q08_cross_resolved": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependents traverse declares traverse calls resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["getDate"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"common.js\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q08_cross_all": {
+        "ok": true,
+        "source": "search \"common.js\" kind module traverse dependents traverse declares traverse calls",
+        "entities": 19,
+        "relations": 20,
+        "kinds": {
+          "FUNCTION": 19
+        },
+        "names": [
+          "Boolean",
+          "formatWithOptions",
+          "getDate",
+          "getItem",
+          "humanize",
+          "isatty",
+          "join",
+          "keys",
+          "match",
+          "parseInt",
+          "push",
+          "removeItem"
+        ],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 19,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"common.js\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls"
+        ]
+      }
+    },
+    "zod": {
+      "seeds": {
+        "fn": "toJSONSchema",
+        "mod": "util.ts"
+      },
+      "Q01_naive": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependents traverse callers",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"util.ts\"", "traverse dependents", "traverse callers"]
+      },
+      "Q01_bridge": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependents traverse declares",
+        "entities": 1085,
+        "relations": 1085,
+        "kinds": {
+          "FUNCTION": 626,
+          "VARIABLE": 413,
+          "CLASS": 46
+        },
+        "names": [
+          "_any",
+          "_array",
+          "_base64",
+          "_base64url",
+          "_bigint",
+          "_boolean",
+          "_catch",
+          "_catch",
+          "_check",
+          "_cidrv4",
+          "_cidrv6",
+          "_coercedBigint"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 1085
+        },
+        "impact": null,
+        "stages": ["search \"util.ts\"", "traverse dependents", "traverse declares"]
+      },
+      "Q01b_callers_of_fn": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"toJSONSchema\"", "traverse callers resolution resolved"]
+      },
+      "Q01c_callers_modules": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved traverse parents",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "FILE": 22,
+          "MODULE": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts",
+          "properties.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 23
+        },
+        "impact": null,
+        "stages": [
+          "search \"toJSONSchema\"",
+          "traverse callers resolution resolved",
+          "traverse parents"
+        ]
+      },
+      "Q02_callers_then_deps": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"toJSONSchema\"", "traverse callers resolution resolved"]
+      },
+      "Q02_via_module_deps": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"toJSONSchema\"", "traverse callers resolution resolved"]
+      },
+      "Q03_import_impact": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module impact describe",
+        "entities": 166,
+        "relations": 178,
+        "kinds": {
+          "MODULE": 166
+        },
+        "names": [
+          "all-errors.test.ts",
+          "anyunknown.test.ts",
+          "api.ts",
+          "apply.test.ts",
+          "ar.ts",
+          "array.test.ts",
+          "az.ts",
+          "base.test.ts",
+          "be.test.ts",
+          "be.ts",
+          "bg.ts",
+          "bn.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 178,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "module:packages/zod/src/v3/helpers/enumUtil.ts",
+            "module:packages/zod/src/v3/helpers/errorUtil.ts",
+            "module:packages/zod/src/v3/helpers/parseUtil.ts",
+            "module:packages/zod/src/v3/helpers/partialUtil.ts",
+            "module:packages/zod/src/v3/helpers/util.ts",
+            "module:packages/zod/src/v4/core/util.ts"
+          ],
+          "affectedCount": 166,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"util.ts\"", "impact", "describe"]
+      },
+      "Q03_call_impact": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function impact along calls describe",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "function:packages/zod/src/v4/core/json-schema-processors.ts:toJSONSchema",
+            "function:packages/zod/src/v4/core/to-json-schema.ts:createToJSONSchemaMethod"
+          ],
+          "affectedCount": 23,
+          "relationKinds": ["CALLS"],
+          "along": "calls",
+          "resolution": "RESOLVED"
+        },
+        "stages": ["search \"toJSONSchema\"", "impact along calls resolution resolved", "describe"]
+      },
+      "Q04_callers": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"toJSONSchema\"", "traverse callers resolution resolved"]
+      },
+      "Q04_impact": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module impact",
+        "entities": 166,
+        "relations": 178,
+        "kinds": {
+          "MODULE": 166
+        },
+        "names": [
+          "all-errors.test.ts",
+          "anyunknown.test.ts",
+          "api.ts",
+          "apply.test.ts",
+          "ar.ts",
+          "array.test.ts",
+          "az.ts",
+          "base.test.ts",
+          "be.test.ts",
+          "be.ts",
+          "bg.ts",
+          "bn.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 178,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "module:packages/zod/src/v3/helpers/enumUtil.ts",
+            "module:packages/zod/src/v3/helpers/errorUtil.ts",
+            "module:packages/zod/src/v3/helpers/parseUtil.ts",
+            "module:packages/zod/src/v3/helpers/partialUtil.ts",
+            "module:packages/zod/src/v3/helpers/util.ts",
+            "module:packages/zod/src/v4/core/util.ts"
+          ],
+          "affectedCount": 166,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"util.ts\"", "impact"]
+      },
+      "Q05_callers": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"toJSONSchema\"", "traverse callers resolution resolved"]
+      },
+      "Q06_one_hop": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"toJSONSchema\"", "traverse callers resolution resolved"]
+      },
+      "Q06_two_hop": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "MODULE": 1
+        },
+        "names": ["to-json-schema-methods.test.ts"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"toJSONSchema\"",
+          "traverse callers resolution resolved",
+          "traverse callers resolution resolved"
+        ]
+      },
+      "Q06_call_impact": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function impact along calls",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "function:packages/zod/src/v4/core/json-schema-processors.ts:toJSONSchema",
+            "function:packages/zod/src/v4/core/to-json-schema.ts:createToJSONSchemaMethod"
+          ],
+          "affectedCount": 23,
+          "relationKinds": ["CALLS"],
+          "along": "calls",
+          "resolution": "RESOLVED"
+        },
+        "stages": ["search \"toJSONSchema\"", "impact along calls resolution resolved"]
+      },
+      "Q07_deps": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependencies",
+        "entities": 5,
+        "relations": 5,
+        "kinds": {
+          "MODULE": 5
+        },
+        "names": ["checks.ts", "core.ts", "errors.ts", "schemas.ts", "types.ts"],
+        "resolution": {
+          "RESOLVED": 5,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"util.ts\"", "traverse dependencies"]
+      },
+      "Q07_two_hop_deps": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependencies traverse dependencies",
+        "entities": 21,
+        "relations": 33,
+        "kinds": {
+          "MODULE": 21
+        },
+        "names": [
+          "checks.ts",
+          "core.ts",
+          "doc.ts",
+          "enumUtil.ts",
+          "errors.ts",
+          "errors.ts",
+          "errorUtil.ts",
+          "json-schema.ts",
+          "parse.ts",
+          "parseUtil.ts",
+          "partialUtil.ts",
+          "regexes.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 33,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"util.ts\"", "traverse dependencies", "traverse dependencies"]
+      },
+      "Q07_impact": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module impact",
+        "entities": 166,
+        "relations": 178,
+        "kinds": {
+          "MODULE": 166
+        },
+        "names": [
+          "all-errors.test.ts",
+          "anyunknown.test.ts",
+          "api.ts",
+          "apply.test.ts",
+          "ar.ts",
+          "array.test.ts",
+          "az.ts",
+          "base.test.ts",
+          "be.test.ts",
+          "be.ts",
+          "bg.ts",
+          "bn.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 178,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "module:packages/zod/src/v3/helpers/enumUtil.ts",
+            "module:packages/zod/src/v3/helpers/errorUtil.ts",
+            "module:packages/zod/src/v3/helpers/parseUtil.ts",
+            "module:packages/zod/src/v3/helpers/partialUtil.ts",
+            "module:packages/zod/src/v3/helpers/util.ts",
+            "module:packages/zod/src/v4/core/util.ts"
+          ],
+          "affectedCount": 166,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"util.ts\"", "impact"]
+      },
+      "Q07_dependents_two": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependents traverse dependents",
+        "entities": 125,
+        "relations": 311,
+        "kinds": {
+          "MODULE": 125
+        },
+        "names": [
+          "api.ts",
+          "ar.ts",
+          "az.ts",
+          "be.test.ts",
+          "be.ts",
+          "bg.ts",
+          "bn.ts",
+          "ca.ts",
+          "checks.ts",
+          "checks.ts",
+          "checks.ts",
+          "ckb.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 311,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"util.ts\"", "traverse dependents", "traverse dependents"]
+      },
+      "Q08_deps_declares_calls_resolved": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependents traverse declares",
+        "entities": 1085,
+        "relations": 1085,
+        "kinds": {
+          "FUNCTION": 626,
+          "VARIABLE": 413,
+          "CLASS": 46
+        },
+        "names": [
+          "_any",
+          "_array",
+          "_base64",
+          "_base64url",
+          "_bigint",
+          "_boolean",
+          "_catch",
+          "_catch",
+          "_check",
+          "_cidrv4",
+          "_cidrv6",
+          "_coercedBigint"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 1085
+        },
+        "impact": null,
+        "stages": ["search \"util.ts\"", "traverse dependents", "traverse declares"]
+      },
+      "Q09_composition": {
+        "ok": true,
+        "source": "select functions where name contains \"toJS\" traverse callers resolution resolved traverse calls resolution resolved",
+        "entities": 45,
+        "relations": 142,
+        "kinds": {
+          "FUNCTION": 14,
+          "METHOD": 30,
+          "VARIABLE": 1
+        },
+        "names": [
+          "$constructor",
+          "acceptSchema",
+          "add",
+          "and",
+          "clear",
+          "emit",
+          "endsWith",
+          "exactPartial",
+          "exclude",
+          "expectMethodMatch",
+          "extract",
+          "fromJSONSchema"
+        ],
+        "resolution": {
+          "RESOLVED": 142,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "select functions",
+          "where name contains \"toJS\"",
+          "traverse callers resolution resolved",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q10_callers_then_deps_attempt": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved",
+        "entities": 23,
+        "relations": 23,
+        "kinds": {
+          "MODULE": 22,
+          "FUNCTION": 1
+        },
+        "names": [
+          "apply.test.ts",
+          "computed.test.ts",
+          "credit-card.test.ts",
+          "datetime.test.ts",
+          "detached-methods.test.ts",
+          "enum.test.ts",
+          "expectMethodMatch",
+          "from-json-schema.test.ts",
+          "in-out.test.ts",
+          "instance-footprint.test.ts",
+          "literal.test.ts",
+          "object.test.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 23,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"toJSONSchema\"", "traverse callers resolution resolved"]
+      },
+      "Q02_callers_dependencies": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved traverse dependencies",
+        "entities": 18,
+        "relations": 58,
+        "kinds": {
+          "MODULE": 18
+        },
+        "names": [
+          "@seriousme/openapi-schema-validator",
+          "checks.ts",
+          "checks.ts",
+          "en.ts",
+          "from-json-schema.ts",
+          "index.ts",
+          "index.ts",
+          "index.ts",
+          "json-schema-processors.ts",
+          "node:crypto",
+          "parse.ts",
+          "standard-schema.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 12,
+          "EXTERNAL": 46,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"toJSONSchema\"",
+          "traverse callers resolution resolved",
+          "traverse dependencies"
+        ]
+      },
+      "Q05_callers_dependencies": {
+        "ok": true,
+        "source": "search \"toJSONSchema\" kind function traverse callers resolution resolved traverse dependencies",
+        "entities": 18,
+        "relations": 58,
+        "kinds": {
+          "MODULE": 18
+        },
+        "names": [
+          "@seriousme/openapi-schema-validator",
+          "checks.ts",
+          "checks.ts",
+          "en.ts",
+          "from-json-schema.ts",
+          "index.ts",
+          "index.ts",
+          "index.ts",
+          "json-schema-processors.ts",
+          "node:crypto",
+          "parse.ts",
+          "standard-schema.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 12,
+          "EXTERNAL": 46,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"toJSONSchema\"",
+          "traverse callers resolution resolved",
+          "traverse dependencies"
+        ]
+      },
+      "Q01_dependents_declares_calls": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependents traverse declares traverse calls resolution resolved",
+        "entities": 278,
+        "relations": 963,
+        "kinds": {
+          "FUNCTION": 247,
+          "METHOD": 25,
+          "VARIABLE": 6
+        },
+        "names": [
+          "_any",
+          "_base64",
+          "_base64url",
+          "_bigint",
+          "_boolean",
+          "_check",
+          "_cidrv4",
+          "_cidrv6",
+          "_creditCard",
+          "_cuid",
+          "_cuid2",
+          "_custom"
+        ],
+        "resolution": {
+          "RESOLVED": 963,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"util.ts\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q01_dependents_calls_direct": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependents traverse calls resolution resolved",
+        "entities": 197,
+        "relations": 327,
+        "kinds": {
+          "FUNCTION": 159,
+          "METHOD": 36,
+          "VARIABLE": 2
+        },
+        "names": [
+          "_decode",
+          "_decodeAsync",
+          "_encode",
+          "_encodeAsync",
+          "_parse",
+          "_parseAsync",
+          "_refinement",
+          "_safeDecode",
+          "_safeDecodeAsync",
+          "_safeEncode",
+          "_safeEncodeAsync",
+          "_safeParse"
+        ],
+        "resolution": {
+          "RESOLVED": 327,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"util.ts\"",
+          "traverse dependents",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q08_cross_resolved": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependents traverse declares traverse calls resolution resolved",
+        "entities": 278,
+        "relations": 963,
+        "kinds": {
+          "FUNCTION": 247,
+          "METHOD": 25,
+          "VARIABLE": 6
+        },
+        "names": [
+          "_any",
+          "_base64",
+          "_base64url",
+          "_bigint",
+          "_boolean",
+          "_check",
+          "_cidrv4",
+          "_cidrv6",
+          "_creditCard",
+          "_cuid",
+          "_cuid2",
+          "_custom"
+        ],
+        "resolution": {
+          "RESOLVED": 963,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"util.ts\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q08_cross_all": {
+        "ok": true,
+        "source": "search \"util.ts\" kind module traverse dependents traverse declares traverse calls",
+        "entities": 453,
+        "relations": 1626,
+        "kinds": {
+          "FUNCTION": 422,
+          "METHOD": 25,
+          "VARIABLE": 6
+        },
+        "names": [
+          "_any",
+          "_base64",
+          "_base64url",
+          "_bigint",
+          "_boolean",
+          "_check",
+          "_cidrv4",
+          "_cidrv6",
+          "_creditCard",
+          "_cuid",
+          "_cuid2",
+          "_custom"
+        ],
+        "resolution": {
+          "RESOLVED": 963,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 465,
+          "AMBIGUOUS": 198,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"util.ts\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls"
+        ]
+      }
+    },
+    "commander": {
+      "seeds": {
+        "fn": "red",
+        "mod": "error.js"
+      },
+      "Q01_naive": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependents traverse callers",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"error.js\"", "traverse dependents", "traverse callers"]
+      },
+      "Q01_bridge": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependents traverse declares",
+        "entities": 14,
+        "relations": 14,
+        "kinds": {
+          "CLASS": 4,
+          "FUNCTION": 5,
+          "VARIABLE": 5
+        },
+        "names": [
+          "Argument",
+          "camelcase",
+          "childProcess",
+          "Command",
+          "DualOptions",
+          "EventEmitter",
+          "fs",
+          "humanReadableArgName",
+          "incrementNodeInspectorPort",
+          "Option",
+          "path",
+          "process"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 14
+        },
+        "impact": null,
+        "stages": ["search \"error.js\"", "traverse dependents", "traverse declares"]
+      },
+      "Q01b_callers_of_fn": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"red\"", "traverse callers resolution resolved"]
+      },
+      "Q01c_callers_modules": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved traverse parents",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "FILE": 1,
+          "MODULE": 1
+        },
+        "names": ["help.style.test.js", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 2
+        },
+        "impact": null,
+        "stages": ["search \"red\"", "traverse callers resolution resolved", "traverse parents"]
+      },
+      "Q02_callers_then_deps": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"red\"", "traverse callers resolution resolved"]
+      },
+      "Q02_via_module_deps": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"red\"", "traverse callers resolution resolved"]
+      },
+      "Q03_import_impact": {
+        "ok": true,
+        "source": "search \"error.js\" kind module impact describe",
+        "entities": 11,
+        "relations": 11,
+        "kinds": {
+          "MODULE": 11
+        },
+        "names": [
+          "argument.js",
+          "command.js",
+          "esm-imports-test.mjs",
+          "esm.mjs",
+          "help.js",
+          "help.stripAnsi.test.js",
+          "index.js",
+          "option.js",
+          "options.dual-options.test.js",
+          "program.test.js",
+          "useColor.test.js"
+        ],
+        "resolution": {
+          "RESOLVED": 11,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["module:lib/error.js"],
+          "affectedCount": 11,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"error.js\"", "impact", "describe"]
+      },
+      "Q03_call_impact": {
+        "ok": true,
+        "source": "search \"red\" kind function impact along calls describe",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "function:tests/help.style.test.js:red",
+            "function:tests/help.style.test.js:stripRed"
+          ],
+          "affectedCount": 2,
+          "relationKinds": ["CALLS"],
+          "along": "calls",
+          "resolution": "RESOLVED"
+        },
+        "stages": ["search \"red\"", "impact along calls resolution resolved", "describe"]
+      },
+      "Q04_callers": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"red\"", "traverse callers resolution resolved"]
+      },
+      "Q04_impact": {
+        "ok": true,
+        "source": "search \"error.js\" kind module impact",
+        "entities": 11,
+        "relations": 11,
+        "kinds": {
+          "MODULE": 11
+        },
+        "names": [
+          "argument.js",
+          "command.js",
+          "esm-imports-test.mjs",
+          "esm.mjs",
+          "help.js",
+          "help.stripAnsi.test.js",
+          "index.js",
+          "option.js",
+          "options.dual-options.test.js",
+          "program.test.js",
+          "useColor.test.js"
+        ],
+        "resolution": {
+          "RESOLVED": 11,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["module:lib/error.js"],
+          "affectedCount": 11,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"error.js\"", "impact"]
+      },
+      "Q05_callers": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"red\"", "traverse callers resolution resolved"]
+      },
+      "Q06_one_hop": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"red\"", "traverse callers resolution resolved"]
+      },
+      "Q06_two_hop": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved traverse callers resolution resolved",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"red\"",
+          "traverse callers resolution resolved",
+          "traverse callers resolution resolved"
+        ]
+      },
+      "Q06_call_impact": {
+        "ok": true,
+        "source": "search \"red\" kind function impact along calls",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "function:tests/help.style.test.js:red",
+            "function:tests/help.style.test.js:stripRed"
+          ],
+          "affectedCount": 2,
+          "relationKinds": ["CALLS"],
+          "along": "calls",
+          "resolution": "RESOLVED"
+        },
+        "stages": ["search \"red\"", "impact along calls resolution resolved"]
+      },
+      "Q07_deps": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependencies",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"error.js\"", "traverse dependencies"]
+      },
+      "Q07_two_hop_deps": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependencies traverse dependencies",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"error.js\"", "traverse dependencies", "traverse dependencies"]
+      },
+      "Q07_impact": {
+        "ok": true,
+        "source": "search \"error.js\" kind module impact",
+        "entities": 11,
+        "relations": 11,
+        "kinds": {
+          "MODULE": 11
+        },
+        "names": [
+          "argument.js",
+          "command.js",
+          "esm-imports-test.mjs",
+          "esm.mjs",
+          "help.js",
+          "help.stripAnsi.test.js",
+          "index.js",
+          "option.js",
+          "options.dual-options.test.js",
+          "program.test.js",
+          "useColor.test.js"
+        ],
+        "resolution": {
+          "RESOLVED": 11,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["module:lib/error.js"],
+          "affectedCount": 11,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"error.js\"", "impact"]
+      },
+      "Q07_dependents_two": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependents traverse dependents",
+        "entities": 7,
+        "relations": 10,
+        "kinds": {
+          "MODULE": 7
+        },
+        "names": [
+          "command.js",
+          "esm.mjs",
+          "help.js",
+          "index.js",
+          "options.dual-options.test.js",
+          "program.test.js",
+          "useColor.test.js"
+        ],
+        "resolution": {
+          "RESOLVED": 10,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"error.js\"", "traverse dependents", "traverse dependents"]
+      },
+      "Q08_deps_declares_calls_resolved": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependents traverse declares",
+        "entities": 14,
+        "relations": 14,
+        "kinds": {
+          "CLASS": 4,
+          "FUNCTION": 5,
+          "VARIABLE": 5
+        },
+        "names": [
+          "Argument",
+          "camelcase",
+          "childProcess",
+          "Command",
+          "DualOptions",
+          "EventEmitter",
+          "fs",
+          "humanReadableArgName",
+          "incrementNodeInspectorPort",
+          "Option",
+          "path",
+          "process"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 14
+        },
+        "impact": null,
+        "stages": ["search \"error.js\"", "traverse dependents", "traverse declares"]
+      },
+      "Q09_composition": {
+        "ok": true,
+        "source": "select functions where name contains \"red\" traverse callers resolution resolved traverse calls resolution resolved",
+        "entities": 11,
+        "relations": 11,
+        "kinds": {
+          "METHOD": 9,
+          "FUNCTION": 2
+        },
+        "names": [
+          "argument",
+          "command",
+          "commandUsage",
+          "configureHelp",
+          "configureOutput",
+          "description",
+          "helpInformation",
+          "option",
+          "outputHelp",
+          "red",
+          "stripRed"
+        ],
+        "resolution": {
+          "RESOLVED": 11,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "select functions",
+          "where name contains \"red\"",
+          "traverse callers resolution resolved",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q10_callers_then_deps_attempt": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved",
+        "entities": 2,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 1,
+          "MODULE": 1
+        },
+        "names": ["displayWidth", "help.style.test.js"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"red\"", "traverse callers resolution resolved"]
+      },
+      "Q02_callers_dependencies": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved traverse dependencies",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "MODULE": 1
+        },
+        "names": ["../"],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 1,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"red\"",
+          "traverse callers resolution resolved",
+          "traverse dependencies"
+        ]
+      },
+      "Q05_callers_dependencies": {
+        "ok": true,
+        "source": "search \"red\" kind function traverse callers resolution resolved traverse dependencies",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "MODULE": 1
+        },
+        "names": ["../"],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 1,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"red\"",
+          "traverse callers resolution resolved",
+          "traverse dependencies"
+        ]
+      },
+      "Q01_dependents_declares_calls": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependents traverse declares traverse calls resolution resolved",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"error.js\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q01_dependents_calls_direct": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependents traverse calls resolution resolved",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"error.js\"",
+          "traverse dependents",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q08_cross_resolved": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependents traverse declares traverse calls resolution resolved",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"error.js\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q08_cross_all": {
+        "ok": true,
+        "source": "search \"error.js\" kind module traverse dependents traverse declares traverse calls",
+        "entities": 12,
+        "relations": 15,
+        "kinds": {
+          "FUNCTION": 12
+        },
+        "names": [
+          "concat",
+          "map",
+          "match",
+          "name",
+          "parseInt",
+          "reduce",
+          "shift",
+          "slice",
+          "split",
+          "startsWith",
+          "test",
+          "toUpperCase"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 14,
+          "AMBIGUOUS": 1,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"error.js\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls"
+        ]
+      }
+    },
+    "ffvs-self": {
+      "seeds": {
+        "fn": "printJson",
+        "mod": "types.ts"
+      },
+      "Q01_naive": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependents traverse callers",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"types.ts\"", "traverse dependents", "traverse callers"]
+      },
+      "Q01_bridge": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependents traverse declares",
+        "entities": 149,
+        "relations": 149,
+        "kinds": {
+          "VARIABLE": 6,
+          "FUNCTION": 143
+        },
+        "names": [
+          "adapters",
+          "addEdge",
+          "addNode",
+          "ancestors",
+          "applyImpact",
+          "applyPath",
+          "applySelect",
+          "buildCandidateTiers",
+          "buildPath",
+          "buildProjectIndex",
+          "children",
+          "clearHopState"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 149
+        },
+        "impact": null,
+        "stages": ["search \"types.ts\"", "traverse dependents", "traverse declares"]
+      },
+      "Q01b_callers_of_fn": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["createProgram"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"printJson\"", "traverse callers resolution resolved"]
+      },
+      "Q01c_callers_modules": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved traverse parents",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "MODULE": 1
+        },
+        "names": ["program.ts"],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 1
+        },
+        "impact": null,
+        "stages": [
+          "search \"printJson\"",
+          "traverse callers resolution resolved",
+          "traverse parents"
+        ]
+      },
+      "Q02_callers_then_deps": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["createProgram"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"printJson\"", "traverse callers resolution resolved"]
+      },
+      "Q02_via_module_deps": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["createProgram"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"printJson\"", "traverse callers resolution resolved"]
+      },
+      "Q03_import_impact": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module impact describe",
+        "entities": 30,
+        "relations": 41,
+        "kinds": {
+          "MODULE": 30
+        },
+        "names": [
+          "adapter.ts",
+          "build-index.ts",
+          "diagnostics.ts",
+          "executor.ts",
+          "explore.ts",
+          "extract.ts",
+          "ffvs-store.ts",
+          "format.ts",
+          "graph.ts",
+          "index-project.ts",
+          "index.ts",
+          "index.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 41,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "module:src/core/domain/types.ts",
+            "module:src/core/resolver/types.ts",
+            "module:src/languages/types.ts"
+          ],
+          "affectedCount": 30,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"types.ts\"", "impact", "describe"]
+      },
+      "Q03_call_impact": {
+        "ok": true,
+        "source": "search \"printJson\" kind function impact along calls describe",
+        "entities": 3,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 2,
+          "MODULE": 1
+        },
+        "names": ["createProgram", "index.ts", "runCli"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["function:src/cli/format.ts:printJson"],
+          "affectedCount": 3,
+          "relationKinds": ["CALLS"],
+          "along": "calls",
+          "resolution": "RESOLVED"
+        },
+        "stages": ["search \"printJson\"", "impact along calls resolution resolved", "describe"]
+      },
+      "Q04_callers": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["createProgram"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"printJson\"", "traverse callers resolution resolved"]
+      },
+      "Q04_impact": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module impact",
+        "entities": 30,
+        "relations": 41,
+        "kinds": {
+          "MODULE": 30
+        },
+        "names": [
+          "adapter.ts",
+          "build-index.ts",
+          "diagnostics.ts",
+          "executor.ts",
+          "explore.ts",
+          "extract.ts",
+          "ffvs-store.ts",
+          "format.ts",
+          "graph.ts",
+          "index-project.ts",
+          "index.ts",
+          "index.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 41,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "module:src/core/domain/types.ts",
+            "module:src/core/resolver/types.ts",
+            "module:src/languages/types.ts"
+          ],
+          "affectedCount": 30,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"types.ts\"", "impact"]
+      },
+      "Q05_callers": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["createProgram"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"printJson\"", "traverse callers resolution resolved"]
+      },
+      "Q06_one_hop": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["createProgram"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"printJson\"", "traverse callers resolution resolved"]
+      },
+      "Q06_two_hop": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["runCli"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"printJson\"",
+          "traverse callers resolution resolved",
+          "traverse callers resolution resolved"
+        ]
+      },
+      "Q06_call_impact": {
+        "ok": true,
+        "source": "search \"printJson\" kind function impact along calls",
+        "entities": 3,
+        "relations": 3,
+        "kinds": {
+          "FUNCTION": 2,
+          "MODULE": 1
+        },
+        "names": ["createProgram", "index.ts", "runCli"],
+        "resolution": {
+          "RESOLVED": 3,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": ["function:src/cli/format.ts:printJson"],
+          "affectedCount": 3,
+          "relationKinds": ["CALLS"],
+          "along": "calls",
+          "resolution": "RESOLVED"
+        },
+        "stages": ["search \"printJson\"", "impact along calls resolution resolved"]
+      },
+      "Q07_deps": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependencies",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "MODULE": 1
+        },
+        "names": ["types.ts"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"types.ts\"", "traverse dependencies"]
+      },
+      "Q07_two_hop_deps": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependencies traverse dependencies",
+        "entities": 0,
+        "relations": 0,
+        "kinds": {},
+        "names": [],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"types.ts\"", "traverse dependencies", "traverse dependencies"]
+      },
+      "Q07_impact": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module impact",
+        "entities": 30,
+        "relations": 41,
+        "kinds": {
+          "MODULE": 30
+        },
+        "names": [
+          "adapter.ts",
+          "build-index.ts",
+          "diagnostics.ts",
+          "executor.ts",
+          "explore.ts",
+          "extract.ts",
+          "ffvs-store.ts",
+          "format.ts",
+          "graph.ts",
+          "index-project.ts",
+          "index.ts",
+          "index.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 41,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": {
+          "seedIds": [
+            "module:src/core/domain/types.ts",
+            "module:src/core/resolver/types.ts",
+            "module:src/languages/types.ts"
+          ],
+          "affectedCount": 30,
+          "relationKinds": ["IMPORTS"],
+          "along": "imports"
+        },
+        "stages": ["search \"types.ts\"", "impact"]
+      },
+      "Q07_dependents_two": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependents traverse dependents",
+        "entities": 20,
+        "relations": 60,
+        "kinds": {
+          "MODULE": 20
+        },
+        "names": [
+          "adapter.ts",
+          "build-index.ts",
+          "diagnostics.ts",
+          "executor.ts",
+          "explore.ts",
+          "extract.ts",
+          "format.ts",
+          "index-project.ts",
+          "index.ts",
+          "index.ts",
+          "index.ts",
+          "index.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 60,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"types.ts\"", "traverse dependents", "traverse dependents"]
+      },
+      "Q08_deps_declares_calls_resolved": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependents traverse declares",
+        "entities": 149,
+        "relations": 149,
+        "kinds": {
+          "VARIABLE": 6,
+          "FUNCTION": 143
+        },
+        "names": [
+          "adapters",
+          "addEdge",
+          "addNode",
+          "ancestors",
+          "applyImpact",
+          "applyPath",
+          "applySelect",
+          "buildCandidateTiers",
+          "buildPath",
+          "buildProjectIndex",
+          "children",
+          "clearHopState"
+        ],
+        "resolution": {
+          "RESOLVED": 0,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 149
+        },
+        "impact": null,
+        "stages": ["search \"types.ts\"", "traverse dependents", "traverse declares"]
+      },
+      "Q09_composition": {
+        "ok": true,
+        "source": "select functions where name contains \"prin\" traverse callers resolution resolved traverse calls resolution resolved",
+        "entities": 38,
+        "relations": 38,
+        "kinds": {
+          "FUNCTION": 38
+        },
+        "names": [
+          "entityGraphView",
+          "exploreCallers",
+          "exploreCalls",
+          "exploreChildren",
+          "exploreDependencies",
+          "exploreDependents",
+          "exploreImpact",
+          "exploreParents",
+          "explorePath",
+          "exploreRelations",
+          "formatDiagnostics",
+          "formatEntityList"
+        ],
+        "resolution": {
+          "RESOLVED": 38,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "select functions",
+          "where name contains \"prin\"",
+          "traverse callers resolution resolved",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q10_callers_then_deps_attempt": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved",
+        "entities": 1,
+        "relations": 1,
+        "kinds": {
+          "FUNCTION": 1
+        },
+        "names": ["createProgram"],
+        "resolution": {
+          "RESOLVED": 1,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": ["search \"printJson\"", "traverse callers resolution resolved"]
+      },
+      "Q02_callers_dependencies": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved traverse dependencies",
+        "entities": 10,
+        "relations": 10,
+        "kinds": {
+          "MODULE": 10
+        },
+        "names": [
+          "commander",
+          "diagnostics.ts",
+          "errors.ts",
+          "explore.ts",
+          "format.ts",
+          "index-project.ts",
+          "init.ts",
+          "query.ts",
+          "status.ts",
+          "types.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 9,
+          "EXTERNAL": 1,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"printJson\"",
+          "traverse callers resolution resolved",
+          "traverse dependencies"
+        ]
+      },
+      "Q05_callers_dependencies": {
+        "ok": true,
+        "source": "search \"printJson\" kind function traverse callers resolution resolved traverse dependencies",
+        "entities": 10,
+        "relations": 10,
+        "kinds": {
+          "MODULE": 10
+        },
+        "names": [
+          "commander",
+          "diagnostics.ts",
+          "errors.ts",
+          "explore.ts",
+          "format.ts",
+          "index-project.ts",
+          "init.ts",
+          "query.ts",
+          "status.ts",
+          "types.ts"
+        ],
+        "resolution": {
+          "RESOLVED": 9,
+          "EXTERNAL": 1,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"printJson\"",
+          "traverse callers resolution resolved",
+          "traverse dependencies"
+        ]
+      },
+      "Q01_dependents_declares_calls": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependents traverse declares traverse calls resolution resolved",
+        "entities": 135,
+        "relations": 254,
+        "kinds": {
+          "FUNCTION": 135
+        },
+        "names": [
+          "addEdge",
+          "addNode",
+          "ancestors",
+          "applyImpact",
+          "applyPath",
+          "applySelect",
+          "buildCandidateTiers",
+          "buildPath",
+          "buildProjectIndex",
+          "clearHopState",
+          "computeCallImpact",
+          "computeImpact"
+        ],
+        "resolution": {
+          "RESOLVED": 254,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"types.ts\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q01_dependents_calls_direct": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependents traverse calls resolution resolved",
+        "entities": 2,
+        "relations": 2,
+        "kinds": {
+          "FUNCTION": 2
+        },
+        "names": ["extractFromJavaScript", "languageForExtension"],
+        "resolution": {
+          "RESOLVED": 2,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"types.ts\"",
+          "traverse dependents",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q08_cross_resolved": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependents traverse declares traverse calls resolution resolved",
+        "entities": 135,
+        "relations": 254,
+        "kinds": {
+          "FUNCTION": 135
+        },
+        "names": [
+          "addEdge",
+          "addNode",
+          "ancestors",
+          "applyImpact",
+          "applyPath",
+          "applySelect",
+          "buildCandidateTiers",
+          "buildPath",
+          "buildProjectIndex",
+          "clearHopState",
+          "computeCallImpact",
+          "computeImpact"
+        ],
+        "resolution": {
+          "RESOLVED": 254,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"types.ts\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls resolution resolved"
+        ]
+      },
+      "Q08_cross_all": {
+        "ok": true,
+        "source": "search \"types.ts\" kind module traverse dependents traverse declares traverse calls",
+        "entities": 245,
+        "relations": 627,
+        "kinds": {
+          "FUNCTION": 245
+        },
+        "names": [
+          "access",
+          "action",
+          "add",
+          "addClassMembers",
+          "addEdge",
+          "addNode",
+          "alias",
+          "ancestors",
+          "applyImpact",
+          "applyPath",
+          "applySelect",
+          "argument"
+        ],
+        "resolution": {
+          "RESOLVED": 254,
+          "EXTERNAL": 0,
+          "UNRESOLVED": 373,
+          "AMBIGUOUS": 0,
+          "unknown": 0
+        },
+        "impact": null,
+        "stages": [
+          "search \"types.ts\"",
+          "traverse dependents",
+          "traverse declares",
+          "traverse calls"
+        ]
+      }
+    }
+  }
+}

@@ -1,38 +1,47 @@
-# Limitations
+# Limitations (FFVS 1.0)
 
-Honest constraints of the current model (Phase ≤ 2.1).
-
-## Module resolution
-
-- Supported: relative paths, extensionless CJS, `.js`→`.ts/.tsx`, `index.*`, bare → EXTERNAL.
-- **Not** implemented: `tsconfig` paths, package `exports` maps, deep node_modules graph fidelity.
-- Ambiguous candidates are not guessed away for IMPORTS.
-
-## CALLS (call graph)
-
-- Best-effort only.
-- Identifier same-file binds when unique; member/cross-file often `AMBIGUOUS` or `UNRESOLVED`.
-- Dynamic callees, HOFs, destructuring aliases, and metaprogramming are largely unresolved.
-- On zod (EXP-0003): majority of CALLS edges are UNRESOLVED or AMBIGUOUS — treat RESOLVED subset as lower bound.
-
-## Selection / search
-
-- FILTER is substring contains (optional equals/prefix in CORE API; CLI uses contains).
-- No boolean filter expressions (intentional — avoids premature DSL).
-- SEARCH ranking is shallow (exact/prefix/contains heuristics).
-
-## Index scope
-
-- Default skip dirs + `--include` / `--exclude` prefixes.
-- Not a full `.gitignore` engine.
-
-## Query Language
-
-- Thin DSL (`ffvs query`) covers SELECT/WHERE/SEARCH/TRAVERSE/DESCRIBE only.
-- No PATH/IMPACT/RELATIONS stages yet; use CLI for those.
-- Language does not mutate the filesystem or graph.
+Honest constraints. Prefer this list over marketing precision.
 
 ## Languages
 
-- JS/TS via Babel only for semantic extraction.
-- Other file types may appear as FILE nodes without deep entities.
+- Semantic extraction: **JavaScript / TypeScript** only (Babel).
+- Other files may appear as FILE nodes without deep entities.
+- Adapter contract exists for future languages; not shipped.
+
+## Module resolution
+
+- Supported: relative paths, extensionless CJS, `.js`→`.ts/.tsx`, directory `index.*`, bare specifiers → EXTERNAL.
+- **Not** implemented: full `tsconfig` paths, package `exports` maps, deep `node_modules` fidelity.
+- Ambiguous IMPORTS are not guessed away.
+
+## CALLS
+
+- Static, best-effort call graph.
+- States: `RESOLVED` · `AMBIGUOUS` · `UNRESOLVED`.
+- Dynamic calls, heavy HOFs, and metaprogramming are often unresolved.
+- Never treat raw CALL counts as ground truth.
+
+## PATH
+
+- Uses **resolved-internal IMPORTS only**.
+- Does **not** walk CALLS in 1.0.
+
+## IMPACT
+
+- CLI `ffvs impact` = IMPORTS dependents.
+- CALL impact only via `ffvs query '… impact along calls'` (default resolved).
+- No unlabeled hybrid IMPORT+CALL impact.
+
+## Query Language
+
+- Stages: select / where / search / traverse / path / impact / describe.
+- No AND/OR, JOIN, PIPE, aggregates, mutation.
+- Cross-relation composition = sequential traverse (+ `declares` kind bridge). Set intersection is manual (EXP-DSL-0006).
+
+## Index scope
+
+- `--include` / `--exclude` + config; not a full `.gitignore` engine.
+
+## Performance
+
+- Loading large `graph.json` often dominates CLI latency. See `docs/performance.md`.

@@ -1,27 +1,20 @@
 # Linguagem FFVS
 
-A especificação e a implementação thin-slice estão em:
+Especificação do produto: [`docs/language/`](./language/)
 
-[`docs/language/`](./language/)
-
-| Doc | Conteúdo |
-| --- | -------- |
-| [vision.md](./language/vision.md) | Por que uma linguagem |
-| [principles.md](./language/principles.md) | Princípios |
-| [semantics.md](./language/semantics.md) | Semântica |
-| [uncertainty.md](./language/uncertainty.md) | Incerteza / resolution |
-| [traverse.md](./language/traverse.md) | Direções e defaults de TRAVERSE |
-| [path.md](./language/path.md) | PATH |
-| [impact.md](./language/impact.md) | IMPACT (+ along calls) |
-| [examples.md](./language/examples.md) | Exemplos executáveis |
-| [grammar-draft.md](./language/grammar-draft.md) | EBNF |
-| [open-questions.md](./language/open-questions.md) | Ambiguidades |
-| [readiness.md](./language/readiness.md) | Status |
+| Doc                                                                                                       | Conteúdo                    |
+| --------------------------------------------------------------------------------------------------------- | --------------------------- |
+| [overview.md](./language/overview.md)                                                                     | Visão da Query Language 1.0 |
+| [syntax.md](./language/syntax.md)                                                                         | Sintaxe                     |
+| [semantics.md](./language/semantics.md)                                                                   | ResultSet, ordem, vazio     |
+| [errors.md](./language/errors.md)                                                                         | Erros                       |
+| [resolution.md](./language/resolution.md)                                                                 | Incerteza                   |
+| [examples.md](./language/examples.md)                                                                     | Exemplos                    |
+| [traverse.md](./language/traverse.md) / [path.md](./language/path.md) / [impact.md](./language/impact.md) | Detalhes                    |
 
 ```bash
 ffvs query 'select functions where name contains "x" describe'
-ffvs query 'search "add" traverse callers resolution resolved describe'
+ffvs query 'search "loadUser" traverse callers resolution resolved describe'
 ```
 
-Query Language **v0.3** (FFVS **0.8.0**): resolution-aware traverse + CALL impact.  
-ADR-0022 · [`docs/roadmap/ffvs-0.9.md`](./roadmap/ffvs-0.9.md).
+**FFVS 1.0.0** · Query Language **1.0** · [ADR-0024](./design-decisions/ADR-0024-ffvs-1-0.md)
