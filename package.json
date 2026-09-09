@@ -1,6 +1,6 @@
 {
   "name": "@valesecond/ffvs",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Local-first CLI that turns JS/TS projects into queryable semantic graphs",
   "type": "module",
   "bin": {

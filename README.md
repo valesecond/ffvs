@@ -14,7 +14,7 @@ Requires Node.js 20+.
 
 ```bash
 npm install -g @valesecond/ffvs
-ffvs --version    # FFVS 1.2.0
+ffvs --version    # FFVS 1.2.1
 ffvs --help
 ```
 
