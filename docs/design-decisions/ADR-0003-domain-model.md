@@ -11,8 +11,9 @@ Software pode ser modelado como árvores (AST), tabelas, ou grafos. O FFVS preci
 ## Decision
 
 - Adotar um **grafo dirigido rotulado** como modelo conceitual central (nós = entidades, arestas = relações).
-- No MVP: nós `Project`, `File`, `Module`; arestas `CONTAINS` e, quando possível, `IMPORTS`.
-- Expandir o vocabulário de entidades/relações conforme fases e evidência.
+- Phase 0: nós `PROJECT`, `FILE`, `MODULE`; arestas `CONTAINS` e `IMPORTS`.
+- Phase 1: adicionar `FUNCTION`, `CLASS`, `METHOD`, `VARIABLE` e relações `DECLARES`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS`.
+- Expandir o vocabulário conforme fases e evidência. Ver `docs/software-model.md`.
 
 ## Alternatives
 

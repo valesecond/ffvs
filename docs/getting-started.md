@@ -1,13 +1,11 @@
 # Getting Started
 
-## Requisitos
+## Requirements
 
 - Node.js 20+ (LTS recomendado)
 - npm 10+ (ou compatível)
 
 ## Instalação (desenvolvimento)
-
-Na raiz do repositório:
 
 ```bash
 npm install
@@ -15,35 +13,40 @@ npm run build
 npm link
 ```
 
-Isso disponibiliza o comando `ffvs` no PATH local.
-
-Alternativa sem link global:
+Alternativa:
 
 ```bash
-npm install
 npx ffvs --help
 ```
 
 ## Uso rápido
 
 ```bash
-# Em um diretório de projeto de software
 ffvs init
 ffvs index .
-ffvs status
+ffvs inspect
+ffvs inspect UserService
+ffvs functions
+ffvs classes
+ffvs imports
+ffvs graph UserService
 ```
 
-### `ffvs init`
+Saída JSON:
 
-Cria o diretório `.ffvs/` com configuração inicial. Não indexa automaticamente.
+```bash
+ffvs functions --json
+ffvs inspect UserService --json
+```
 
-### `ffvs index [path]`
+### Fixture de demonstração
 
-Escaneia o diretório (padrão: `.`), detecta arquivos relevantes, constrói inventário e grafo inicial, e persiste em `.ffvs/`.
-
-### `ffvs status`
-
-Mostra se o projeto está inicializado, quando foi indexado e contagens básicas.
+```bash
+cd fixtures/basic-project
+ffvs init
+ffvs index .
+ffvs inspect UserService
+```
 
 ## Testes
 
@@ -59,11 +62,9 @@ npm run typecheck
 npm run format:check
 ```
 
-## Próximos passos
+## Leitura
 
-Leia:
-
-- [Arquitetura](./architecture.md)
+- [Software model](./software-model.md)
+- [Architecture](./architecture.md)
 - [Roadmap](./roadmap.md)
-- [Filosofia](./philosophy.md)
 - [Contributing](../CONTRIBUTING.md)

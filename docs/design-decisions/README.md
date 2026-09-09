@@ -8,5 +8,6 @@
 | [ADR-0004](./ADR-0004-query-language.md)         | Query language strategy             | Accepted (provisional) |
 | [ADR-0005](./ADR-0005-single-package-layered.md) | Single package layered architecture | Accepted               |
 | [ADR-0006](./ADR-0006-local-json-storage.md)     | Local JSON persistence in `.ffvs/`  | Accepted (MVP)         |
+| [ADR-0007](./ADR-0007-js-ts-parser.md)           | JavaScript/TypeScript parser choice | Accepted               |
 
 New ADRs should be numbered sequentially and linked from this index.

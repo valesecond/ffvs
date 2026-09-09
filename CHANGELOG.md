@@ -10,8 +10,24 @@ once releases are cut.
 
 ### Added
 
+- Phase 1 software understanding for JavaScript/TypeScript via `@babel/parser`.
+- Semantic graph entities: `FUNCTION`, `CLASS`, `METHOD`, `VARIABLE` (+ existing project/file/module).
+- Relations: `DECLARES`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS` (+ `CONTAINS`, `IMPORTS`).
+- Explore CLI: `inspect`, `files`, `functions`, `classes`, `imports`, `graph` with `--json`.
+- Controlled fixture `fixtures/basic-project/`.
+- Docs: `docs/software-model.md`, ADR-0007, `research/related-tools.md`.
+
+### Changed
+
+- Index/graph schema bumped to version 2.
+- Language adapter contract now returns structured `FileExtraction`.
+
+## [0.1.0] — Phase 0 foundation
+
+### Added
+
 - Project foundation: documentation, ADRs, research agenda.
 - CLI commands: `ffvs init`, `ffvs index`, `ffvs status`, `--help`.
-- Local persistence under `.ffvs/` (`config.json`, `index.json`, `graph.json`).
-- Initial JavaScript/TypeScript language detection adapter.
+- Local persistence under `.ffvs/`.
+- Initial JavaScript/TypeScript detection adapter.
 - Automated tests and CI workflow.

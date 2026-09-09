@@ -2,157 +2,112 @@
 
 ## Objetivo deste documento
 
-Definir a arquitetura inicial do MVP e os princípios que devem orientar evoluções futuras.
-A estrutura de pastas proposta na visão original foi analisada criticamente; a versão abaixo é a adotada.
+Definir a arquitetura atual (Phase 0–1) e os princípios que orientam evoluções futuras.
 
 ## Princípio de camadas
 
 ```text
 CLI
  ↓
-Application Layer   (casos de uso)
+Application Layer   (init, index, status, explore)
  ↓
-Core Engine         (indexação, grafo, consulta — evolutivo)
+Core Engine         (indexer, graph helpers)
  ↓
 Domain Model        (entidades e relações)
  ↓
-Adapters            (filesystem, parsers por linguagem, storage, git…)
+Adapters            (filesystem, storage, language parsers)
 ```
 
-A CLI **não** contém lógica de negócio. Ela traduz argumentos em chamadas à Application Layer e formata saída / códigos de saída.
+A CLI **não** contém lógica de negócio. Ela traduz argumentos em chamadas à Application Layer e formata saída (humana ou `--json`).
 
-Isso permite, no futuro, outras interfaces (API, extensão de editor, language server) reutilizarem o mesmo núcleo — sem implementá-las agora.
+## Fluxo Phase 1
 
-## Por que não um monorepo multi-package no dia 1?
-
-**Alternativas consideradas:**
-
-1. **Monorepo com packages** (`@ffvs/cli`, `@ffvs/core`, …) — isolamento forte, mas custo operacional alto para um MVP e um único mantenedor.
-2. **Um único pacote com módulos por camada** — fronteiras claras via pastas e APIs públicas internas, menos fricção.
-3. **Plugin runtime desde o início** — prematuro sem contratos estáveis.
-
-**Decisão:** pacote único TypeScript com módulos internos por responsabilidade. Extrair packages quando houver evidência de necessidade (múltiplos consumidores ou ciclos de release distintos). Ver ADR-0005.
+```text
+SOURCE CODE
+    ↓
+LanguageAdapter.extract()   (@babel/parser for JS/TS)
+    ↓
+FileExtraction (entities + relations + imports)
+    ↓
+Indexer → SemanticGraph + ProjectIndex
+    ↓
+Persist .ffvs/{config,index,graph}.json
+    ↓
+Explore commands (inspect, files, functions, …)
+```
 
 ## Estrutura do repositório
 
 ```text
 ffvs/
 ├── src/
-│   ├── cli/                 # Interface de linha de comando
-│   ├── application/         # Casos de uso: init, index, status
+│   ├── cli/                 # program + formatters
+│   ├── application/         # init, index, status, explore
 │   ├── core/
-│   │   ├── domain/          # Project, File, Module, edges…
-│   │   ├── indexer/         # Orquestra scan + extratores
-│   │   ├── graph/           # Grafo em memória / serialização
-│   │   ├── query/           # Reservado (Phase 2)
-│   │   ├── analysis/        # Reservado (Phase 3)
-│   │   └── transformation/  # Reservado (Phase 6)
+│   │   ├── domain/          # types, graph helpers, errors
+│   │   └── indexer/         # buildProjectIndex
 │   ├── languages/
-│   │   ├── types.ts         # Contrato LanguageAdapter
-│   │   └── javascript/      # Adapter inicial (detecção; AST depois)
+│   │   ├── types.ts         # LanguageAdapter contract
+│   │   └── javascript/      # parse + extract (Babel)
 │   └── adapters/
-│       ├── filesystem/      # Scan de diretórios
-│       └── storage/         # Persistência em .ffvs/
+│       ├── filesystem/
+│       └── storage/
+├── fixtures/                # controlled sample projects
 ├── tests/
 ├── docs/
-│   └── design-decisions/
 ├── research/
 ├── examples/
-├── .github/workflows/
-├── package.json
-├── tsconfig.json
-└── README.md
+└── .github/workflows/
 ```
 
-### Comparação com a proposta original
+Pacote único TypeScript (ADR-0005). Parser JS/TS: `@babel/parser` (ADR-0007).
 
-A proposta original (`cli/`, `core/`, `languages/`, `git/`, `runtime/` na raiz) misturava pacotes de top-level com áreas ainda inexistentes (`git/`, `runtime/`).
+## Modelo de domínio
 
-Ajustes:
+Ver [`software-model.md`](./software-model.md).
 
-- Tudo executável sob `src/` para um único entrypoint e tooling simples.
-- `git/` e `runtime/` **não** existem como pastas vazias; entram quando houver código e testes reais.
-- `docs/`, `research/`, `examples/` e `tests/` permanecem na raiz (visão open source / acadêmica).
+Entidades Phase 1: `PROJECT`, `FILE`, `MODULE`, `FUNCTION`, `CLASS`, `METHOD`, `VARIABLE`.
 
-## Modelo de domínio (MVP)
-
-Entidades iniciais:
-
-| Entidade  | Descrição                                               |
-| --------- | ------------------------------------------------------- |
-| `Project` | Raiz FFVS (config + metadados)                          |
-| `File`    | Arquivo indexado (path, linguagem, hash, tamanho)       |
-| `Module`  | Unidade lógica (no JS: arquivo módulo); refinada depois |
-
-Relações iniciais:
-
-| Relação    | Significado                                                                   |
-| ---------- | ----------------------------------------------------------------------------- |
-| `CONTAINS` | Project → File; File → Module (quando aplicável)                              |
-| `IMPORTS`  | Módulo → módulo/arquivo (quando o adapter conseguir extrair; opcional no MVP) |
-
-Entidades futuras (não no MVP): Class, Function, Variable, Route, Test, Commit, Service, etc.
+Relações Phase 1: `CONTAINS`, `DECLARES`, `IMPORTS`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS`.
 
 ## Persistência local
 
-Diretório `.ffvs/` na raiz do projeto alvo:
-
 ```text
 .ffvs/
-├── config.json      # Configuração do projeto FFVS
-├── index.json       # Inventário de arquivos + estatísticas
-└── graph.json       # Grafo serializado (nós e arestas)
+├── config.json
+├── index.json      # v2: files, languages, entity stats, parse errors
+└── graph.json      # v2: nodes + edges
 ```
 
-JSON é suficiente para o MVP (inspecionável, diffável, sem dependência nativa).
-Migração para SQLite ou outro store pode ocorrer se benchmarks justificarem (ADR futuro).
+JSON permanece a escolha do MVP (ADR-0006).
 
-## Fluxos do MVP
+## Comandos CLI (Phase 1)
 
-### `ffvs init`
+| Comando                                       | Papel                         |
+| --------------------------------------------- | ----------------------------- |
+| `init` / `index` / `status`                   | Ciclo de vida                 |
+| `inspect [entity]`                            | Resumo do projeto ou entidade |
+| `files` / `functions` / `classes` / `imports` | Listagens                     |
+| `graph <entity>`                              | Relações incidentes           |
+| `--json`                                      | Saída estruturada estável     |
 
-1. Verifica se já existe `.ffvs/`.
-2. Cria estrutura e `config.json` com metadados mínimos.
-3. Não indexa automaticamente (explícito: `ffvs index`).
-
-### `ffvs index [path]`
-
-1. Resolve projeto FFVS (sobe diretórios até achar `.ffvs/` ou usa cwd após init).
-2. Escaneia o filesystem com exclusões padrão (`node_modules`, `.git`, `.ffvs`, …).
-3. Detecta linguagem por extensão / heurística via adapters.
-4. Constrói inventário + grafo inicial (arquivos; imports JS quando trivial).
-5. Persiste `index.json` e `graph.json`.
-6. Atualiza timestamp em `config.json`.
-
-### `ffvs status`
-
-1. Lê `.ffvs/`.
-2. Reporta se inicializado, última indexação, contagens e avisos.
+Não há DSL nesta fase (ADR-0004).
 
 ## Extensibilidade de linguagem
 
 ```text
 LanguageAdapter
-  - id / name
-  - matches(file): boolean
-  - extract?(source, path): ExtractionResult   // Phase 1+
+  matches(path)
+  detectLanguage(path)
+  extract(source, path) → FileExtraction
 ```
 
-O indexer depende da interface, não de JavaScript. O adapter JS é o primeiro; Python, Java, etc. entram como novos módulos sob `languages/`.
+O indexer depende do contrato, não de Babel.
 
-## Observabilidade e qualidade
+## Limitações conscientes
 
-- Códigos de saída: `0` sucesso, `1` erro de uso/estado, `2` falha interna.
-- Mensagens de erro acionáveis na CLI.
-- Logs estruturados apenas quando necessário (stderr); stdout preserva saída útil para piping futuro.
-- Testes automatizados das camadas application e core.
-
-## Limitações conscientes do MVP
-
-- Sem DSL completa.
-- Sem call graph robusto.
-- Sem Git / runtime / transformações.
-- Indexação full-scan (não incremental).
-- Extração de imports JS best-effort e limitada.
-
-Essas limitações são intencionais e documentadas no roadmap.
+- Sem call graph (`CALLS`) confiável.
+- Imports de pacotes viram nós `external:*`, sem resolução de node_modules.
+- `extends`/`implements` cross-file são best-effort por nome.
+- Sem indexação incremental.
+- Sem type-aware analysis.

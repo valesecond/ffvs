@@ -71,7 +71,9 @@ describe("indexProject + getStatus", () => {
     expect(indexed.index.files.map((f) => f.path).sort()).toEqual(["a.js", "b.js", "readme.md"]);
     expect(indexed.index.languages.some((l) => l.language === "javascript")).toBe(true);
 
-    const importEdges = indexed.graph.edges.filter((e) => e.kind === "IMPORTS");
+    const importEdges = indexed.graph.edges.filter(
+      (e) => e.kind === "IMPORTS" && e.properties?.["external"] !== true,
+    );
     expect(importEdges.length).toBe(1);
     expect(importEdges[0]?.from).toBe("module:a.js");
     expect(importEdges[0]?.to).toBe("module:b.js");
@@ -115,6 +117,8 @@ describe("CLI", () => {
       expect(text).toContain("init");
       expect(text).toContain("index");
       expect(text).toContain("status");
+      expect(text).toContain("inspect");
+      expect(text).toContain("functions");
     } finally {
       process.stdout.write = originalWrite;
     }

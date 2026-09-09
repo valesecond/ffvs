@@ -1,10 +1,22 @@
-export type EntityKind = "project" | "file" | "module";
+export type EntityKind =
+  "PROJECT" | "FILE" | "MODULE" | "FUNCTION" | "CLASS" | "METHOD" | "VARIABLE";
 
-export type RelationKind = "CONTAINS" | "IMPORTS";
+export type RelationKind =
+  "CONTAINS" | "IMPORTS" | "EXPORTS" | "DECLARES" | "EXTENDS" | "IMPLEMENTS";
+
+export interface SourceLocation {
+  file: string;
+  startLine: number;
+  startColumn: number;
+  endLine: number;
+  endColumn: number;
+}
 
 export interface GraphNode {
   id: string;
   kind: EntityKind;
+  name: string | null;
+  location: SourceLocation | null;
   properties: Record<string, unknown>;
 }
 
@@ -17,6 +29,7 @@ export interface GraphEdge {
 }
 
 export interface SemanticGraph {
+  version: 2;
   nodes: GraphNode[];
   edges: GraphEdge[];
 }
@@ -35,13 +48,20 @@ export interface LanguageStats {
   fileCount: number;
 }
 
+export interface EntityStats {
+  kind: EntityKind;
+  count: number;
+}
+
 export interface ProjectIndex {
-  version: 1;
+  version: 2;
   root: string;
   indexedAt: string;
   files: IndexedFile[];
   languages: LanguageStats[];
+  entities: EntityStats[];
   skippedDirectoryNames: string[];
+  parseErrors: Array<{ path: string; message: string }>;
 }
 
 export interface FfvsConfig {

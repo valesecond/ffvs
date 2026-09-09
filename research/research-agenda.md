@@ -6,42 +6,50 @@ Agenda de investigação do FFVS. Hipóteses e experimentos vivem em documentos 
 
 É possível construir uma abstração unificada e composicional para consultar e operar sobre código-fonte, arquitetura, histórico e comportamento de sistemas de software?
 
+## Foco imediato (pós-Phase 1)
+
+Com um grafo estrutural JS/TS em mãos, as perguntas práticas passam a ser:
+
+1. Quais entidades/relações bastam para program comprehension em CLI?
+2. Onde AST-only falha e CPG / type-aware analysis se tornam necessários?
+3. Como a exploração explícita informa o design de uma futura linguagem de consulta?
+4. Qual a distância honestamente mensurável frente a CodeQL, Joern, Semgrep, etc.?
+
+Ver também [`related-tools.md`](./related-tools.md).
+
 ## Áreas de investigação
 
-| Área                           | Interesse para o FFVS                                                                       |
-| ------------------------------ | ------------------------------------------------------------------------------------------- |
-| Software visualization         | Como representar grafos semânticos de forma útil (CLI e, depois, visualizadores auxiliares) |
-| Program analysis               | Limites da análise estática vs. necessidades de consulta                                    |
-| Static analysis                | Extração confiável de entidades e relações                                                  |
-| AST / CST                      | Camada de parsing e normalização cross-language                                             |
-| Code property graphs           | Modelos ricos (AST + CFG + DFG + call graph)                                                |
-| Software architecture recovery | Inferir estrutura a partir do código                                                        |
-| Program comprehension          | Apoiar entendimento humano via consultas                                                    |
-| Dependency analysis            | Módulos, pacotes, acoplamento                                                               |
-| Impact analysis                | Estimar efeitos de mudanças                                                                 |
-| Program querying               | Linguagens e motores de consulta sobre código                                               |
-| Language design / DSLs         | Ergonomia da linguagem FFVS                                                                 |
-| Developer tools                | Integração com fluxos reais de desenvolvimento                                              |
-| Observability                  | Correlacionar estático e runtime                                                            |
-| Software evolution             | Git, churn, autoria, drift arquitetural                                                     |
+| Área                       | Interesse para o FFVS                         |
+| -------------------------- | --------------------------------------------- |
+| AST-based program analysis | Extração estrutural confiável (Phase 1)       |
+| Software graphs            | Modelo navegável de entidades/relações        |
+| Code property graphs       | Evolução possível além de AST + imports       |
+| Program comprehension      | Experiência `inspect` / explore               |
+| Static analysis            | Limites sem execução / tipos                  |
+| Dependency analysis        | IMPORTS resolvidos e externos                 |
+| Architecture recovery      | Inferir estrutura a partir do grafo           |
+| Software visualization     | CLI primeiro; visualizadores depois           |
+| Program querying / DSLs    | Diferir até observar consultas recorrentes    |
+| Developer tools            | Encaixe em fluxos locais e scripts (`--json`) |
+| Observability              | Fase futura (runtime)                         |
+| Software evolution         | Fase futura (Git)                             |
 
 ## Objetivos de pesquisa (não são claims)
 
 1. Caracterizar o que uma abstração unificada consegue e **não** consegue cobrir.
-2. Avaliar ergonomia de uma DSL operacional CLI-first.
-3. Medir custo/benefício de indexação local e consulta sobre grafos de projeto.
-4. Comparar, com metodologia explícita, subsets de capacidade frente a ferramentas existentes.
+2. Avaliar se CLI-first + grafo local melhora compreensão vs. ferramentas fragmentadas.
+3. Medir custo/benefício de indexação local.
+4. Comparar subsets de capacidade com metodologia explícita.
 
 ## Método (direção)
 
 - Implementação incremental com artefatos reproduzíveis;
-- Experimentos pequenos e registrados em `experiments.md`;
-- Datasets e benchmarks públicos quando possível;
-- Estudos de usabilidade apenas quando houver protótipo estável o suficiente;
-- Revisão contínua da bibliografia em `bibliography.md`.
+- Experimentos registrados em `experiments.md`;
+- Fixtures controladas antes de corpora grandes;
+- Distinguir demo de ferramenta de evidência empírica.
 
 ## Ética e honestidade científica
 
 - Não inventar resultados;
 - Declarar limitações e ameaças à validade;
-- Distinguir demonstração de ferramenta de evidência empírica.
+- Não afirmar superioridade sem dados.

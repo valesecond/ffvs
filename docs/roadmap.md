@@ -2,7 +2,7 @@
 
 Documento vivo. Datas não são compromissos; fases avançam quando critérios de qualidade forem atendidos.
 
-## Phase 0 — Foundation (atual)
+## Phase 0 — Foundation
 
 - [x] Repositório e identidade FFVS
 - [x] Documentação base (visão, arquitetura, pesquisa, ADRs)
@@ -12,62 +12,61 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [x] Lint / format / typecheck
 - [x] CI básica
 
-## Phase 1 — Index
+## Phase 1 — Software Understanding (atual)
 
-- [ ] Scanner robusto (includes/excludes configuráveis)
-- [ ] Parser JavaScript/TypeScript (AST)
-- [ ] Extração de funções, classes, exports
-- [ ] Modelo de projeto enriquecido
-- [ ] Grafo inicial com relações estruturais
+- [x] Parser JS/TS (`@babel/parser`)
+- [x] Extração de functions, classes, methods, variables, exports
+- [x] Modelo de domínio enriquecido + grafo semântico
+- [x] Relações `CONTAINS`, `DECLARES`, `IMPORTS`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS`
+- [x] Comandos explore: `inspect`, `files`, `functions`, `classes`, `imports`, `graph`
+- [x] Saída `--json`
+- [x] Fixtures + testes
+- [x] `docs/software-model.md`
+- [ ] Scanner com includes/excludes configuráveis
 - [ ] Indexação incremental (quando justificada)
+- [ ] Resolução de imports de packages (opcional/experimental)
 
-## Phase 2 — Query
+## Phase 2 — Query (ainda sem DSL formal completa)
+
+Antes de uma linguagem rica, observar padrões de uso dos comandos explore.
 
 - [ ] Motor de consulta sobre o grafo
-- [ ] Sintaxe experimental (`find`, `where`, …)
-- [ ] `ffvs find` / `ffvs query` com comportamento real
-- [ ] Seleção de campos e filtros simples
-- [ ] Documentação de ergonomia e trade-offs
+- [ ] Sintaxe experimental mínima (`find` / filtros), se ergonomia exigir
+- [ ] Documentar consultas recorrentes observadas
+- [ ] **Não** congelar DSL sem evidência de necessidade
 
 ## Phase 3 — Software Intelligence
 
-- [ ] Análise de dependências
+- [ ] Análise de dependências mais profunda
 - [ ] Callers / callees (best-effort)
 - [ ] Impact analysis inicial
-- [ ] Métricas simples (ex.: complexidade ciclomática aproximada)
+- [ ] Métricas simples
 - [ ] Sinais arquiteturais básicos
 
 ## Phase 4 — History
 
 - [ ] Integração Git
-- [ ] Histórico de mudanças por entidade
-- [ ] Autoria agregada
-- [ ] Consultas envolvendo janelas temporais
+- [ ] Histórico / autoria por entidade
+- [ ] Consultas com janelas temporais
 
 ## Phase 5 — Runtime
 
 - [ ] Modelo para serviços / processos
-- [ ] Ingestão opcional de traces / metadados
-- [ ] Correlação estática ↔ runtime (experimental)
+- [ ] Ingestão opcional de traces
+- [ ] Correlação estático ↔ runtime (experimental)
 
 ## Phase 6 — Transformation
 
-- [ ] Transformações seguras e validadas
-- [ ] Preview / dry-run
-- [ ] Ligação com testes afetados
+- [ ] Transformações seguras / dry-run
+- [ ] Validação e testes afetados
 
 ## Phase 7 — Research
 
-- [ ] Benchmarks e datasets
-- [ ] Experimentos controlados
-- [ ] Comparação com ferramentas existentes
-- [ ] Estudos de usabilidade
-- [ ] Avaliação de performance
-- [ ] Materiais para publicação acadêmica (se houver evidência)
+- [ ] Benchmarks, experimentos, comparações, usabilidade, publicações (se houver evidência)
 
 ## Critério para avançar de fase
 
 1. Funcionalidade testada;
 2. Documentação atualizada;
 3. Limitações explícitas;
-4. Nenhum comando “placeholder” sem comportamento.
+4. Nenhum comando placeholder.

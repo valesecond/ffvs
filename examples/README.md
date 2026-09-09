@@ -1,14 +1,24 @@
 # Examples
 
-Small fixtures used for manual exploration of the FFVS CLI.
+Small fixtures for manual exploration live primarily under `fixtures/`.
 
 ## mini-js
-
-A tiny JavaScript project with a relative import.
 
 ```bash
 cd examples/mini-js
 ffvs init
 ffvs index .
-ffvs status
+ffvs inspect
+ffvs functions
+```
+
+## basic-project (recommended Phase 1 demo)
+
+```bash
+cd fixtures/basic-project
+ffvs init
+ffvs index .
+ffvs inspect UserService
+ffvs imports
+ffvs graph UserController
 ```

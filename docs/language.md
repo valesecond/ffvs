@@ -1,88 +1,40 @@
-# Linguagem FFVS (proposta inicial)
+# Linguagem FFVS (proposta — não implementada)
 
-A linguagem **ainda não está implementada**. Este documento registra a proposta experimental e os trade-offs para orientar a Phase 2.
+A DSL **permanece deliberadamente fora do escopo** na Phase 1.
 
-## Objetivo
+## Por que esperar?
 
-Explorar uma forma de expressar consultas e operações sobre o modelo semântico do projeto (entidades + relações), com boa ergonomia em terminal e potencial de composição.
+Comandos explícitos (`inspect`, `functions`, `graph`, …) existem para aprender:
 
-## Alternativas de design
+1. quais entidades são realmente consultadas;
+2. quais relações importam;
+3. quais filtros se repetem;
+4. onde a composição ajuda ou atrapalha;
+5. o que é difícil de expressar só com subcomandos.
 
-### A. Comandos tradicionais da CLI
+A linguagem deve nascer dessas necessidades observadas — não de estética antecipada.
 
-```bash
-ffvs find functions --complexity-gt 20 --callers-gt 5
-```
+## Alternativas (resumo)
 
-| Prós                          | Contras                               |
-| ----------------------------- | ------------------------------------- |
-| Familiar; fácil de documentar | Flags proliferam; composição limitada |
-| Bom para poucos filtros       | Expressões complexas ficam verbosas   |
+Ver trade-offs completos na versão anterior deste desenho:
 
-### B. DSL declarativa (inspiração SQL / find)
+| Abordagem                             | Status no FFVS             |
+| ------------------------------------- | -------------------------- |
+| Flags CLI                             | Usado agora para explore   |
+| DSL declarativa estilo `find … where` | Proposta futura            |
+| SQL-like                              | Alternativa documentada    |
+| Pipes semânticos                      | Direção de longo prazo     |
+| REPL                                  | Complementar, não primário |
 
-```text
-find functions
-where complexity > 20
-and callers > 5
-and changed within 30d
-```
+## Decisão vigente
 
-| Prós                      | Contras                                   |
-| ------------------------- | ----------------------------------------- |
-| Legível; alinhada à visão | Exige parser e design de linguagem        |
-| Boa para artigos / demos  | Curva de aprendizado; risco de overdesign |
+**Híbrido estável + experimental (ADR-0004):**
 
-### C. Sintaxe semelhante a SQL
+1. Comandos de ciclo de vida e exploração explícitos (Phase 1).
+2. DSL experimental só quando houver padrões recorrentes suficientes.
+3. `--json` desde já para composição externa via scripts.
 
-```sql
-SELECT name, path FROM functions
-WHERE complexity > 20 AND callers > 5
-```
-
-| Prós                           | Contras                                           |
-| ------------------------------ | ------------------------------------------------- |
-| Familiar a muitos              | Semântica de software ≠ tabelas relacionais puras |
-| Ferramentas mentais existentes | Pode induzir expectativas de SQL completo         |
-
-### D. Composição estilo Unix (pipes semânticos)
-
-```text
-find functions | where complexity > 20 | where callers > 5
-```
-
-| Prós                      | Contras                                       |
-| ------------------------- | --------------------------------------------- |
-| Alinhada à filosofia Unix | Tipagem/stream de entidades precisa ser clara |
-| Composição natural        | UX de erros e partial results é difícil       |
-
-### E. REPL
-
-Sessão interativa com a mesma linguagem.
-
-| Prós              | Contras                      |
-| ----------------- | ---------------------------- |
-| Exploração rápida | Secundária à linguagem em si |
-| Bom para demos    | Não substitui scripts e CI   |
-
-## Decisão provisória (não implementada)
-
-**Híbrido A + B + D:**
-
-1. Comandos CLI estáveis para operações estruturais (`init`, `index`, `status`, …).
-2. Uma DSL experimental embutida em `ffvs query` / `ffvs find` para consultas.
-3. Composição por pipes **semânticos** como direção de longo prazo, começando por pipelines simples dentro da DSL.
-
-Justificativa: separa o que deve ser estável (ciclo de vida do projeto) do que deve ser experimental (expressividade da consulta). Evita forçar toda interação em flags ou em uma DSL prematuramente completa.
-
-Ver ADR-0004.
-
-## Exemplos-alvo (futuro)
-
-```text
-find functions
-where complexity > 20
-```
+## Exemplos-alvo (futuro — não implementados)
 
 ```text
 find functions
@@ -90,16 +42,16 @@ where callers > 5
 ```
 
 ```text
-trace UserService.create
+impact UserService.create
 ```
 
 ```text
-impact UserService.create
+trace UserController.createUser
 ```
 
 ## Princípios de evolução
 
-1. Preferir poucas construções ortogonais.
-2. Diagnósticos de erro claros.
-3. Toda construção nova exige exemplo, teste e nota de limitação.
-4. Ergonomia mede-se com uso real (mesmo que pequeno), não só com gosto estético.
+1. Poucas construções ortogonais.
+2. Diagnósticos claros.
+3. Cada construção nova exige exemplo, teste e limitações.
+4. Ergonomia medida por uso, não por gosto estético.

@@ -1,9 +1,31 @@
 import { Command } from "commander";
 
+import {
+  entityGraphView,
+  inspectEntity,
+  listEntities,
+  listFiles,
+  listImports,
+  loadModel,
+  summarizeProject,
+} from "../application/explore.js";
 import { indexProject } from "../application/index-project.js";
 import { initProject } from "../application/init.js";
 import { getStatus } from "../application/status.js";
 import { FfvsError } from "../core/domain/errors.js";
+import {
+  formatEntityList,
+  formatFiles,
+  formatGraphView,
+  formatInspection,
+  formatImports,
+  formatProjectSummary,
+  printJson,
+} from "./format.js";
+
+interface JsonOption {
+  json?: boolean;
+}
 
 export function createProgram(): Command {
   const program = new Command();
@@ -11,7 +33,7 @@ export function createProgram(): Command {
   program
     .name("ffvs")
     .description("FFVS — local-first CLI for exploring software projects as semantic structures")
-    .version("0.1.0");
+    .version("0.2.0");
 
   program
     .command("init")
@@ -29,7 +51,7 @@ export function createProgram(): Command {
 
   program
     .command("index")
-    .description("Index a directory and persist inventory + graph under .ffvs/")
+    .description("Index a directory and build a semantic software graph under .ffvs/")
     .argument("[path]", "Directory to index relative to the FFVS project", ".")
     .action(async (scanPath: string) => {
       const result = await indexProject(process.cwd(), scanPath);
@@ -43,13 +65,30 @@ export function createProgram(): Command {
       console.log(`Scan root: ${result.scanRoot}`);
       console.log(`Wrote .ffvs/index.json and .ffvs/graph.json`);
       console.log(`Graph: ${result.graph.nodes.length} nodes, ${result.graph.edges.length} edges`);
+
+      const interesting = result.index.entities.filter((e) =>
+        ["FUNCTION", "CLASS", "METHOD", "MODULE"].includes(e.kind),
+      );
+      if (interesting.length > 0) {
+        console.log(
+          `Entities: ${interesting.map((e) => `${e.kind.toLowerCase()}=${e.count}`).join(", ")}`,
+        );
+      }
+      if (result.index.parseErrors.length > 0) {
+        console.log(`Parse errors: ${result.index.parseErrors.length}`);
+      }
     });
 
   program
     .command("status")
     .description("Show FFVS project status")
-    .action(async () => {
+    .option("--json", "Emit JSON", false)
+    .action(async (options: JsonOption) => {
       const status = await getStatus(process.cwd());
+      if (options.json) {
+        printJson(status);
+        return;
+      }
       console.log(`FFVS project: initialized`);
       console.log(`Root: ${status.projectRoot}`);
       console.log(`Name: ${status.config.name}`);
@@ -82,6 +121,102 @@ export function createProgram(): Command {
       }
     });
 
+  program
+    .command("inspect")
+    .description("Summarize the project or inspect a named entity")
+    .argument("[entity]", "Entity name or id (omit for project summary)")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string | undefined, options: JsonOption) => {
+      if (!entity) {
+        const summary = await summarizeProject(process.cwd());
+        if (options.json) {
+          printJson(summary);
+          return;
+        }
+        console.log(formatProjectSummary(summary));
+        return;
+      }
+
+      const model = await loadModel(process.cwd());
+      const view = inspectEntity(model.graph, entity);
+      if (options.json) {
+        printJson(view);
+        return;
+      }
+      console.log(formatInspection(view));
+    });
+
+  program
+    .command("files")
+    .description("List indexed files")
+    .option("--json", "Emit JSON", false)
+    .action(async (options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const files = listFiles(model.index);
+      if (options.json) {
+        printJson(files);
+        return;
+      }
+      console.log(formatFiles(files));
+    });
+
+  program
+    .command("functions")
+    .description("List extracted functions")
+    .option("--json", "Emit JSON", false)
+    .action(async (options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const nodes = listEntities(model.graph, "FUNCTION");
+      if (options.json) {
+        printJson(nodes);
+        return;
+      }
+      console.log(formatEntityList(nodes, "Functions"));
+    });
+
+  program
+    .command("classes")
+    .description("List extracted classes")
+    .option("--json", "Emit JSON", false)
+    .action(async (options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const nodes = listEntities(model.graph, "CLASS");
+      if (options.json) {
+        printJson(nodes);
+        return;
+      }
+      console.log(formatEntityList(nodes, "Classes"));
+    });
+
+  program
+    .command("imports")
+    .description("List module import relations")
+    .option("--json", "Emit JSON", false)
+    .action(async (options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const imports = listImports(model.graph);
+      if (options.json) {
+        printJson(imports);
+        return;
+      }
+      console.log(formatImports(imports));
+    });
+
+  program
+    .command("graph")
+    .description("Show relations for an entity")
+    .argument("<entity>", "Entity name or id")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const view = entityGraphView(model.graph, entity);
+      if (options.json) {
+        printJson(view);
+        return;
+      }
+      console.log(formatGraphView(view.entity, view.edges, view.nodes));
+    });
+
   return program;
 }
 
@@ -98,7 +233,6 @@ export async function runCli(argv: string[]): Promise<number> {
       return error.exitCode;
     }
 
-    // Commander throws CommanderError for help/version and user errors.
     if (
       typeof error === "object" &&
       error !== null &&

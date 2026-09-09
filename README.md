@@ -8,34 +8,44 @@ It is **not** a claim of superiority over existing analyzers or search tools. It
 
 Understanding a system usually means jumping between editors, static analyzers, dependency graphs, Git history, and observability tools. FFVS investigates a single local model and a CLI/language-oriented interface for consulting that model.
 
-Critical analysis of strengths, risks, and related work: [`docs/analysis.md`](docs/analysis.md).
+Critical analysis: [`docs/analysis.md`](docs/analysis.md).  
+Software model: [`docs/software-model.md`](docs/software-model.md).
 
 ## Working hypothesis
 
 > It is possible to build a unified, compositional abstraction to query and operate on source code, architecture, history, and behavior of software systems.
 
-Hypotheses are recorded in [`research/hypotheses.md`](research/hypotheses.md). They are not proven.
+Hypotheses: [`research/hypotheses.md`](research/hypotheses.md). They are not proven.
 
 ## Conceptual model
 
-Projects are modeled as a **graph**: entities (files, modules, …) and relationships (`CONTAINS`, `IMPORTS`, …). The CLI drives a core engine; the core does not depend on the CLI.
+```text
+SOURCE CODE → PARSER → SOFTWARE MODEL → GRAPH → CLI EXPLORE → (future DSL)
+```
 
 ```text
 CLI → Application → Core → Domain ← Adapters (fs, languages, storage)
 ```
 
-## Current status (Phase 0)
+## Current status (Phase 1)
 
-Implemented:
+FFVS can index JavaScript/TypeScript projects into a semantic graph (files, modules, functions, classes, methods, imports/exports) and explore that graph from the CLI.
 
 ```bash
-ffvs --help
 ffvs init
 ffvs index .
-ffvs status
+ffvs inspect
+ffvs inspect UserService
+ffvs files
+ffvs functions
+ffvs classes
+ffvs imports
+ffvs graph UserService
 ```
 
-Not implemented yet: query DSL, impact/trace, Git intelligence, runtime, transformations.
+JSON output is available via `--json` on explore commands.
+
+A query DSL is **intentionally not implemented yet**. Explore commands exist to discover what a future language must express.
 
 ## Quick start
 
@@ -48,7 +58,16 @@ npm link
 
 ffvs init
 ffvs index .
-ffvs status
+ffvs inspect
+```
+
+Try the fixture:
+
+```bash
+cd fixtures/basic-project
+ffvs init
+ffvs index .
+ffvs inspect UserService
 ```
 
 See [Getting Started](docs/getting-started.md).
@@ -56,32 +75,46 @@ See [Getting Started](docs/getting-started.md).
 ## Example session
 
 ```text
-$ ffvs init
-Initialized FFVS project in .ffvs/
-
 $ ffvs index .
-Indexed 42 files (3 languages detected)
-Wrote .ffvs/index.json and .ffvs/graph.json
+Indexed 4 files (javascript=4)
+Entities: module=4, function=1, class=4, method=...
 
-$ ffvs status
-FFVS project: initialized
-Last indexed: 2026-03-09T...
-Files: 42
-Graph nodes: 43
-Graph edges: 42
+$ ffvs inspect UserService
+UserService
+
+Type: Class
+File: UserService.js
+
+Methods
+├── constructor()
+├── create()
+├── update()
+└── delete()
+
+Imports
+├── ./UserRepository.js
+└── ./User.js
+
+Used by
+└── index.js
+```
+
+```bash
+ffvs functions --json
+ffvs classes --json
 ```
 
 ## Architecture
 
-See [`docs/architecture.md`](docs/architecture.md). Design decisions live in [`docs/design-decisions/`](docs/design-decisions/).
+See [`docs/architecture.md`](docs/architecture.md). Design decisions: [`docs/design-decisions/`](docs/design-decisions/).
 
 ## Roadmap
 
-Phased plan: [`docs/roadmap.md`](docs/roadmap.md).
+[`docs/roadmap.md`](docs/roadmap.md)
 
 ## Language (proposal only)
 
-Syntax experiments and trade-offs: [`docs/language.md`](docs/language.md).
+[`docs/language.md`](docs/language.md) — DSL deferred until explore ergonomics are better understood.
 
 ## Research
 
@@ -89,19 +122,20 @@ Syntax experiments and trade-offs: [`docs/language.md`](docs/language.md).
 - [`research/hypotheses.md`](research/hypotheses.md)
 - [`research/experiments.md`](research/experiments.md)
 - [`research/bibliography.md`](research/bibliography.md)
+- [`research/related-tools.md`](research/related-tools.md)
 
 ## Contributing
 
-Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+[`CONTRIBUTING.md`](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## Security
 
-See [`SECURITY.md`](SECURITY.md).
+[`SECURITY.md`](SECURITY.md)
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT — [`LICENSE`](LICENSE)
 
 ## Name
 
-The project name is **FFVS**. The acronym is intentional and personal. No artificial expansion is defined here.
+The project name is **FFVS**. No artificial expansion is defined here.
