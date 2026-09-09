@@ -17,7 +17,8 @@ if (!graphPath) {
 
 const graph = JSON.parse(fs.readFileSync(graphPath, "utf8"));
 const modules = graph.nodes.filter(
-  (n) => n.kind === "MODULE" && n.properties?.external !== true && n.properties?.unresolved !== true,
+  (n) =>
+    n.kind === "MODULE" && n.properties?.external !== true && n.properties?.unresolved !== true,
 );
 const imports = graph.edges.filter((e) => e.kind === "IMPORTS");
 
@@ -43,7 +44,9 @@ function top(map, n = 10) {
     });
 }
 
-const isolated = modules.filter((m) => (inDegree.get(m.id) ?? 0) === 0 && (outDegree.get(m.id) ?? 0) === 0);
+const isolated = modules.filter(
+  (m) => (inDegree.get(m.id) ?? 0) === 0 && (outDegree.get(m.id) ?? 0) === 0,
+);
 
 // Simple directed cycle detection among internal IMPORTS
 const adj = new Map();
@@ -87,9 +90,9 @@ const result = {
   topOutDegree: top(outDegree, 10),
   isolatedModules: isolated.slice(0, 30).map((m) => m.properties?.path ?? m.id),
   isolatedCount: isolated.length,
-  cyclesSample: cycles.slice(0, 10).map((c) =>
-    c.map((id) => graph.nodes.find((n) => n.id === id)?.properties?.path ?? id),
-  ),
+  cyclesSample: cycles
+    .slice(0, 10)
+    .map((c) => c.map((id) => graph.nodes.find((n) => n.id === id)?.properties?.path ?? id)),
   cycleCountSampled: cycles.length,
 };
 

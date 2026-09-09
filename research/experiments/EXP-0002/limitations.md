@@ -20,13 +20,13 @@
 
 ## Threats to validity
 
-| Threat | Risk | Mitigation used |
-|--------|------|-----------------|
-| Confirmation bias | Prefer questions FFVS can answer | Included dependency/impact/call questions expected to stress the model |
-| Fixture leakage | Overstate impact quality | Separated control fixture Q-022 from OSS results |
-| Measurement error | Mis-count YES/PARTIAL/NO | Catalogued per-question with operations actually run |
-| External validity | Two repos only | Documented; recommend more corpora later |
-| Tooling version drift | Future FFVS changes alter answers | Pinned FFVS commit `da12caf` and repo SHAs |
+| Threat                | Risk                              | Mitigation used                                                        |
+| --------------------- | --------------------------------- | ---------------------------------------------------------------------- |
+| Confirmation bias     | Prefer questions FFVS can answer  | Included dependency/impact/call questions expected to stress the model |
+| Fixture leakage       | Overstate impact quality          | Separated control fixture Q-022 from OSS results                       |
+| Measurement error     | Mis-count YES/PARTIAL/NO          | Catalogued per-question with operations actually run                   |
+| External validity     | Two repos only                    | Documented; recommend more corpora later                               |
+| Tooling version drift | Future FFVS changes alter answers | Pinned FFVS commit `da12caf` and repo SHAs                             |
 
 ## Ethical / licensing
 

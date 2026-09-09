@@ -11,11 +11,11 @@
 
 ### F1 — Import resolution is the blocker
 
-| Pattern | Example | Effect |
-|---------|---------|--------|
-| Extensionless CJS | `require('./common')` in debug | No edge to `common.js` |
-| TS ESM `.js`→`.ts` | `import … from './schemas.js'` while file is `schemas.ts` | 1411/1413 zod IMPORTS marked **external** |
-| Directory / package entry | `require('./src')` | Unresolved |
+| Pattern                   | Example                                                   | Effect                                    |
+| ------------------------- | --------------------------------------------------------- | ----------------------------------------- |
+| Extensionless CJS         | `require('./common')` in debug                            | No edge to `common.js`                    |
+| TS ESM `.js`→`.ts`        | `import … from './schemas.js'` while file is `schemas.ts` | 1411/1413 zod IMPORTS marked **external** |
+| Directory / package entry | `require('./src')`                                        | Unresolved                                |
 
 Consequence: **TRAVERSE / FIND PATH / IMPACT on module IMPORTS are not trustworthy** on these repos.
 
@@ -52,26 +52,26 @@ Composition desire appeared **even when single commands existed**, especially fo
 
 ## Redundancies (confirmed on real runs)
 
-| Pair | Observation |
-|------|-------------|
-| `imports` vs `relations --kind IMPORTS` | Same edges; formatting differs |
-| `graph` vs `relations` | Human vs edge-first views of neighborhood |
-| `dependents` ⊂ `impact` | Still true; irrelevant when both empty due to missing edges |
-| `inspect` Used by ≈ `dependents` | Still true when edges exist |
+| Pair                                    | Observation                                                 |
+| --------------------------------------- | ----------------------------------------------------------- |
+| `imports` vs `relations --kind IMPORTS` | Same edges; formatting differs                              |
+| `graph` vs `relations`                  | Human vs edge-first views of neighborhood                   |
+| `dependents` ⊂ `impact`                 | Still true; irrelevant when both empty due to missing edges |
+| `inspect` Used by ≈ `dependents`        | Still true when edges exist                                 |
 
 No removals performed (document first).
 
 ## Candidate new primitives (not implemented)
 
-| Candidate | Why | Example question |
-|-----------|-----|------------------|
+| Candidate                     | Why                                  | Example question                       |
+| ----------------------------- | ------------------------------------ | -------------------------------------- |
 | **RESOLVE** (import fidelity) | Prerequisite for TRAVERSE usefulness | Map `./x.js`→`x.ts`, extensionless CJS |
-| **FILTER** | Scale + composition | Classes under `packages/zod/src` |
-| **SEARCH** | Name/path lookup | Functions matching `/parse/i` |
-| **RANK / COUNT** | Architecture questions | Top dependents |
-| **CYCLE** | Architecture smell | Detect import cycles |
-| **CALLS** | Impact at function level | Who calls `safeParse`? |
-| **DISAMBIGUATE** policy | UX | Prefer MODULE for deps commands |
+| **FILTER**                    | Scale + composition                  | Classes under `packages/zod/src`       |
+| **SEARCH**                    | Name/path lookup                     | Functions matching `/parse/i`          |
+| **RANK / COUNT**              | Architecture questions               | Top dependents                         |
+| **CYCLE**                     | Architecture smell                   | Detect import cycles                   |
+| **CALLS**                     | Impact at function level             | Who calls `safeParse`?                 |
+| **DISAMBIGUATE** policy       | UX                                   | Prefer MODULE for deps commands        |
 
 ## Evidence regarding a DSL
 

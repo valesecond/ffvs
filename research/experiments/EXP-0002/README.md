@@ -3,7 +3,7 @@
 **Status:** completed (exploratory study)  
 **Date:** 2026-09-09  
 **FFVS version:** `0.3.0` (`da12caf`)  
-**Environment:** Windows 10, Node.js v22.22.0  
+**Environment:** Windows 10, Node.js v22.22.0
 
 ## Hypothesis under test
 
@@ -29,15 +29,15 @@ See [`repositories.md`](./repositories.md).
 
 ## Artifacts
 
-| File | Content |
-|------|---------|
-| [`repositories.md`](./repositories.md) | Corpus metadata |
-| [`questions.md`](./questions.md) | Question catalog |
-| [`findings.md`](./findings.md) | Qualitative findings |
-| [`results.md`](./results.md) | Aggregate tables |
-| [`limitations.md`](./limitations.md) | Limits & threats to validity |
+| File                                                       | Content                        |
+| ---------------------------------------------------------- | ------------------------------ |
+| [`repositories.md`](./repositories.md)                     | Corpus metadata                |
+| [`questions.md`](./questions.md)                           | Question catalog               |
+| [`findings.md`](./findings.md)                             | Qualitative findings           |
+| [`results.md`](./results.md)                               | Aggregate tables               |
+| [`limitations.md`](./limitations.md)                       | Limits & threats to validity   |
 | [`scripts/analyze-graph.mjs`](./scripts/analyze-graph.mjs) | Read-only graph metrics helper |
-| [`scripts/run-notes.md`](./scripts/run-notes.md) | How to reproduce locally |
+| [`scripts/run-notes.md`](./scripts/run-notes.md)           | How to reproduce locally       |
 
 ## One-sentence result
 

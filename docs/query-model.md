@@ -127,30 +127,31 @@ Composition (pipes) remains a hypothesis (H4), not a design commitment.
 
 ## EXP-0002 update (real repositories)
 
-Full report: [`research/experiments/EXP-0002/`](../research/experiments/EXP-0002/).
+Full report: [`research/experiments/EXP-0002/`](../research/experiments/EXP-0002/).  
+Re-run after Phase 1.6: [`rerun-phase-1.6.md`](../research/experiments/EXP-0002/rerun-phase-1.6.md).
 
-| Finding | Implication for query model |
-|---------|------------------------------|
-| STRUCTURE/DESCRIBE worked on `debug` + `zod` | SELECT/DESCRIBE primitives are real |
-| TRAVERSE/PATH/IMPACT failed on OSS imports | Edge fidelity ≫ DSL urgency |
-| SELECT without FILTER painful at zod scale | FILTER/SEARCH candidates |
-| CALL questions impossible | CALLS still deferred but demanded |
-| Composition intents appeared | Language later; fix RESOLVE first |
+| Finding                                                   | Implication for query model           |
+| --------------------------------------------------------- | ------------------------------------- |
+| STRUCTURE/DESCRIBE worked on `debug` + `zod`              | SELECT/DESCRIBE primitives are real   |
+| TRAVERSE/PATH/IMPACT failed on first run                  | Edge fidelity was the blocker         |
+| After Phase 1.6, TRAVERSE/PATH/IMPACT work on same corpus | Model fidelity unlocks existing verbs |
+| SELECT without FILTER still painful at zod scale          | FILTER/SEARCH still candidates        |
+| CALL questions impossible                                 | CALLS still deferred                  |
+| Composition intents appeared                              | Language later; FILTER/CALLS next     |
 
 ### Revised priority of primitives
 
 ```text
-1. RESOLVE imports (extless CJS, .js→.ts)   — prerequisite
-2. FILTER / SEARCH                          — scale + composition
-3. TRAVERSE / PATH / IMPACT                 — already present; need data
-4. RANK / CYCLE                             — architecture questions
-5. CALLS                                    — deeper impact
-6. DSL syntax                               — only after 1–3 stabilize
+1. RESOLVE imports                         — done (Phase 1.6)
+2. FILTER / SEARCH                         — scale + composition
+3. TRAVERSE / PATH / IMPACT                — present; now trustworthy for IMPORTS
+4. RANK / CYCLE                            — architecture questions
+5. CALLS                                   — deeper impact
+6. DSL syntax                              — only after repeated FILTER/compose pressure
 ```
 
 ## Next empirical steps
 
-1. ~~Use these commands on a real mid-size repo~~ → done (EXP-0002).
-2. Fix import resolution; re-run EXP-0002 metrics (EXP-0002-followup).
-3. Optional timed A/B vs editor+grep once edges are trustworthy.
-4. Only then draft minimal query syntax for top repeated patterns.
+1. Optional timed A/B vs editor+grep now that edges are trustworthy.
+2. Observe FILTER pressure on large listings.
+3. Only then draft minimal query syntax for top repeated patterns.

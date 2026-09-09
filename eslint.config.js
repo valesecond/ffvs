@@ -5,7 +5,14 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ["dist/**", "node_modules/**", "examples/**", "fixtures/**", "coverage/**"],
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      "examples/**",
+      "fixtures/**",
+      "coverage/**",
+      "research/experiments/**/scripts/**",
+    ],
   },
   {
     files: ["**/*.ts"],

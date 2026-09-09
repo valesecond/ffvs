@@ -37,19 +37,23 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [x] `research/related-work.md`, hipótese H5
 - [x] EXP-0002 real-repo exploration (`research/experiments/EXP-0002/`)
 
-## Phase 1.6 — Model fidelity (recommended next; not DSL)
+## Phase 1.6 — Model fidelity (atual)
 
 Prioridade pós-EXP-0002 (evidência: imports quebrados em repos reais):
 
-- [ ] Resolver imports extensionless (CJS) e `.js`→`.ts` (TS ESM)
-- [ ] Preferir `MODULE` em comandos de dependência quando ambíguo
-- [ ] Includes/excludes de paths (ignorar docs/bench opcionalmente)
-- [ ] FILTER/SEARCH mínimos na CLI (se ainda necessários após resolução)
-- [ ] Re-rodar métricas EXP-0002 (internal IMPORTS ratio, impact recall)
+- [x] Resolver de módulos desacoplado (`src/core/resolver`)
+- [x] CJS extensionless + TS/ESM `.js`→`.ts` + directory/index
+- [x] Estados RESOLVED / EXTERNAL / UNRESOLVED / AMBIGUOUS
+- [x] Preferência MODULE sobre FILE no lookup
+- [x] `ffvs diagnostics` / `ffvs unresolved` + métricas em `status`
+- [x] Fixtures + testes de resolução
+- [x] Re-execução EXP-0002 nos mesmos commits (`rerun-phase-1.6.md`)
+- [ ] Includes/excludes de paths (docs/bench)
+- [ ] tsconfig paths / package exports (futuro)
 
 ## Phase 2 — Query (ainda sem DSL formal completa)
 
-**Bloqueada deliberadamente** até haver evidência pós-correção de resolução.
+**Ainda não iniciada.** EXP-0002 + Phase 1.6 mostram que fidelidade de IMPORTS era o gargalo; DSL continua adiada.
 
 - [ ] Motor de consulta sobre o grafo
 - [ ] Sintaxe experimental mínima (`find` / filtros), se ergonomia exigir

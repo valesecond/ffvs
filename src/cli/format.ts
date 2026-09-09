@@ -3,6 +3,7 @@ import type {
   ImportRelationView,
   ProjectSummary,
 } from "../application/explore.js";
+import type { DiagnosticsResult } from "../application/diagnostics.js";
 import type {
   ImpactResult,
   NeighborhoodResult,
@@ -263,6 +264,52 @@ export function formatImpact(result: ImpactResult): string {
     lines.push(`depth=${item.depth}  ${item.name ?? item.path ?? item.id}`);
   }
   return lines.join("\n");
+}
+
+export function formatDiagnostics(result: DiagnosticsResult): string {
+  const rate =
+    result.counts.internalResolutionRate === null
+      ? "n/a"
+      : `${(result.counts.internalResolutionRate * 100).toFixed(1)}%`;
+  const lines = [
+    "Resolution diagnostics",
+    "",
+    `Resolved internal: ${result.counts.resolvedInternal}`,
+    `External: ${result.counts.external}`,
+    `Unresolved: ${result.counts.unresolved}`,
+    `Ambiguous: ${result.counts.ambiguous}`,
+    `Internal resolution rate: ${rate}`,
+    "",
+  ];
+
+  const entries = [...result.unresolved, ...result.ambiguous];
+  if (entries.length === 0) {
+    lines.push("No unresolved or ambiguous relative imports.");
+    return lines.join("\n");
+  }
+
+  lines.push("UNRESOLVED / AMBIGUOUS REFERENCES", "");
+  for (const entry of entries.slice(0, 50)) {
+    lines.push(`${entry.fromPath ?? entry.fromModule}`);
+    lines.push(`  import "${entry.specifier}"  [${entry.status}]`);
+    if (entry.reason) {
+      lines.push(`  Reason: ${entry.reason}`);
+    }
+    if (entry.candidatesChecked.length > 0) {
+      lines.push(`  Candidates checked:`);
+      for (const c of entry.candidatesChecked.slice(0, 12)) {
+        lines.push(`    - ${c}`);
+      }
+    }
+    if (entry.ambiguousPaths.length > 0) {
+      lines.push(`  Ambiguous matches: ${entry.ambiguousPaths.join(", ")}`);
+    }
+    lines.push("");
+  }
+  if (entries.length > 50) {
+    lines.push(`… and ${entries.length - 50} more`);
+  }
+  return lines.join("\n").trimEnd();
 }
 
 function titleCase(kind: string): string {

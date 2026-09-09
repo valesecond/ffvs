@@ -150,16 +150,37 @@ export function resolveEntity(graph: SemanticGraph, query: string): GraphNode {
       node.properties["external"] !== true &&
       node.properties["unresolved"] !== true,
   );
-  if (byName.length === 1) {
-    return byName[0]!;
+  const preferredName = preferModule(byName);
+  if (preferredName.length === 1) {
+    return preferredName[0]!;
   }
-  if (byName.length > 1) {
-    const preview = byName
+  if (preferredName.length > 1) {
+    const preview = preferredName
       .slice(0, 8)
       .map((n) => `  - ${n.id}`)
       .join("\n");
     throw new UsageError(
-      `Ambiguous entity "${query}". Candidates:\n${preview}${byName.length > 8 ? "\n  ..." : ""}`,
+      `Ambiguous entity "${query}". Candidates:\n${preview}${preferredName.length > 8 ? "\n  ..." : ""}`,
+    );
+  }
+
+  const byPath = graph.nodes.filter(
+    (node) =>
+      node.properties["path"] === query &&
+      node.properties["external"] !== true &&
+      node.properties["unresolved"] !== true,
+  );
+  const preferredPath = preferModule(byPath);
+  if (preferredPath.length === 1) {
+    return preferredPath[0]!;
+  }
+  if (preferredPath.length > 1) {
+    const preview = preferredPath
+      .slice(0, 8)
+      .map((n) => `  - ${n.id}`)
+      .join("\n");
+    throw new UsageError(
+      `Ambiguous entity "${query}". Candidates:\n${preview}${preferredPath.length > 8 ? "\n  ..." : ""}`,
     );
   }
 
@@ -168,22 +189,55 @@ export function resolveEntity(graph: SemanticGraph, query: string): GraphNode {
       (node.id.endsWith(`:${query}`) ||
         node.id.includes(`/${query}`) ||
         node.id.includes(`:${query}.`)) &&
-      node.properties["external"] !== true,
+      node.properties["external"] !== true &&
+      node.properties["unresolved"] !== true,
   );
-  if (bySuffix.length === 1) {
-    return bySuffix[0]!;
+  const preferredSuffix = preferModule(bySuffix);
+  if (preferredSuffix.length === 1) {
+    return preferredSuffix[0]!;
   }
-  if (bySuffix.length > 1) {
-    const preview = bySuffix
+  if (preferredSuffix.length > 1) {
+    const preview = preferredSuffix
       .slice(0, 8)
       .map((n) => `  - ${n.id}`)
       .join("\n");
     throw new UsageError(
-      `Ambiguous entity "${query}". Candidates:\n${preview}${bySuffix.length > 8 ? "\n  ..." : ""}`,
+      `Ambiguous entity "${query}". Candidates:\n${preview}${preferredSuffix.length > 8 ? "\n  ..." : ""}`,
     );
   }
 
   throw new UsageError(`Entity not found: ${query}`);
+}
+
+/** Prefer MODULE when FILE and MODULE both match (ADR-0010). */
+function preferModule(nodes: GraphNode[]): GraphNode[] {
+  if (nodes.length <= 1) {
+    return nodes;
+  }
+  const modules = nodes.filter((n) => n.kind === "MODULE");
+  if (modules.length === 1) {
+    return modules;
+  }
+  if (modules.length > 1) {
+    return modules;
+  }
+  return nodes;
+}
+
+function isResolvedInternalImport(edge: GraphEdge): boolean {
+  if (edge.kind !== "IMPORTS") {
+    return false;
+  }
+  if (edge.properties?.["resolution"] === "RESOLVED") {
+    return true;
+  }
+  // Backward compatibility with pre-1.6 graphs.
+  return (
+    edge.properties?.["resolution"] === undefined &&
+    edge.properties?.["external"] !== true &&
+    edge.properties?.["unresolved"] !== true &&
+    edge.to.startsWith("module:")
+  );
 }
 
 /**
@@ -340,7 +394,7 @@ export function exploreDependents(graph: SemanticGraph, query: string): Neighbor
   const entity = resolveEntity(graph, query);
   const anchor = resolveModuleAnchor(graph, entity);
   const kinds: RelationKind[] = ["IMPORTS"];
-  const edges = incomingNeighbors(graph, anchor.id, { kinds });
+  const edges = incomingNeighbors(graph, anchor.id, { kinds }).filter(isResolvedInternalImport);
   return neighborhood(graph, anchor, "dependents", edges, kinds);
 }
 
@@ -416,7 +470,15 @@ export function explorePath(
 ): PathExploreResult {
   const fromEntity = resolveModuleAnchor(graph, resolveEntity(graph, fromQuery));
   const toEntity = resolveModuleAnchor(graph, resolveEntity(graph, toQuery));
-  const path = findPath(graph, fromEntity.id, toEntity.id, { kinds });
+
+  // Restrict traversal to resolved internal imports only.
+  const filtered: SemanticGraph = {
+    version: graph.version,
+    nodes: graph.nodes,
+    edges: graph.edges.filter((edge) => edge.kind !== "IMPORTS" || isResolvedInternalImport(edge)),
+  };
+
+  const path = findPath(filtered, fromEntity.id, toEntity.id, { kinds });
 
   const nodes = path.nodeIds
     .map((id) => getNode(graph, id))
@@ -451,7 +513,12 @@ export function exploreImpact(graph: SemanticGraph, query: string): ImpactResult
   const entity = resolveEntity(graph, query);
   const anchor = resolveModuleAnchor(graph, entity);
   const kinds: RelationKind[] = ["IMPORTS"];
-  const closure = ancestors(graph, anchor.id, { kinds });
+  const filtered: SemanticGraph = {
+    version: graph.version,
+    nodes: graph.nodes,
+    edges: graph.edges.filter((edge) => edge.kind !== "IMPORTS" || isResolvedInternalImport(edge)),
+  };
+  const closure = ancestors(filtered, anchor.id, { kinds });
 
   return {
     operation: "impact",

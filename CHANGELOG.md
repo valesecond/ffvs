@@ -10,6 +10,13 @@ once releases are cut.
 
 ### Added
 
+- Phase 1.6 module resolver (`RESOLVED`/`EXTERNAL`/`UNRESOLVED`/`AMBIGUOUS`).
+- CJS extensionless + TS ESM `.js`→`.ts` + directory/index resolution.
+- `ffvs diagnostics` / `ffvs unresolved` and resolution metrics on `status`/`index`.
+- Broader CJS `require()` site extraction.
+- ADRs 0009–0011; EXP-0002 re-run comparison.
+- Resolution fixtures + tests.
+
 - Phase 1.5 graph navigation API (`src/core/graph/navigate.ts`).
 - Explore commands: `dependencies`/`deps`, `dependents`, `children`, `parents`, `path`, `impact`, `relations`.
 - Shared JSON views: `EntityRef`, `RelationRef`, neighborhood/path/impact payloads.

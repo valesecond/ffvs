@@ -48,9 +48,23 @@ Ferramentas poderosas existem, mas perguntas cotidianas de compreensão:
 
 ainda exigem frequentemente **navegação manual fragmentada** entre arquivos. Phase 1.5 testa se verbos de grafo locais reduzem essa fragmentação.
 
+## Learned hypothesis (Phase 1.6)
+
+> Query expressiveness is constrained by semantic model fidelity.
+
+```text
+better graph fidelity
+        ↓
+more reliable queries
+        ↓
+more meaningful composition
+```
+
+EXP-0002 initially showed empty TRAVERSE/IMPACT on zod/debug; after Phase 1.6 resolution, the same verbs produced meaningful answers without a DSL.
+
 ## EXP-0002 note (2026-09-09)
 
-On `debug` and `zod`, FFVS matched IDE-like **structure inspection** more than CodeQL/Joern-style dependency querying—because import edges were mostly unresolved. This positions near-term FFVS work closer to **faithful local graph construction** than to competing with mature query engines.
+On `debug` and `zod`, first-run FFVS matched IDE-like **structure inspection** more than dependency querying—because import edges were mostly unresolved. Phase 1.6 addressed local relative resolution; near-term work shifts toward FILTER/CALLS rather than competing with CodeQL/Joern.
 
 ## Métricas candidatas para avaliação futura
 

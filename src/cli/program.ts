@@ -16,12 +16,14 @@ import {
   loadModel,
   summarizeProject,
 } from "../application/explore.js";
+import { getDiagnostics } from "../application/diagnostics.js";
 import { indexProject } from "../application/index-project.js";
 import { initProject } from "../application/init.js";
 import { getStatus } from "../application/status.js";
 import { FfvsError } from "../core/domain/errors.js";
 import type { RelationKind } from "../core/domain/types.js";
 import {
+  formatDiagnostics,
   formatEntityList,
   formatFiles,
   formatGraphView,
@@ -52,7 +54,7 @@ export function createProgram(): Command {
   program
     .name("ffvs")
     .description("FFVS — local-first CLI for exploring software projects as semantic structures")
-    .version("0.3.0");
+    .version("0.4.0");
 
   program
     .command("init")
@@ -96,6 +98,15 @@ export function createProgram(): Command {
       if (result.index.parseErrors.length > 0) {
         console.log(`Parse errors: ${result.index.parseErrors.length}`);
       }
+      if (result.index.resolution) {
+        const rate =
+          result.index.resolution.internalResolutionRate === null
+            ? "n/a"
+            : `${(result.index.resolution.internalResolutionRate * 100).toFixed(1)}%`;
+        console.log(
+          `Imports: resolved=${result.index.resolution.resolvedInternal} external=${result.index.resolution.external} unresolved=${result.index.resolution.unresolved} ambiguous=${result.index.resolution.ambiguous} (internal rate ${rate})`,
+        );
+      }
     });
 
   program
@@ -131,6 +142,17 @@ export function createProgram(): Command {
       console.log(`Graph nodes: ${status.graph?.nodes.length ?? 0}`);
       console.log(`Graph edges: ${status.edgeCount}`);
       console.log(`IMPORTS edges: ${status.importEdgeCount}`);
+      if (status.resolution) {
+        const rate =
+          status.resolution.internalResolutionRate === null
+            ? "n/a"
+            : `${(status.resolution.internalResolutionRate * 100).toFixed(1)}%`;
+        console.log(`Imports resolved (internal): ${status.resolution.resolvedInternal}`);
+        console.log(`Imports external: ${status.resolution.external}`);
+        console.log(`Imports unresolved: ${status.resolution.unresolved}`);
+        console.log(`Imports ambiguous: ${status.resolution.ambiguous}`);
+        console.log(`Internal resolution rate: ${rate}`);
+      }
       if (Object.keys(status.nodeCounts).length > 0) {
         console.log(
           `Nodes by kind: ${Object.entries(status.nodeCounts)
@@ -348,6 +370,20 @@ export function createProgram(): Command {
           result.entity ? (result.entity.name ?? result.entity.id) : null,
         ),
       );
+    });
+
+  program
+    .command("diagnostics")
+    .alias("unresolved")
+    .description("Show unresolved/ambiguous import resolution diagnostics")
+    .option("--json", "Emit JSON", false)
+    .action(async (options: JsonOption) => {
+      const result = await getDiagnostics(process.cwd());
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatDiagnostics(result));
     });
 
   return program;

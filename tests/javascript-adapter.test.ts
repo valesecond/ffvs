@@ -21,4 +21,10 @@ describe("javascriptAdapter", () => {
     expect(specifiers).toEqual(["../y", "./x.js", "./z.ts"]);
     expect(result.entities.some((e) => e.kind === "FUNCTION" && e.name === "hello")).toBe(true);
   });
+
+  it("extracts require() in expression form", () => {
+    const source = `module.exports = require('./common')(exports);`;
+    const result = javascriptAdapter.extract(source, "node.js");
+    expect(result.imports.some((i) => i.specifier === "./common")).toBe(true);
+  });
 });

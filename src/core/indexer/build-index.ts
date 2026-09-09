@@ -13,8 +13,11 @@ import {
   type LanguageStats,
   type ProjectIndex,
   type RelationKind,
+  type ResolutionStats,
   type SemanticGraph,
 } from "../domain/types.js";
+import { internalImportResolutionRate, resolveModule } from "../resolver/module-resolver.js";
+import type { ModuleResolutionResult } from "../resolver/types.js";
 
 const TEXT_EXTENSIONS = new Set([
   ".js",
@@ -71,14 +74,22 @@ export async function buildProjectIndex(rootDir: string): Promise<IndexBuildResu
 
   const fileIds = new Map<string, string>();
   const moduleIds = new Map<string, string>();
+  const filePathSet = new Set<string>();
   const pendingNamed: Array<{
     kind: RelationKind;
     from: string;
     toName: string;
     properties?: Record<string, unknown>;
   }> = [];
+  const resolutionCounts = {
+    resolved: 0,
+    external: 0,
+    unresolved: 0,
+    ambiguous: 0,
+  };
 
   for (const entry of scanned) {
+    filePathSet.add(entry.relativePath);
     const language = detectLanguage(entry.relativePath);
     const hash = await hashFile(entry.absolutePath);
     const indexed: IndexedFile = {
@@ -221,36 +232,8 @@ export async function buildProjectIndex(rootDir: string): Promise<IndexBuildResu
     }
 
     for (const item of extraction.imports) {
-      const resolved = resolveImportPath(file.path, item.specifier, fileIds);
-      if (resolved) {
-        const targetModule = moduleIds.get(resolved);
-        if (targetModule) {
-          addEdge(graph, "IMPORTS", moduleId, targetModule, {
-            specifier: item.specifier,
-            importKind: item.kind,
-            namedImports: item.namedImports,
-            ...(item.defaultImport ? { defaultImport: item.defaultImport } : {}),
-          });
-        }
-      } else {
-        const externalId = `external:${item.specifier}`;
-        if (!graph.nodes.some((n) => n.id === externalId)) {
-          addNode(graph, {
-            id: externalId,
-            kind: "MODULE",
-            name: item.specifier,
-            location: null,
-            properties: { external: true, specifier: item.specifier },
-          });
-        }
-        addEdge(graph, "IMPORTS", moduleId, externalId, {
-          specifier: item.specifier,
-          importKind: item.kind,
-          unresolved: true,
-          external: true,
-          namedImports: item.namedImports,
-        });
-      }
+      const resolution = resolveModule(file.path, item.specifier, { files: filePathSet });
+      wireImportEdge(graph, moduleId, moduleIds, item, resolution, resolutionCounts);
     }
   }
 
@@ -265,6 +248,19 @@ export async function buildProjectIndex(rootDir: string): Promise<IndexBuildResu
     .map((kind) => ({ kind, count: kindCounts[kind] ?? 0 }))
     .sort((a, b) => a.kind.localeCompare(b.kind));
 
+  const resolution: ResolutionStats = {
+    importsTotal:
+      resolutionCounts.resolved +
+      resolutionCounts.external +
+      resolutionCounts.unresolved +
+      resolutionCounts.ambiguous,
+    resolvedInternal: resolutionCounts.resolved,
+    external: resolutionCounts.external,
+    unresolved: resolutionCounts.unresolved,
+    ambiguous: resolutionCounts.ambiguous,
+    internalResolutionRate: internalImportResolutionRate(resolutionCounts),
+  };
+
   const index: ProjectIndex = {
     version: 2,
     root: toPosix(resolvedRoot),
@@ -277,9 +273,115 @@ export async function buildProjectIndex(rootDir: string): Promise<IndexBuildResu
     entities,
     skippedDirectoryNames: [...DEFAULT_SKIP_DIRS].sort(),
     parseErrors,
+    resolution,
   };
 
   return { index, graph };
+}
+
+function wireImportEdge(
+  graph: SemanticGraph,
+  fromModuleId: string,
+  moduleIds: Map<string, string>,
+  item: {
+    specifier: string;
+    kind: "esm" | "cjs";
+    namedImports: string[];
+    defaultImport?: string;
+  },
+  resolution: ModuleResolutionResult,
+  counts: { resolved: number; external: number; unresolved: number; ambiguous: number },
+): void {
+  const baseProps: Record<string, unknown> = {
+    specifier: item.specifier,
+    importKind: item.kind,
+    namedImports: item.namedImports,
+    resolution: resolution.status,
+    candidatesChecked: resolution.candidatesChecked,
+    ...(item.defaultImport ? { defaultImport: item.defaultImport } : {}),
+    ...(resolution.reason ? { reason: resolution.reason } : {}),
+  };
+
+  if (resolution.status === "RESOLVED" && resolution.resolvedPath) {
+    counts.resolved += 1;
+    const targetModule = moduleIds.get(resolution.resolvedPath);
+    if (!targetModule) {
+      // File exists but is not a JS/TS module (e.g. .json) — still record resolved path.
+      const stubId = `file-target:${resolution.resolvedPath}`;
+      if (!graph.nodes.some((n) => n.id === stubId)) {
+        addNode(graph, {
+          id: stubId,
+          kind: "FILE",
+          name: resolution.resolvedPath,
+          location: null,
+          properties: { path: resolution.resolvedPath, resolvedImportTarget: true },
+        });
+      }
+      addEdge(graph, "IMPORTS", fromModuleId, stubId, {
+        ...baseProps,
+        resolvedPath: resolution.resolvedPath,
+      });
+      return;
+    }
+    addEdge(graph, "IMPORTS", fromModuleId, targetModule, {
+      ...baseProps,
+      resolvedPath: resolution.resolvedPath,
+      external: false,
+      unresolved: false,
+    });
+    return;
+  }
+
+  if (resolution.status === "EXTERNAL") {
+    counts.external += 1;
+    const externalId = `external:${item.specifier}`;
+    if (!graph.nodes.some((n) => n.id === externalId)) {
+      addNode(graph, {
+        id: externalId,
+        kind: "MODULE",
+        name: item.specifier,
+        location: null,
+        properties: { external: true, specifier: item.specifier },
+      });
+    }
+    addEdge(graph, "IMPORTS", fromModuleId, externalId, {
+      ...baseProps,
+      external: true,
+      unresolved: false,
+    });
+    return;
+  }
+
+  if (resolution.status === "AMBIGUOUS") {
+    counts.ambiguous += 1;
+  } else {
+    counts.unresolved += 1;
+  }
+
+  const stubId = `unresolved:${resolution.fromFile}::${item.specifier}`;
+  if (!graph.nodes.some((n) => n.id === stubId)) {
+    addNode(graph, {
+      id: stubId,
+      kind: "MODULE",
+      name: item.specifier,
+      location: null,
+      properties: {
+        unresolved: true,
+        ambiguous: resolution.status === "AMBIGUOUS",
+        specifier: item.specifier,
+        fromFile: resolution.fromFile,
+        ...(resolution.ambiguousPaths.length > 0
+          ? { ambiguousPaths: resolution.ambiguousPaths }
+          : {}),
+      },
+    });
+  }
+  addEdge(graph, "IMPORTS", fromModuleId, stubId, {
+    ...baseProps,
+    external: false,
+    unresolved: true,
+    ...(resolution.ambiguousPaths.length > 0 ? { ambiguousPaths: resolution.ambiguousPaths } : {}),
+  });
 }
 
 function resolveNamedRelations(
@@ -365,36 +467,6 @@ async function hashFile(absolutePath: string): Promise<string> {
   } catch {
     return crypto.createHash("sha256").update(`unreadable:${absolutePath}`).digest("hex");
   }
-}
-
-function resolveImportPath(
-  fromFile: string,
-  specifier: string,
-  fileIds: Map<string, string>,
-): string | null {
-  if (!specifier.startsWith(".") && !specifier.startsWith("/")) {
-    return null;
-  }
-  const fromDir = path.posix.dirname(fromFile);
-  const joined = path.posix.normalize(path.posix.join(fromDir, specifier));
-  const candidates = [
-    joined,
-    `${joined}.js`,
-    `${joined}.ts`,
-    `${joined}.jsx`,
-    `${joined}.tsx`,
-    `${joined}.mjs`,
-    `${joined}.cjs`,
-    `${joined}/index.js`,
-    `${joined}/index.ts`,
-  ];
-
-  for (const candidate of candidates) {
-    if (fileIds.has(candidate)) {
-      return candidate;
-    }
-  }
-  return null;
 }
 
 function toPosix(p: string): string {

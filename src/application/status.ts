@@ -3,7 +3,12 @@ import path from "node:path";
 import * as store from "../adapters/storage/ffvs-store.js";
 import { countByKind } from "../core/domain/graph.js";
 import { StateError } from "../core/domain/errors.js";
-import type { FfvsConfig, ProjectIndex, SemanticGraph } from "../core/domain/types.js";
+import type {
+  FfvsConfig,
+  ProjectIndex,
+  ResolutionStats,
+  SemanticGraph,
+} from "../core/domain/types.js";
 
 export interface StatusResult {
   projectRoot: string;
@@ -14,6 +19,7 @@ export interface StatusResult {
   nodeCounts: Record<string, number>;
   edgeCount: number;
   importEdgeCount: number;
+  resolution: ResolutionStats | null;
 }
 
 export async function getStatus(startDir: string): Promise<StatusResult> {
@@ -41,5 +47,6 @@ export async function getStatus(startDir: string): Promise<StatusResult> {
     nodeCounts,
     edgeCount,
     importEdgeCount,
+    resolution: index?.resolution ?? null,
   };
 }

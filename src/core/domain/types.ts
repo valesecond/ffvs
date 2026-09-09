@@ -53,6 +53,19 @@ export interface EntityStats {
   count: number;
 }
 
+export interface ResolutionStats {
+  importsTotal: number;
+  resolvedInternal: number;
+  external: number;
+  unresolved: number;
+  ambiguous: number;
+  /**
+   * resolvedInternal / (resolvedInternal + unresolved + ambiguous).
+   * EXTERNAL excluded. null when denominator is 0.
+   */
+  internalResolutionRate: number | null;
+}
+
 export interface ProjectIndex {
   version: 2;
   root: string;
@@ -62,6 +75,7 @@ export interface ProjectIndex {
   entities: EntityStats[];
   skippedDirectoryNames: string[];
   parseErrors: Array<{ path: string; message: string }>;
+  resolution?: ResolutionStats;
 }
 
 export interface FfvsConfig {

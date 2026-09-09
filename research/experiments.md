@@ -40,5 +40,6 @@ Registro de experimentos. Entradas devem ser adicionadas **somente** quando um e
 - Dataset: debug@`f405ade`, zod@`c5b9bcb` (temp clones); fixtures/layered as control
 - Metrics: YES/PARTIAL/NO counts; missing-capability frequency; internal vs external IMPORTS ratio
 - Results: STRUCTURE/DESCRIBE strong; TRAVERSE/PATH/IMPACT on OSS largely failed due to import resolution (zod: 2/1413 internal IMPORTS). Insufficient evidence for DSL; prioritize RESOLVE + FILTER. Full write-up under `research/experiments/EXP-0002/`.
+- **Follow-up (Phase 1.6 re-run):** After resolver + require extraction, zod resolved internal IMPORTS **660** (rate 100% of relative); debug impact/path/dependents for `common.js` now work. See `research/experiments/EXP-0002/rerun-phase-1.6.md`.
 - Limitations: n=2 repos; author-posed questions; no timed control condition in this run
 - Artifacts: `research/experiments/EXP-0002/*`

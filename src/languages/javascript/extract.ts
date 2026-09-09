@@ -288,13 +288,41 @@ export function extractFromJavaScript(source: string, filePath: string): FileExt
     if (!t.isStringLiteral(arg)) {
       return;
     }
+    recordCjsImport(arg.value, node, node.id.name);
+  }
+
+  function recordCjsImport(specifier: string, node: Node, defaultImport?: string): void {
+    if (imports.some((i) => i.specifier === specifier && i.kind === "cjs")) {
+      return;
+    }
     imports.push({
-      specifier: arg.value,
+      specifier,
       kind: "cjs",
-      defaultImport: node.id.name,
+      ...(defaultImport !== undefined ? { defaultImport } : {}),
       namedImports: [],
       location: locOf(node),
     });
+  }
+
+  function walkRequires(node: Node): void {
+    if (t.isCallExpression(node) && t.isIdentifier(node.callee) && node.callee.name === "require") {
+      const arg = node.arguments[0];
+      if (t.isStringLiteral(arg)) {
+        recordCjsImport(arg.value, node);
+      }
+    }
+    for (const key of t.VISITOR_KEYS[node.type] ?? []) {
+      const value = (node as unknown as Record<string, unknown>)[key];
+      if (Array.isArray(value)) {
+        for (const child of value) {
+          if (child && typeof child === "object" && "type" in child) {
+            walkRequires(child as Node);
+          }
+        }
+      } else if (value && typeof value === "object" && "type" in value) {
+        walkRequires(value as Node);
+      }
+    }
   }
 
   for (const stmt of ast.program.body) {
@@ -418,6 +446,9 @@ export function extractFromJavaScript(source: string, filePath: string): FileExt
       });
     }
   }
+
+  // Collect all require("...") sites (including nested / expression forms).
+  walkRequires(ast);
 
   // Resolve export-default-identifier and EXTENDS/IMPLEMENTS to local entities when possible.
   const byName = new Map<string, string>();

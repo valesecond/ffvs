@@ -30,7 +30,9 @@ Hipóteses de trabalho. Status: **não avaliadas** até que experimentos sejam e
 
 **Hipótese:** A representation of software as a semantic graph may enable more expressive and composable exploration of software structure than file-oriented navigation alone.
 
-**Status (EXP-0002, 2026-09-09):** partially tested — **not confirmed**.
+**Status (EXP-0002, 2026-09-09):** partially tested — **not confirmed** at first run.
+
+**Follow-up (Phase 1.6 re-run):** After improving import resolution, DEPENDENCY/PATH/IMPACT questions on the same corpus became largely answerable (zod internal resolution rate 100% of relative imports; debug `common.js` impact works). H5 remains not fully confirmed (no timed A/B vs editor+grep yet), but the prior falsifying factor (empty dependency graph) is largely addressed for IMPORTS.
 
 **Evidence so far:**
 
@@ -42,15 +44,15 @@ Hipóteses de trabalho. Status: **não avaliadas** até que experimentos sejam e
 
 ### Métricas candidatas
 
-| Métrica | Ideia de medição |
-|---------|------------------|
-| Operações necessárias | Contagem de comandos/passos até a resposta |
-| Arquivos inspecionados manualmente | Quantos arquivos abertos na condição controle |
-| Tempo até a informação | Latência de tarefa |
-| Precisão das relações | Precision/recall vs oráculo em fixtures |
-| Escalabilidade | Tempo/memória de index+traverse vs tamanho do repo |
-| Usabilidade / satisfação | Escala subjetiva pós-tarefa |
-| Import resolution recall | % relative imports linked to internal modules (zod measured ≈ 2/1413) |
+| Métrica                            | Ideia de medição                                                      |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| Operações necessárias              | Contagem de comandos/passos até a resposta                            |
+| Arquivos inspecionados manualmente | Quantos arquivos abertos na condição controle                         |
+| Tempo até a informação             | Latência de tarefa                                                    |
+| Precisão das relações              | Precision/recall vs oráculo em fixtures                               |
+| Escalabilidade                     | Tempo/memória de index+traverse vs tamanho do repo                    |
+| Usabilidade / satisfação           | Escala subjetiva pós-tarefa                                           |
+| Import resolution recall           | % relative imports linked to internal modules (zod measured ≈ 2/1413) |
 
 ## Registro
 
