@@ -12,7 +12,7 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [x] Lint / format / typecheck
 - [x] CI básica
 
-## Phase 1 — Software Understanding (atual)
+## Phase 1 — Software Understanding
 
 - [x] Parser JS/TS (`@babel/parser`)
 - [x] Extração de functions, classes, methods, variables, exports
@@ -26,13 +26,24 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [ ] Indexação incremental (quando justificada)
 - [ ] Resolução de imports de packages (opcional/experimental)
 
+## Phase 1.5 — Discover the Query Model (atual)
+
+- [x] API interna de navegação (`neighbors`, `path`, `ancestors`, …)
+- [x] Navegação reversa sem duplicar arestas
+- [x] Comandos: `dependencies`/`deps`, `dependents`, `children`, `parents`, `path`, `impact`, `relations`
+- [x] JSON consistente (`EntityRef` / `RelationRef`)
+- [x] Fixtures: layered, diamond, cycle, isolated, inheritance
+- [x] `docs/query-model.md`, ADR-0008
+- [x] `research/related-work.md`, hipótese H5
+- [ ] Uso em repo real + log de perguntas recorrentes (EXP-0002)
+
 ## Phase 2 — Query (ainda sem DSL formal completa)
 
-Antes de uma linguagem rica, observar padrões de uso dos comandos explore.
+Antes de uma linguagem rica, observar padrões de uso dos comandos explore (`docs/query-model.md`).
 
 - [ ] Motor de consulta sobre o grafo
 - [ ] Sintaxe experimental mínima (`find` / filtros), se ergonomia exigir
-- [ ] Documentar consultas recorrentes observadas
+- [ ] Documentar consultas recorrentes observadas em uso real
 - [ ] **Não** congelar DSL sem evidência de necessidade
 
 ## Phase 3 — Software Intelligence

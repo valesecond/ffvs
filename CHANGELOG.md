@@ -10,6 +10,14 @@ once releases are cut.
 
 ### Added
 
+- Phase 1.5 graph navigation API (`src/core/graph/navigate.ts`).
+- Explore commands: `dependencies`/`deps`, `dependents`, `children`, `parents`, `path`, `impact`, `relations`.
+- Shared JSON views: `EntityRef`, `RelationRef`, neighborhood/path/impact payloads.
+- Fixtures: `layered`, `diamond`, `cycle`, `isolated`, `inheritance`.
+- Docs: `docs/query-model.md`, ADR-0008, `research/related-work.md`, hypothesis H5.
+
+### Added (Phase 1)
+
 - Phase 1 software understanding for JavaScript/TypeScript via `@babel/parser`.
 - Semantic graph entities: `FUNCTION`, `CLASS`, `METHOD`, `VARIABLE` (+ existing project/file/module).
 - Relations: `DECLARES`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS` (+ `CONTAINS`, `IMPORTS`).
@@ -21,6 +29,7 @@ once releases are cut.
 
 - Index/graph schema bumped to version 2.
 - Language adapter contract now returns structured `FileExtraction`.
+- Package version `0.3.0`.
 
 ## [0.1.0] — Phase 0 foundation
 

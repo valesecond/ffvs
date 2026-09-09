@@ -2,6 +2,13 @@ import { Command } from "commander";
 
 import {
   entityGraphView,
+  exploreChildren,
+  exploreDependencies,
+  exploreDependents,
+  exploreImpact,
+  exploreParents,
+  explorePath,
+  exploreRelations,
   inspectEntity,
   listEntities,
   listFiles,
@@ -13,18 +20,30 @@ import { indexProject } from "../application/index-project.js";
 import { initProject } from "../application/init.js";
 import { getStatus } from "../application/status.js";
 import { FfvsError } from "../core/domain/errors.js";
+import type { RelationKind } from "../core/domain/types.js";
 import {
   formatEntityList,
   formatFiles,
   formatGraphView,
+  formatImpact,
   formatInspection,
   formatImports,
+  formatNeighborhood,
+  formatPathResult,
   formatProjectSummary,
+  formatRelationsList,
   printJson,
 } from "./format.js";
 
 interface JsonOption {
   json?: boolean;
+}
+
+function parseKinds(raw?: string): RelationKind[] | undefined {
+  if (!raw) {
+    return undefined;
+  }
+  return raw.split(",").map((part) => part.trim().toUpperCase()) as RelationKind[];
 }
 
 export function createProgram(): Command {
@@ -33,7 +52,7 @@ export function createProgram(): Command {
   program
     .name("ffvs")
     .description("FFVS — local-first CLI for exploring software projects as semantic structures")
-    .version("0.2.0");
+    .version("0.3.0");
 
   program
     .command("init")
@@ -204,7 +223,7 @@ export function createProgram(): Command {
 
   program
     .command("graph")
-    .description("Show relations for an entity")
+    .description("Show incident relations for an entity")
     .argument("<entity>", "Entity name or id")
     .option("--json", "Emit JSON", false)
     .action(async (entity: string, options: JsonOption) => {
@@ -215,6 +234,120 @@ export function createProgram(): Command {
         return;
       }
       console.log(formatGraphView(view.entity, view.edges, view.nodes));
+    });
+
+  program
+    .command("dependencies")
+    .alias("deps")
+    .description("List what an entity depends on (module IMPORTS)")
+    .argument("<entity>", "Entity name or id")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const result = exploreDependencies(model.graph, entity);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatNeighborhood(result, "Dependencies"));
+    });
+
+  program
+    .command("dependents")
+    .description("List who depends on an entity (reverse IMPORTS)")
+    .argument("<entity>", "Entity name or id")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const result = exploreDependents(model.graph, entity);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatNeighborhood(result, "Dependents"));
+    });
+
+  program
+    .command("children")
+    .description("List structural children (CONTAINS)")
+    .argument("<entity>", "Entity name or id")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const result = exploreChildren(model.graph, entity);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatNeighborhood(result, "Children"));
+    });
+
+  program
+    .command("parents")
+    .description("List structural parents (CONTAINS)")
+    .argument("<entity>", "Entity name or id")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const result = exploreParents(model.graph, entity);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatNeighborhood(result, "Parents"));
+    });
+
+  program
+    .command("path")
+    .description("Find a shortest IMPORTS path between two entities")
+    .argument("<from>", "Source entity")
+    .argument("<to>", "Target entity")
+    .option("--json", "Emit JSON", false)
+    .action(async (from: string, to: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const result = explorePath(model.graph, from, to);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatPathResult(result));
+    });
+
+  program
+    .command("impact")
+    .description("List transitive dependents (who may be affected by changes)")
+    .argument("<entity>", "Entity name or id")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string, options: JsonOption) => {
+      const model = await loadModel(process.cwd());
+      const result = exploreImpact(model.graph, entity);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(formatImpact(result));
+    });
+
+  program
+    .command("relations")
+    .description("List relations as first-class objects (optional entity filter)")
+    .argument("[entity]", "Entity name or id")
+    .option("--kind <kinds>", "Comma-separated relation kinds (e.g. IMPORTS,CONTAINS)")
+    .option("--json", "Emit JSON", false)
+    .action(async (entity: string | undefined, options: JsonOption & { kind?: string }) => {
+      const model = await loadModel(process.cwd());
+      const kinds = parseKinds(options.kind);
+      const result = exploreRelations(model.graph, entity, kinds);
+      if (options.json) {
+        printJson(result);
+        return;
+      }
+      console.log(
+        formatRelationsList(
+          result.relations,
+          result.entity ? (result.entity.name ?? result.entity.id) : null,
+        ),
+      );
     });
 
   return program;

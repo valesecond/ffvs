@@ -3,6 +3,14 @@ import path from "node:path";
 import * as store from "../adapters/storage/ffvs-store.js";
 import { findNodesByKind, getNode, incoming, outgoing } from "../core/domain/graph.js";
 import { StateError, UsageError } from "../core/domain/errors.js";
+import {
+  ancestors,
+  children as graphChildren,
+  findPath,
+  incomingNeighbors,
+  outgoingNeighbors,
+  parents as graphParents,
+} from "../core/graph/navigate.js";
 import type {
   EntityKind,
   GraphEdge,
@@ -11,6 +19,15 @@ import type {
   RelationKind,
   SemanticGraph,
 } from "../core/domain/types.js";
+import {
+  type EntityRef,
+  type ImpactResult,
+  type NeighborhoodResult,
+  type PathExploreResult,
+  type RelationRef,
+  toEntityRef,
+  toRelationRef,
+} from "./views.js";
 
 export interface LoadedModel {
   projectRoot: string;
@@ -169,6 +186,36 @@ export function resolveEntity(graph: SemanticGraph, query: string): GraphNode {
   throw new UsageError(`Entity not found: ${query}`);
 }
 
+/**
+ * Map a class/function/file entity to its module node for dependency-oriented queries.
+ */
+export function resolveModuleAnchor(graph: SemanticGraph, entity: GraphNode): GraphNode {
+  if (entity.kind === "MODULE") {
+    return entity;
+  }
+  if (entity.kind === "FILE") {
+    const module = graph.nodes.find(
+      (node) =>
+        node.kind === "MODULE" &&
+        node.properties["path"] === entity.properties["path"] &&
+        node.properties["external"] !== true,
+    );
+    if (module) {
+      return module;
+    }
+  }
+
+  const moduleId = findOwningModule(graph, entity.id);
+  if (moduleId) {
+    const module = getNode(graph, moduleId);
+    if (module) {
+      return module;
+    }
+  }
+
+  return entity;
+}
+
 export function inspectEntity(graph: SemanticGraph, query: string): EntityInspection {
   const entity = resolveEntity(graph, query);
   const file =
@@ -243,6 +290,180 @@ export function entityGraphView(
   return { entity, edges, nodes };
 }
 
+function relationsFromEdges(graph: SemanticGraph, edges: GraphEdge[]): RelationRef[] {
+  const result: RelationRef[] = [];
+  for (const edge of edges) {
+    const from = getNode(graph, edge.from);
+    const to = getNode(graph, edge.to);
+    if (!from || !to) {
+      continue;
+    }
+    result.push(toRelationRef(edge, from, to));
+  }
+  return result.sort((a, b) => a.kind.localeCompare(b.kind) || a.id.localeCompare(b.id));
+}
+
+function neighborhood(
+  graph: SemanticGraph,
+  entity: GraphNode,
+  operation: string,
+  edges: GraphEdge[],
+  kinds: RelationKind[],
+): NeighborhoodResult {
+  const relations = relationsFromEdges(graph, edges);
+  const nodeMap = new Map<string, EntityRef>();
+  for (const rel of relations) {
+    nodeMap.set(rel.from.id, rel.from);
+    nodeMap.set(rel.to.id, rel.to);
+  }
+  nodeMap.delete(entity.id);
+  return {
+    entity: toEntityRef(entity),
+    operation,
+    relationKinds: kinds,
+    relations,
+    nodes: [...nodeMap.values()].sort((a, b) => (a.name ?? a.id).localeCompare(b.name ?? b.id)),
+  };
+}
+
+/** What this entity (module-anchored) imports / depends on. */
+export function exploreDependencies(graph: SemanticGraph, query: string): NeighborhoodResult {
+  const entity = resolveEntity(graph, query);
+  const anchor = resolveModuleAnchor(graph, entity);
+  const kinds: RelationKind[] = ["IMPORTS"];
+  const edges = outgoingNeighbors(graph, anchor.id, { kinds });
+  return neighborhood(graph, anchor, "dependencies", edges, kinds);
+}
+
+/** Who depends on this entity (reverse IMPORTS). */
+export function exploreDependents(graph: SemanticGraph, query: string): NeighborhoodResult {
+  const entity = resolveEntity(graph, query);
+  const anchor = resolveModuleAnchor(graph, entity);
+  const kinds: RelationKind[] = ["IMPORTS"];
+  const edges = incomingNeighbors(graph, anchor.id, { kinds });
+  return neighborhood(graph, anchor, "dependents", edges, kinds);
+}
+
+/** Structural children via CONTAINS. */
+export function exploreChildren(graph: SemanticGraph, query: string): NeighborhoodResult {
+  const entity = resolveEntity(graph, query);
+  const kinds: RelationKind[] = ["CONTAINS"];
+  const childNodes = graphChildren(graph, entity.id, kinds);
+  const edges = outgoingNeighbors(graph, entity.id, { kinds }).filter((edge) =>
+    childNodes.some((node) => node.id === edge.to),
+  );
+  return neighborhood(graph, entity, "children", edges, kinds);
+}
+
+/** Structural parents via CONTAINS. */
+export function exploreParents(graph: SemanticGraph, query: string): NeighborhoodResult {
+  const entity = resolveEntity(graph, query);
+  const kinds: RelationKind[] = ["CONTAINS"];
+  const parentNodes = graphParents(graph, entity.id, kinds);
+  const edges = incomingNeighbors(graph, entity.id, { kinds }).filter((edge) =>
+    parentNodes.some((node) => node.id === edge.from),
+  );
+  return neighborhood(graph, entity, "parents", edges, kinds);
+}
+
+/** First-class relations incident to an entity (or all IMPORTS if omitted). */
+export function exploreRelations(
+  graph: SemanticGraph,
+  query?: string,
+  kinds?: RelationKind[],
+): { operation: "relations"; entity: EntityRef | null; relations: RelationRef[] } {
+  const filterKinds = kinds && kinds.length > 0 ? kinds : undefined;
+  let edges: GraphEdge[];
+  let entity: GraphNode | null = null;
+
+  if (query) {
+    entity = resolveEntity(graph, query);
+    const anchor = resolveModuleAnchor(graph, entity);
+    const ids = new Set<string>([entity.id, anchor.id]);
+    const collected: GraphEdge[] = [];
+    const seen = new Set<string>();
+    for (const id of ids) {
+      const navOpts = filterKinds ? { kinds: filterKinds } : {};
+      for (const edge of [
+        ...outgoingNeighbors(graph, id, navOpts),
+        ...incomingNeighbors(graph, id, navOpts),
+      ]) {
+        if (seen.has(edge.id)) {
+          continue;
+        }
+        seen.add(edge.id);
+        collected.push(edge);
+      }
+    }
+    edges = collected;
+  } else {
+    edges = graph.edges.filter((edge) => !filterKinds || filterKinds.includes(edge.kind));
+  }
+
+  return {
+    operation: "relations",
+    entity: entity ? toEntityRef(entity) : null,
+    relations: relationsFromEdges(graph, edges),
+  };
+}
+
+/** Shortest directed path over IMPORTS by default (module-anchored). */
+export function explorePath(
+  graph: SemanticGraph,
+  fromQuery: string,
+  toQuery: string,
+  kinds: RelationKind[] = ["IMPORTS"],
+): PathExploreResult {
+  const fromEntity = resolveModuleAnchor(graph, resolveEntity(graph, fromQuery));
+  const toEntity = resolveModuleAnchor(graph, resolveEntity(graph, toQuery));
+  const path = findPath(graph, fromEntity.id, toEntity.id, { kinds });
+
+  const nodes = path.nodeIds
+    .map((id) => getNode(graph, id))
+    .filter((node): node is GraphNode => !!node)
+    .map(toEntityRef);
+
+  const relations: RelationRef[] = [];
+  for (const hop of path.hops) {
+    const from = getNode(graph, hop.from);
+    const to = getNode(graph, hop.to);
+    if (from && to) {
+      relations.push(toRelationRef(hop.edge, from, to));
+    }
+  }
+
+  return {
+    operation: "path",
+    from: toEntityRef(fromEntity),
+    to: toEntityRef(toEntity),
+    found: path.found,
+    relationKinds: kinds,
+    nodes,
+    relations,
+  };
+}
+
+/**
+ * Impact = transitive dependents via IMPORTS (who may break if this module changes).
+ * Depth 1 is direct dependents.
+ */
+export function exploreImpact(graph: SemanticGraph, query: string): ImpactResult {
+  const entity = resolveEntity(graph, query);
+  const anchor = resolveModuleAnchor(graph, entity);
+  const kinds: RelationKind[] = ["IMPORTS"];
+  const closure = ancestors(graph, anchor.id, { kinds });
+
+  return {
+    operation: "impact",
+    entity: toEntityRef(anchor),
+    relationKinds: kinds,
+    affected: closure.map((item) => ({
+      ...toEntityRef(item.node),
+      depth: item.depth,
+    })),
+  };
+}
+
 function findOwningModule(graph: SemanticGraph, entityId: string): string | null {
   const declared = incoming(graph, entityId, "DECLARES")[0];
   if (declared) {
@@ -252,7 +473,6 @@ function findOwningModule(graph: SemanticGraph, entityId: string): string | null
   if (contained?.from.startsWith("module:")) {
     return contained.from;
   }
-  // method → class → module
   const parent = incoming(graph, entityId, "CONTAINS")[0];
   if (parent) {
     const grand = incoming(graph, parent.from, "DECLARES")[0];
@@ -264,3 +484,4 @@ function findOwningModule(graph: SemanticGraph, entityId: string): string | null
 }
 
 export type { GraphEdge, GraphNode, RelationKind };
+export type { EntityRef, ImpactResult, NeighborhoodResult, PathExploreResult, RelationRef };

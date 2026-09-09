@@ -106,7 +106,7 @@ describe("phase1 indexing and inspect", () => {
     expect(imports.some((i) => i.specifier === "./UserService.js")).toBe(true);
 
     const summary = await summarizeProject(root);
-    expect(summary.files).toBe(4);
+    expect(summary.files).toBe(5);
   });
 });
 

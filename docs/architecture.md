@@ -45,6 +45,7 @@ ffvs/
 │   ├── application/         # init, index, status, explore
 │   ├── core/
 │   │   ├── domain/          # types, graph helpers, errors
+│   │   ├── graph/           # navigation: path, ancestors, …
 │   │   └── indexer/         # buildProjectIndex
 │   ├── languages/
 │   │   ├── types.ts         # LanguageAdapter contract
@@ -81,17 +82,23 @@ Relações Phase 1: `CONTAINS`, `DECLARES`, `IMPORTS`, `EXPORTS`, `EXTENDS`, `IM
 
 JSON permanece a escolha do MVP (ADR-0006).
 
-## Comandos CLI (Phase 1)
+## Comandos CLI (Phase 1 / 1.5)
 
-| Comando                                       | Papel                         |
-| --------------------------------------------- | ----------------------------- |
-| `init` / `index` / `status`                   | Ciclo de vida                 |
-| `inspect [entity]`                            | Resumo do projeto ou entidade |
-| `files` / `functions` / `classes` / `imports` | Listagens                     |
-| `graph <entity>`                              | Relações incidentes           |
-| `--json`                                      | Saída estruturada estável     |
+| Comando                                       | Papel                          |
+| --------------------------------------------- | ------------------------------ |
+| `init` / `index` / `status`                   | Ciclo de vida                  |
+| `inspect [entity]`                            | Resumo do projeto ou entidade  |
+| `files` / `functions` / `classes` / `imports` | Listagens                      |
+| `graph <entity>`                              | Relações incidentes            |
+| `dependencies` / `deps`                       | IMPORTS de saída (módulo)      |
+| `dependents`                                  | IMPORTS de entrada             |
+| `children` / `parents`                        | CONTAINS estrutural            |
+| `path <a> <b>`                                | Caminho mais curto via IMPORTS |
+| `impact <entity>`                             | Dependentes transitivos        |
+| `relations [entity]`                          | Arestas como objetos           |
+| `--json`                                      | Saída estruturada estável      |
 
-Não há DSL nesta fase (ADR-0004).
+Não há DSL nesta fase (ADR-0004, ADR-0008).
 
 ## Extensibilidade de linguagem
 

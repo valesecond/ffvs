@@ -27,25 +27,22 @@ SOURCE CODE → PARSER → SOFTWARE MODEL → GRAPH → CLI EXPLORE → (future 
 CLI → Application → Core → Domain ← Adapters (fs, languages, storage)
 ```
 
-## Current status (Phase 1)
+## Current status (Phase 1.5)
 
-FFVS can index JavaScript/TypeScript projects into a semantic graph (files, modules, functions, classes, methods, imports/exports) and explore that graph from the CLI.
+FFVS indexes JavaScript/TypeScript into a semantic graph and supports bidirectional exploration — without a DSL yet.
 
 ```bash
-ffvs init
-ffvs index .
-ffvs inspect
+ffvs init && ffvs index .
 ffvs inspect UserService
-ffvs files
-ffvs functions
-ffvs classes
-ffvs imports
-ffvs graph UserService
+ffvs dependencies Service
+ffvs dependents Repository
+ffvs path Controller Database
+ffvs impact Database
+ffvs children Controller
+ffvs relations Service --kind IMPORTS --json
 ```
 
-JSON output is available via `--json` on explore commands.
-
-A query DSL is **intentionally not implemented yet**. Explore commands exist to discover what a future language must express.
+Query patterns emerging from these verbs are documented in [`docs/query-model.md`](docs/query-model.md).
 
 ## Quick start
 

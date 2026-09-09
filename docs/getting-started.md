@@ -29,7 +29,9 @@ ffvs inspect UserService
 ffvs functions
 ffvs classes
 ffvs imports
-ffvs graph UserService
+ffvs children Controller
+ffvs parents Database
+ffvs relations Service --kind IMPORTS
 ```
 
 Saída JSON:
@@ -37,9 +39,21 @@ Saída JSON:
 ```bash
 ffvs functions --json
 ffvs inspect UserService --json
+ffvs path Controller Database --json
+ffvs impact Database --json
 ```
 
 ### Fixture de demonstração
+
+```bash
+cd fixtures/layered
+ffvs init
+ffvs index .
+ffvs path Controller Database
+ffvs impact Database
+```
+
+Ou o clássico:
 
 ```bash
 cd fixtures/basic-project

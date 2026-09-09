@@ -19,7 +19,7 @@ Registro de experimentos. Entradas devem ser adicionadas **somente** quando um e
 
 ## Experimentos
 
-Nenhum experimento concluído nesta fundação (Phase 0).
+Nenhum experimento concluído ainda.
 
 ### EXP-0001 — Baseline de indexação local (planejado)
 
@@ -31,4 +31,16 @@ Nenhum experimento concluído nesta fundação (Phase 0).
 - Metrics: tempo de `ffvs index`, bytes de `index.json`/`graph.json`, contagem de nós/arestas
 - Results: —
 - Limitations: não mede qualidade semântica além de inventário
+- Artifacts: —
+
+### EXP-0002 — Explore verbs vs file navigation (planejado)
+
+- Date: TBD
+- Status: planned
+- Hypothesis: H5 — semantic graph exploration reduces steps vs editor+grep for dependency/impact tasks
+- Method: Same tasks on `fixtures/layered` (+ optionally a mid-size OSS repo): (A) editor+grep only, (B) FFVS explore commands; compare steps/time/errors
+- Dataset: `fixtures/layered`, `fixtures/diamond`
+- Metrics: steps, time, files opened, correctness of answer
+- Results: —
+- Limitations: lab setting; small fixtures may overstate benefits
 - Artifacts: —

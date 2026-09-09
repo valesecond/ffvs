@@ -26,6 +26,23 @@ Hipóteses de trabalho. Status: **não avaliadas** até que experimentos sejam e
 
 **Falsificável se:** A composição for pouco usada ou introduzir complexidade cognitiva sem ganho mensurável.
 
+## H5 — Grafo semântico vs navegação por arquivos
+
+**Hipótese:** A representation of software as a semantic graph may enable more expressive and composable exploration of software structure than file-oriented navigation alone.
+
+**Falsificável se:** Em tarefas controladas de compreensão/impacto, desenvolvedores não reduzirem passos/tempo/erro frente a editor+grep (ou o grafo induzir confusão/imprecisão sistemáticas).
+
+### Métricas candidatas (ainda não medidas)
+
+| Métrica                            | Ideia de medição                                   |
+| ---------------------------------- | -------------------------------------------------- |
+| Operações necessárias              | Contagem de comandos/passos até a resposta         |
+| Arquivos inspecionados manualmente | Quantos arquivos abertos na condição controle      |
+| Tempo até a informação             | Latência de tarefa                                 |
+| Precisão das relações              | Precision/recall vs oráculo em fixtures            |
+| Escalabilidade                     | Tempo/memória de index+traverse vs tamanho do repo |
+| Usabilidade / satisfação           | Escala subjetiva pós-tarefa                        |
+
 ## Registro
 
 Atualize o status de cada hipótese após experimentos (`experiments.md`). Não altere o enunciado original sem versionar a mudança.

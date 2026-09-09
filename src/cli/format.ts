@@ -3,6 +3,12 @@ import type {
   ImportRelationView,
   ProjectSummary,
 } from "../application/explore.js";
+import type {
+  ImpactResult,
+  NeighborhoodResult,
+  PathExploreResult,
+  RelationRef,
+} from "../application/views.js";
 import type { GraphEdge, GraphNode, IndexedFile } from "../core/domain/types.js";
 
 export function printJson(value: unknown): void {
@@ -189,6 +195,74 @@ export function formatGraphView(entity: GraphNode, edges: GraphEdge[], nodes: Gr
     lines.push("");
   }
   return lines.join("\n").trimEnd();
+}
+
+export function formatNeighborhood(result: NeighborhoodResult, title: string): string {
+  const entityLabel = result.entity.name ?? result.entity.id;
+  if (result.relations.length === 0) {
+    return `${title}: ${entityLabel}\n(none)`;
+  }
+  const lines = [`${title}: ${entityLabel}`, `Kinds: ${result.relationKinds.join(", ")}`, ""];
+  for (const rel of result.relations) {
+    const other =
+      rel.from.id === result.entity.id
+        ? (rel.to.name ?? rel.to.path ?? rel.to.id)
+        : (rel.from.name ?? rel.from.path ?? rel.from.id);
+    const arrow = rel.from.id === result.entity.id ? "→" : "←";
+    lines.push(`${rel.kind} ${arrow} ${other}`);
+  }
+  return lines.join("\n");
+}
+
+export function formatRelationsList(relations: RelationRef[], entityLabel: string | null): string {
+  const header = entityLabel ? `Relations for ${entityLabel}` : `Relations (${relations.length})`;
+  if (relations.length === 0) {
+    return `${header}\n(none)`;
+  }
+  const lines = [header, ""];
+  for (const rel of relations) {
+    const from = rel.from.name ?? rel.from.path ?? rel.from.id;
+    const to = rel.to.name ?? rel.to.path ?? rel.to.id;
+    lines.push(`${from}`);
+    lines.push(`  └─ ${rel.kind} → ${to}`);
+    lines.push("");
+  }
+  return lines.join("\n").trimEnd();
+}
+
+export function formatPathResult(result: PathExploreResult): string {
+  const from = result.from.name ?? result.from.path ?? result.from.id;
+  const to = result.to.name ?? result.to.path ?? result.to.id;
+  if (!result.found) {
+    return `No path from ${from} to ${to} via ${result.relationKinds.join("|")}`;
+  }
+  const lines = [`Path: ${from} → ${to}`, `Hops: ${result.relations.length}`, ""];
+  for (let i = 0; i < result.nodes.length; i += 1) {
+    const node = result.nodes[i]!;
+    lines.push(`${i === 0 ? "" : "  ↓ "}${node.name ?? node.path ?? node.id}`);
+    const edge = result.relations[i];
+    if (edge) {
+      lines.push(`  ${edge.kind}`);
+    }
+  }
+  return lines.join("\n");
+}
+
+export function formatImpact(result: ImpactResult): string {
+  const entity = result.entity.name ?? result.entity.path ?? result.entity.id;
+  if (result.affected.length === 0) {
+    return `Impact: ${entity}\n(no dependents)`;
+  }
+  const lines = [
+    `Impact: ${entity}`,
+    `Transitive dependents via ${result.relationKinds.join(", ")}`,
+    `Affected: ${result.affected.length}`,
+    "",
+  ];
+  for (const item of result.affected) {
+    lines.push(`depth=${item.depth}  ${item.name ?? item.path ?? item.id}`);
+  }
+  return lines.join("\n");
 }
 
 function titleCase(kind: string): string {

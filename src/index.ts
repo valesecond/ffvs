@@ -8,5 +8,12 @@ export {
   listImports,
   loadModel,
   summarizeProject,
+  exploreDependencies,
+  exploreDependents,
+  exploreChildren,
+  exploreParents,
+  explorePath,
+  exploreImpact,
+  exploreRelations,
 } from "./application/explore.js";
 export { createProgram, runCli } from "./cli/program.js";
