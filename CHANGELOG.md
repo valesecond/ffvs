@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Package **1.2.0**. Command Mode and `--json` contracts unchanged.
+- Package **1.2.0**, published as **`@valesecond/ffvs`** (`npm i -g @valesecond/ffvs`; CLI command remains `ffvs`).
+- Command Mode and `--json` contracts unchanged.
 - Human-readable CLI presentation aligned to a premium developer-tool aesthetic (cyan brand, kind icons, bordered panels).
 - Interactive entity lists use the same table chrome with `›` selection.
 ## [1.1.0] — 2026-09-09

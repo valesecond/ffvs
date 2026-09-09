@@ -13,13 +13,19 @@ Editors and grep show text. FFVS shows **relations**: who imports whom, who call
 Requires Node.js 20+.
 
 ```bash
-git clone <repository-url>
-cd FFVS
+npm install -g @valesecond/ffvs
+ffvs --version    # FFVS 1.2.0
+ffvs --help
+```
+
+From source:
+
+```bash
+git clone https://github.com/valesecond/ffvs.git
+cd ffvs
 npm install
 npm run build
 npm link
-ffvs --version    # FFVS 1.2.0
-ffvs --help
 ```
 
 Two complementary modes:
