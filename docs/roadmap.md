@@ -84,19 +84,26 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [x] `ffvs query` + `--json` + `--file`
 - [x] SELECT / WHERE / SEARCH / TRAVERSE / DESCRIBE
 - [x] EXP-DSL-0002
-- [ ] PATH / IMPACT / richer describe (candidates for 0.7.0)
+
+## Phase 0.7.0 — PATH & IMPACT
+
+- [x] `path` / `impact` DSL stages (QL v0.2)
+- [x] Shared core with CLI
+- [x] EXP-DSL-0004
+
+## Phase 0.8.0 — Semantic depth
+
+- [x] Resolution-aware `traverse` (QL v0.3)
+- [x] Explicit `impact along calls` (default resolved)
+- [x] Minimal richer `describe` (module + lines)
+- [x] EXP-RESOLUTION / CALLS-IMPACT / DESCRIBE / SCOPE / DSL-0005
+- [x] Query `scope` stage investigated → **NOT JUSTIFIED**
+- [x] Roadmap [`docs/roadmap/ffvs-0.9.md`](./roadmap/ffvs-0.9.md)
 
 ```text
-Query Language v0.1 = SHIPPED (thin slice)
-Full DSL = NOT COMPLETE
+Query Language v0.3 = SHIPPED (0.8.0)
+0.9.0 features = NOT IMPLEMENTED
 ```
-
-## Phase 3+ (futuro)
-
-- [ ] DSL stages: path, impact (se evidência)
-- [ ] History / Git
-- [ ] Runtime signals
-- [ ] Multi-language adapters
 
 ## Princípios permanentes
 

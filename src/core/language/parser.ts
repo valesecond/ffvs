@@ -1,8 +1,11 @@
 import type {
   EntityKindName,
+  ImpactAlongRelation,
   MatcherOp,
+  PathAlongRelation,
   QueryAst,
   QueryStage,
+  ResolutionStateName,
   TraverseDirection,
   TraverseRelationName,
 } from "./ast.js";
@@ -41,6 +44,10 @@ const RELATIONS = new Set<string>([
   "parents",
 ]);
 
+const PATH_ALONG = new Set<string>(["imports"]);
+const IMPACT_ALONG = new Set<string>(["imports", "calls"]);
+const RESOLUTION_STATES = new Set<string>(["resolved", "ambiguous", "unresolved", "external"]);
+
 export function parseQuery(source: string): QueryAst {
   const tokens = lex(source);
   let pos = 0;
@@ -72,12 +79,12 @@ export function parseQuery(source: string): QueryAst {
 
   const stages: QueryStage[] = [];
 
-  if (!at("SELECT") && !at("SEARCH")) {
+  if (!at("SELECT") && !at("SEARCH") && !at("PATH")) {
     throw new LanguageError(
       "PARSE",
-      `expected select or search, got ${describeToken(current())}`,
+      `expected select, search, or path, got ${describeToken(current())}`,
       { line: current().line, column: current().column },
-      'queries must start with select <kind> or search "…"',
+      'queries must start with select <kind>, search "…", or path "A" "B"',
     );
   }
 
@@ -98,6 +105,14 @@ export function parseQuery(source: string): QueryAst {
       stages.push(parseTraverse());
       continue;
     }
+    if (at("PATH")) {
+      stages.push(parsePath());
+      continue;
+    }
+    if (at("IMPACT")) {
+      stages.push(parseImpact());
+      continue;
+    }
     if (at("DESCRIBE")) {
       const tok = advance();
       stages.push({ type: "describe", span: { line: tok.line, column: tok.column } });
@@ -107,11 +122,11 @@ export function parseQuery(source: string): QueryAst {
       "PARSE",
       `unexpected token '${describeToken(current())}'`,
       { line: current().line, column: current().column },
-      "expected where, traverse, describe, select, or search",
+      "expected where, traverse, path, impact, describe, select, or search",
     );
   }
 
-  return { languageVersion: "0.1", stages };
+  return { languageVersion: "0.3", stages };
 
   function parseSelect(): QueryStage {
     const tok = consume("SELECT", 'expected "select"');
@@ -151,6 +166,7 @@ export function parseQuery(source: string): QueryAst {
         kind = kindValue as EntityKindName;
         continue;
       }
+      // search … path "…"
       advance();
       path = consume("STRING", 'expected string after "path"').value;
     }
@@ -227,10 +243,144 @@ export function parseQuery(source: string): QueryAst {
       direction = advance().value as TraverseDirection;
     }
 
+    const resolution = parseOptionalResolution();
+
     return {
       type: "traverse",
       relation: relValue as TraverseRelationName,
       ...(direction !== undefined ? { direction } : {}),
+      ...(resolution !== undefined ? { resolution } : {}),
+      span: { line: tok.line, column: tok.column },
+    };
+  }
+
+  function parseOptionalResolution(): ResolutionStateName | undefined {
+    if (!at("RESOLUTION")) {
+      return undefined;
+    }
+    advance();
+    const stateTok = takeWord();
+    const state = stateTok.value.toLowerCase();
+    if (!RESOLUTION_STATES.has(state)) {
+      throw new LanguageError(
+        "SEMANTIC",
+        `unknown resolution state "${stateTok.value}"`,
+        { line: stateTok.line, column: stateTok.column },
+        "supported: resolved, ambiguous, unresolved, external",
+      );
+    }
+    return state as ResolutionStateName;
+  }
+
+  function parseImpact(): QueryStage {
+    const tok = consume("IMPACT", 'expected "impact"');
+    let along: ImpactAlongRelation = "imports";
+    let resolution: ResolutionStateName | undefined;
+
+    if (at("ALONG")) {
+      advance();
+      const relTok = takeWord();
+      const rel = relTok.value.toLowerCase();
+      if (!IMPACT_ALONG.has(rel)) {
+        throw new LanguageError(
+          "SEMANTIC",
+          `unsupported impact relation "${relTok.value}"`,
+          { line: relTok.line, column: relTok.column },
+          "supported: along imports, along calls",
+        );
+      }
+      along = rel as ImpactAlongRelation;
+    }
+
+    resolution = parseOptionalResolution();
+    if (along === "imports" && resolution !== undefined) {
+      throw new LanguageError(
+        "SEMANTIC",
+        "resolution filter is not applicable to import impact (already resolved-internal)",
+        { line: tok.line, column: tok.column },
+        'use: impact along calls [resolution …]',
+      );
+    }
+    if (along === "calls" && resolution === undefined) {
+      resolution = "resolved";
+    }
+
+    return {
+      type: "impact",
+      along,
+      ...(resolution !== undefined ? { resolution } : {}),
+      span: { line: tok.line, column: tok.column },
+    };
+  }
+
+  function parseAlong(): PathAlongRelation {
+    if (!at("ALONG")) {
+      return "imports";
+    }
+    advance();
+    const relTok = takeWord();
+    const rel = relTok.value.toLowerCase();
+    if (!PATH_ALONG.has(rel)) {
+      throw new LanguageError(
+        "SEMANTIC",
+        `unsupported path relation "${relTok.value}"`,
+        { line: relTok.line, column: relTok.column },
+        "v0.3 path supports only: along imports",
+      );
+    }
+    return rel as PathAlongRelation;
+  }
+
+  function parsePath(): QueryStage {
+    const tok = consume("PATH", 'expected "path"');
+
+    // path from "A" to "B" [along imports]
+    if (at("FROM")) {
+      advance();
+      const from = consume("STRING", 'expected string after "from"').value;
+      consume("TO", 'expected "to" after path from');
+      const to = consume("STRING", 'expected string after "to"').value;
+      const along = parseAlong();
+      return {
+        type: "path",
+        from,
+        to,
+        along,
+        span: { line: tok.line, column: tok.column },
+      };
+    }
+
+    // path to "B" [along imports]  OR  path "B" … OR path "A" "B"
+    if (at("TO")) {
+      advance();
+      const to = consume("STRING", 'expected string after "to"').value;
+      const along = parseAlong();
+      return {
+        type: "path",
+        to,
+        along,
+        span: { line: tok.line, column: tok.column },
+      };
+    }
+
+    const first = consume("STRING", 'expected string after "path"').value;
+    if (at("STRING")) {
+      const to = advance().value;
+      const along = parseAlong();
+      return {
+        type: "path",
+        from: first,
+        to,
+        along,
+        span: { line: tok.line, column: tok.column },
+      };
+    }
+
+    const along = parseAlong();
+    return {
+      type: "path",
+      to: first,
+      along,
       span: { line: tok.line, column: tok.column },
     };
   }

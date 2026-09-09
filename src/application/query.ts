@@ -16,6 +16,8 @@ export interface QueryJsonPayload {
   entities: ReturnType<typeof toEntityRef>[];
   relations: ReturnType<typeof toRelationRef>[];
   descriptions?: QueryResultSet["descriptions"];
+  paths?: QueryResultSet["paths"];
+  impact?: QueryResultSet["impact"];
   diagnostics: QueryResultSet["diagnostics"];
 }
 
@@ -58,6 +60,27 @@ export function formatQueryResult(result: QueryResultSet): string {
     );
   }
 
+  if (result.paths && result.paths.length > 0) {
+    lines.push("", "Paths");
+    for (const p of result.paths) {
+      lines.push(
+        p.found
+          ? `├── ${p.fromId} → ${p.toId}  length=${p.length}  nodes=${p.nodeIds.length}`
+          : `├── ${p.fromId} → ${p.toId}  (not found)`,
+      );
+    }
+  }
+
+  if (result.impact) {
+    const along = result.impact.along ?? "imports";
+    const res =
+      result.impact.resolution !== undefined ? ` resolution=${result.impact.resolution}` : "";
+    lines.push(
+      "",
+      `Impact: along=${along}${res} seeds=${result.impact.seedIds.length} affected=${result.impact.affectedCount}`,
+    );
+  }
+
   if (result.descriptions && result.descriptions.length > 0) {
     lines.push("", "Describe");
     for (const d of result.descriptions.slice(0, 50)) {
@@ -65,6 +88,14 @@ export function formatQueryResult(result: QueryResultSet): string {
       lines.push(`│     id: ${d.id}`);
       if (d.path) {
         lines.push(`│     path: ${d.path}`);
+      }
+      if (d.module) {
+        lines.push(`│     module: ${d.module}`);
+      }
+      if (d.startLine !== null) {
+        lines.push(
+          `│     loc: ${d.startLine}${d.endLine !== null ? `-${d.endLine}` : ""}`,
+        );
       }
       lines.push(`│     relations: ${d.relationCount} (${d.edgeKinds.join(", ") || "none"})`);
     }
@@ -102,14 +133,24 @@ function toJsonPayload(allNodes: GraphNode[], result: QueryResultSet): QueryJson
     const to = byId.get(edge.to) ?? stubNode(edge.to);
     relations.push(toRelationRef(edge, from, to));
   }
+  relations.sort((a, b) => a.id.localeCompare(b.id, "en"));
 
   return {
     languageVersion: LANGUAGE_VERSION,
-    stagesApplied: result.stagesApplied,
+    stagesApplied: [...result.stagesApplied],
     entities: result.entities.map(toEntityRef),
     relations,
-    ...(result.descriptions !== undefined ? { descriptions: result.descriptions } : {}),
-    diagnostics: result.diagnostics,
+    ...(result.descriptions !== undefined
+      ? { descriptions: result.descriptions.map((d) => ({ ...d, edgeKinds: [...d.edgeKinds] })) }
+      : {}),
+    ...(result.paths !== undefined ? { paths: result.paths.map((p) => ({ ...p, nodeIds: [...p.nodeIds] })) } : {}),
+    ...(result.impact !== undefined
+      ? { impact: { ...result.impact, seedIds: [...result.impact.seedIds] } }
+      : {}),
+    diagnostics: {
+      messages: [...result.diagnostics.messages],
+      resolutionCounts: { ...result.diagnostics.resolutionCounts },
+    },
   };
 }
 

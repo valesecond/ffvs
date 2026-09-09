@@ -1,0 +1,3 @@
+search "add" kind function
+traverse callers resolution resolved
+describe

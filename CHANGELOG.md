@@ -10,49 +10,20 @@ once releases are cut.
 
 ### Added
 
-- **0.6.0** FFVS Query Language v0.1: lexer, parser, AST, executor, `ffvs query` (`--json`, `--file`).
-- Stages: `select`, `where`, `search`, `traverse`, `describe` (read-only).
-- ADR-0019; `docs/language/semantics.md`; EXP-DSL-0002.
-- Tests: `dsl-lexer-parser`, `dsl-executor`.
+- **0.8.0** Query Language v0.3: resolution-aware `traverse`, explicit `impact along calls`, minimal richer `describe` (module + lines); `uncertainty.md`; ADR-0022; EXP-RESOLUTION/CALLS-IMPACT/DESCRIBE/SCOPE/DSL-0005; CALL impact fixtures.
+- **0.7.0** Query Language v0.2: `path` and `impact` stages; shared `computePath`/`computeImpact` with CLI; ADR-0021; EXP-DSL-0004; path/impact docs and corpus.
+- Tests: `dsl-path-impact.test.ts`, `dsl-resolution-0.8.test.ts`.
 
-- Phase 1.7–2.9 pre-DSL track: FILTER (`--name`/`--path`), `ffvs search`, index `--include`/`--exclude`, `CALLS` + `calls`/`callers`.
-- Core query helpers: `src/core/query/{select,search}.ts`.
-- ADRs 0012–0018; `docs/query-algebra.md`; `docs/language/*`; `docs/limitations.md`.
-- Experiments: EXP-0003, EXP-DSL-0001; fixture `fixtures/calls-basic/`.
-
-- Phase 1.6 module resolver (`RESOLVED`/`EXTERNAL`/`UNRESOLVED`/`AMBIGUOUS`).
-- CJS extensionless + TS ESM `.js`→`.ts` + directory/index resolution.
-- `ffvs diagnostics` / `ffvs unresolved` and resolution metrics on `status`/`index`.
-- Broader CJS `require()` site extraction.
-- ADRs 0009–0011; EXP-0002 re-run comparison.
-- Resolution fixtures + tests.
-
-- Phase 1.5 graph navigation API (`src/core/graph/navigate.ts`).
-- Explore commands: `dependencies`/`deps`, `dependents`, `children`, `parents`, `path`, `impact`, `relations`.
-- Shared JSON views: `EntityRef`, `RelationRef`, neighborhood/path/impact payloads.
-- Fixtures: `layered`, `diamond`, `cycle`, `isolated`, `inheritance`.
-- Docs: `docs/query-model.md`, ADR-0008, `research/related-work.md`, hypothesis H5.
-- EXP-0002 real-world exploration report under `research/experiments/EXP-0002/`.
-
-### Added (Phase 1)
-
-- Phase 1 software understanding for JavaScript/TypeScript via `@babel/parser`.
-- Semantic graph entities: `FUNCTION`, `CLASS`, `METHOD`, `VARIABLE` (+ existing project/file/module).
-- Relations: `DECLARES`, `EXPORTS`, `EXTENDS`, `IMPLEMENTS` (+ `CONTAINS`, `IMPORTS`).
-- Explore CLI: `inspect`, `files`, `functions`, `classes`, `imports`, `graph` with `--json`.
-- Controlled fixture `fixtures/basic-project/`.
-- Docs: `docs/software-model.md`, ADR-0007, `research/related-tools.md`.
+- **0.6.1** semantic stabilization, EXP-DSL-0003, ADR-0020.
+- **0.6.0** Query Language v0.1 thin slice.
 
 ### Changed
 
-- Index/graph schema bumped to version 2.
-- Language adapter contract now returns structured `FileExtraction`.
-- Package version `0.6.0`.
-- Relation kind set includes `CALLS`.
+- Package version `0.8.0`; language version `0.3`.
 
-### Not included (deliberate)
+### Not included
 
-- PATH / IMPACT / RELATIONS DSL stages, boolean WHERE, aggregates, mutation.
+- Query `scope` stage, entity `where resolution`, AND/OR, pipes, aggregates, mutation, silent default CALL impact.
 
 ## [0.1.0] — Phase 0 foundation
 
@@ -63,3 +34,4 @@ once releases are cut.
 - Local persistence under `.ffvs/`.
 - Initial JavaScript/TypeScript detection adapter.
 - Automated tests and CI workflow.
+- Local-first, read-only exploration posture for the MVP.

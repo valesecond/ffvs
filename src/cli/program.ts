@@ -71,7 +71,7 @@ export function createProgram(): Command {
   program
     .name("ffvs")
     .description("FFVS — local-first CLI for exploring software projects as semantic structures")
-    .version("0.6.0");
+    .version("0.7.0");
 
   program
     .command("init")

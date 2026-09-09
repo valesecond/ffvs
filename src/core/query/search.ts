@@ -50,7 +50,9 @@ export function searchEntities(graph: SemanticGraph, options: SearchOptions): Gr
 
   scored.sort(
     (a, b) =>
-      b.score - a.score || (a.node.name ?? a.node.id).localeCompare(b.node.name ?? b.node.id),
+      b.score - a.score ||
+      (a.node.name ?? a.node.id).localeCompare(b.node.name ?? b.node.id, "en") ||
+      a.node.id.localeCompare(b.node.id, "en"),
   );
 
   const limit = options.limit ?? 50;

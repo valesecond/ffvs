@@ -37,7 +37,7 @@ describe("DSL parser", () => {
     const ast = parseQuery(
       'select functions where name contains "resolve" traverse callers describe',
     );
-    expect(ast.languageVersion).toBe("0.1");
+    expect(ast.languageVersion).toBe("0.3");
     expect(ast.stages.map((s) => s.type)).toEqual([
       "select",
       "where",

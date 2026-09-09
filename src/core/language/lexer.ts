@@ -6,9 +6,18 @@ export type TokenKind =
   | "SEARCH"
   | "TRAVERSE"
   | "DESCRIBE"
+  | "PATH"
+  | "IMPACT"
+  | "TO"
+  | "FROM"
+  | "ALONG"
+  | "RESOLUTION"
+  | "RESOLVED"
+  | "AMBIGUOUS"
+  | "UNRESOLVED"
+  | "EXTERNAL"
   | "KIND"
   | "NAME"
-  | "PATH"
   | "CONTAINS"
   | "EQ"
   | "PREFIX"
@@ -32,9 +41,18 @@ const KEYWORDS: Record<string, TokenKind> = {
   search: "SEARCH",
   traverse: "TRAVERSE",
   describe: "DESCRIBE",
+  path: "PATH",
+  impact: "IMPACT",
+  to: "TO",
+  from: "FROM",
+  along: "ALONG",
+  resolution: "RESOLUTION",
+  resolved: "RESOLVED",
+  ambiguous: "AMBIGUOUS",
+  unresolved: "UNRESOLVED",
+  external: "EXTERNAL",
   kind: "KIND",
   name: "NAME",
-  path: "PATH",
   contains: "CONTAINS",
   eq: "EQ",
   prefix: "PREFIX",

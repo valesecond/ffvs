@@ -2,22 +2,19 @@
 
 **FFVS** is an experimental, local-first toolkit for treating a software project as a queryable semantic structure — a CLI and a thin compositional query language over a local semantic graph.
 
-## Current status (0.6.0)
+## Current status (0.8.0)
 
-Indexes JavaScript/TypeScript into a semantic graph with selection, search, scoped indexing, import fidelity, best-effort CALLS, and **FFVS Query Language v0.1**.
+Semantic graph + Query Language **v0.3** (`select` / `where` / `search` / `traverse` / `path` / `impact` / `describe`), with **resolution-aware** traverse and explicit **CALL impact**.
 
 ```bash
 ffvs init && ffvs index .
-ffvs functions --path src --name resolve
-ffvs search safeParse --kind function
-ffvs query 'select functions where name contains "resolve" traverse callers describe'
-ffvs query 'search "safeParse" kind function traverse callers describe' --json
+ffvs query 'search "add" traverse callers resolution resolved describe'
+ffvs query 'select modules where name = "Database.js" impact describe'
+ffvs query 'search "target" kind function impact along calls describe'
 ```
 
-Explore CLI and DSL share the same Query Core. The language is read-only and deliberately small.
-
-Language docs: [`docs/language/`](docs/language/).  
-Limitations: [`docs/limitations.md`](docs/limitations.md).
+Docs: [`docs/language/`](docs/language/) · Uncertainty: [`uncertainty.md`](docs/language/uncertainty.md).  
+Evidence: [`EXP-DSL-0005`](research/experiments/EXP-DSL-0005/).
 
 ## Quick start
 
@@ -35,9 +32,11 @@ ffvs query 'select modules describe'
 
 ## Research
 
-- [EXP-0003](research/experiments/EXP-0003/) — post FILTER/SEARCH/CALLS metrics  
-- [EXP-DSL-0001](research/experiments/EXP-DSL-0001/) — composition discovery  
-- [EXP-DSL-0002](research/experiments/EXP-DSL-0002/) — CLI vs DSL  
+- [EXP-RESOLUTION-0001](research/experiments/EXP-RESOLUTION-0001/) — resolution filters
+- [EXP-CALLS-IMPACT-0001](research/experiments/EXP-CALLS-IMPACT-0001/) — CALL vs IMPORT impact
+- [EXP-DESCRIBE-0001](research/experiments/EXP-DESCRIBE-0001/) — describe depth
+- [EXP-SCOPE-0001](research/experiments/EXP-SCOPE-0001/) — scope = indexing (not DSL)
+- [EXP-DSL-0005](research/experiments/EXP-DSL-0005/) — 0.7 vs 0.8 evaluation
 
 ## License
 

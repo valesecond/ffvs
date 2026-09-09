@@ -32,6 +32,20 @@ function matchText(
   }
 }
 
+function nodePath(node: GraphNode): string | null {
+  if (typeof node.properties["path"] === "string") {
+    return normalizePathSeparators(node.properties["path"]);
+  }
+  if (node.location?.file) {
+    return normalizePathSeparators(node.location.file);
+  }
+  return null;
+}
+
+function normalizePathSeparators(pathValue: string): string {
+  return pathValue.replace(/\\/g, "/");
+}
+
 export function matchesNode(node: GraphNode, predicate: SelectPredicate): boolean {
   if (predicate.kind !== undefined && node.kind !== predicate.kind) {
     return false;
@@ -44,11 +58,9 @@ export function matchesNode(node: GraphNode, predicate: SelectPredicate): boolea
   }
   if (predicate.path !== undefined) {
     const mode = predicate.pathMode ?? "contains";
-    const pathValue =
-      typeof node.properties["path"] === "string"
-        ? node.properties["path"]
-        : (node.location?.file ?? null);
-    if (!matchText(pathValue, predicate.path, mode)) {
+    const pathValue = nodePath(node);
+    const needle = normalizePathSeparators(predicate.path);
+    if (!matchText(pathValue, needle, mode)) {
       return false;
     }
   }
@@ -63,13 +75,15 @@ export function selectFiles(files: IndexedFile[], predicate: SelectPredicate): I
   return files.filter((file) => {
     if (predicate.path !== undefined) {
       const mode = predicate.pathMode ?? "contains";
-      if (!matchText(file.path, predicate.path, mode)) {
+      const filePath = file.path.replace(/\\/g, "/");
+      const needle = predicate.path.replace(/\\/g, "/");
+      if (!matchText(filePath, needle, mode)) {
         return false;
       }
     }
     if (predicate.name !== undefined) {
       const mode = predicate.nameMode ?? "contains";
-      const base = file.path.split("/").pop() ?? file.path;
+      const base = file.path.replace(/\\/g, "/").split("/").pop() ?? file.path;
       if (!matchText(base, predicate.name, mode)) {
         return false;
       }

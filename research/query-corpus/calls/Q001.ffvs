@@ -1,0 +1,4 @@
+select functions
+where name contains "resolve"
+traverse callers
+describe

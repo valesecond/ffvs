@@ -21,5 +21,8 @@
 | [ADR-0017](./ADR-0017-query-model.md)            | Query model classification             | Accepted               |
 | [ADR-0018](./ADR-0018-dsl-readiness.md)          | DSL readiness (spec only)              | Accepted               |
 | [ADR-0019](./ADR-0019-query-language-impl.md)    | Query Language thin slice (0.6.0)      | Accepted               |
+| [ADR-0020](./ADR-0020-dsl-stabilization.md)      | DSL semantic stabilization (0.6.1)     | Accepted               |
+| [ADR-0021](./ADR-0021-path-impact.md)            | PATH and IMPACT (QL v0.2 / 0.7.0)      | Accepted               |
+| [ADR-0022](./ADR-0022-resolution-semantic-depth.md) | Resolution traverse + CALL impact (QL v0.3 / 0.8.0) | Accepted |
 
 New ADRs should be numbered sequentially and linked from this index.

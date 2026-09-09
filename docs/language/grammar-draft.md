@@ -1,18 +1,20 @@
-# Grammar draft (EBNF)
+# Grammar draft (EBNF) — Query Language v0.3
 
-## Implemented in FFVS 0.6.0 (Query Language v0.1)
+Implemented in FFVS **0.8.0**.
 
 ```ebnf
 query          = pipeline ;
 
 pipeline       = seed_stage , { stage } ;
 
-seed_stage     = select_stage | search_stage ;
+seed_stage     = select_stage | search_stage | path_seed ;
 
 stage          = select_stage
                | search_stage
                | filter_stage
                | traverse_stage
+               | path_stage
+               | impact_stage
                | describe_stage ;
 
 select_stage   = "select" , entity_kind ;
@@ -30,16 +32,33 @@ field          = "name" | "path" ;
 
 matcher        = "contains" | "eq" | "=" | "prefix" ;
 
-traverse_stage = "traverse" , relation , [ direction ] ;
+traverse_stage = "traverse" , relation , [ direction ] , [ resolution_mod ] ;
+
+resolution_mod = "resolution" , resolution_state ;
+
+resolution_state = "resolved" | "ambiguous" | "unresolved" | "external" ;
+
+path_seed      = path_stage ;
+
+path_stage     = "path" , path_body , [ "along" , "imports" ] ;
+
+path_body      = "from" , string , "to" , string
+               | "to" , string
+               | string , string
+               | string ;
+
+impact_stage   = "impact" , [ "along" , impact_along ] , [ resolution_mod ] ;
+
+impact_along   = "imports" | "calls" ;
+
+direction      = "inbound" | "outbound" ;
+
+describe_stage = "describe" ;
 
 relation       = "imports" | "contains" | "calls" | "exports"
                | "extends" | "implements" | "declares"
                | "callers" | "dependents" | "dependencies" | "deps"
                | "children" | "parents" ;
-
-direction      = "inbound" | "outbound" ;
-
-describe_stage = "describe" ;
 
 entity_kind    = "functions" | "classes" | "modules" | "files"
                | "methods" | "variables" | "entities"
@@ -49,22 +68,11 @@ entity_kind    = "functions" | "classes" | "modules" | "files"
 string         = '"' , { character } , '"' ;
 ```
 
-### Spec vs earlier draft
+## Notes
 
-| Draft item | 0.6.0 decision |
-| ---------- | -------------- |
-| `and` in WHERE | Deferred — sequential `where` stages instead |
-| Required traverse direction | Made **optional** (defaults from relation sugar) |
-| Sugar as separate stages (`callers` alone) | Sugar is **relation names** under `traverse` (matches examples) |
-| `path` / `relations` stages | Deferred (not in 0.6.0 product scope) |
-| `=` matcher | Added (alias of `eq`) — used in readiness examples |
+- `impact` alone ≡ `impact along imports` (no `resolution` allowed).
+- `impact along calls` defaults to `resolution resolved` if omitted.
+- Resolution filters apply to **edges**, never via `where` on entities.
+- No `scope` stage (EXP-SCOPE-0001: NOT JUSTIFIED).
 
-See ADR-0019.
-
-## Deferred (not implemented)
-
-```ebnf
-path_stage     = "path" , "to" , target , "along" , relation ;
-relations_stage= "relations" , [ "kind" , relation , { "," , relation } ] ;
-sugar_stage    = "callers" | "calls" | "dependents" | "deps" | "impact" ;
-```
+See ADR-0022.

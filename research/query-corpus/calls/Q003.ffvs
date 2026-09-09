@@ -1,0 +1,4 @@
+select functions
+where name = "total"
+traverse calls
+describe

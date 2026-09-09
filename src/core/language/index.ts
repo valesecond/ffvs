@@ -1,6 +1,6 @@
-/** FFVS Query Language (DSL) — version 0.1 thin slice. */
+/** FFVS Query Language (DSL) — version 0.3 (resolution-aware traverse + CALL impact). */
 
-export const LANGUAGE_VERSION = "0.1" as const;
+export const LANGUAGE_VERSION = "0.3" as const;
 
 export type {
   QueryAst,
@@ -10,10 +10,15 @@ export type {
   SearchStage,
   TraverseStage,
   DescribeStage,
+  PathStage,
+  ImpactStage,
   EntityKindName,
   MatcherOp,
   TraverseRelationName,
   TraverseDirection,
+  PathAlongRelation,
+  ImpactAlongRelation,
+  ResolutionStateName,
 } from "./ast.js";
 
 export { lex, type Token, type TokenKind } from "./lexer.js";
@@ -25,6 +30,9 @@ export {
   type QueryResultSet,
   type QueryDiagnostics,
   type EntityDescription,
+  type PathRecord,
+  type ImpactRecord,
 } from "./result-set.js";
 export { LanguageError, type LanguageErrorKind } from "./errors.js";
 export { resolveTraverse } from "./traverse-map.js";
+export { compareEntities, compareEdges, normalizePathKey } from "./ordering.js";

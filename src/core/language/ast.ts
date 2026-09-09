@@ -1,4 +1,4 @@
-/** FFVS Query Language AST (v0.1). Execution-free. */
+/** FFVS Query Language AST (v0.3). Execution-free. */
 
 export type EntityKindName =
   | "functions"
@@ -34,6 +34,14 @@ export type TraverseRelationName =
 
 export type TraverseDirection = "inbound" | "outbound";
 
+/** Relations allowed for PATH `along` (v0.2: IMPORTS only, matching CLI). */
+export type PathAlongRelation = "imports";
+
+/** IMPACT along: default imports; calls is explicit CALL-graph impact (v0.3). */
+export type ImpactAlongRelation = "imports" | "calls";
+
+export type ResolutionStateName = "resolved" | "ambiguous" | "unresolved" | "external";
+
 export interface SourceSpan {
   line: number;
   column: number;
@@ -65,6 +73,8 @@ export interface TraverseStage {
   type: "traverse";
   relation: TraverseRelationName;
   direction?: TraverseDirection;
+  /** Opt-in edge resolution filter (relation property — not entity). */
+  resolution?: ResolutionStateName;
   span: SourceSpan;
 }
 
@@ -73,9 +83,32 @@ export interface DescribeStage {
   span: SourceSpan;
 }
 
-export type QueryStage = SelectStage | WhereStage | SearchStage | TraverseStage | DescribeStage;
+export interface PathStage {
+  type: "path";
+  from?: string;
+  to: string;
+  along: PathAlongRelation;
+  span: SourceSpan;
+}
+
+export interface ImpactStage {
+  type: "impact";
+  along: ImpactAlongRelation;
+  /** For along calls: defaults to resolved when omitted. Ignored for imports (already resolved-internal). */
+  resolution?: ResolutionStateName;
+  span: SourceSpan;
+}
+
+export type QueryStage =
+  | SelectStage
+  | WhereStage
+  | SearchStage
+  | TraverseStage
+  | DescribeStage
+  | PathStage
+  | ImpactStage;
 
 export interface QueryAst {
-  languageVersion: "0.1";
+  languageVersion: "0.3";
   stages: QueryStage[];
 }

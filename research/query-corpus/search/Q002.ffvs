@@ -1,0 +1,4 @@
+select functions
+where path contains "src/core"
+where name contains "parse"
+describe

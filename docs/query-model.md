@@ -56,13 +56,10 @@ Business logic must stay in CORE/application — not in a parser.
 
 ## Language status
 
-Query Language **v0.1** shipped in FFVS **0.6.0** (`ffvs query`).
+Query Language **v0.3** in FFVS **0.8.0**:
 
 ```text
-select | where | search | traverse | describe
+select | where | search | traverse [resolution] | path | impact [along calls] | describe
 ```
 
-Spec + semantics: [`docs/language/`](./language/).  
-Experiment: [`EXP-DSL-0002`](../research/experiments/EXP-DSL-0002/).
-
-CLI explore verbs remain supported and share Query Core.
+Spec: [`docs/language/`](./language/). EXP-DSL-0005. ADR-0022.

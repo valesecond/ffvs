@@ -1,0 +1,4 @@
+search "parse"
+kind function
+path "src/core"
+describe

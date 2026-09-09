@@ -1,17 +1,22 @@
-## Open questions (updated for v0.1)
+# Open questions (post 0.8.0)
 
-Resolved in 0.6.0:
+Resolved in 0.6–0.8:
 
-- Pipeline threads EntitySet (map-all) rather than requiring `pick`.
-- Default output lists entities; `describe` adds summaries.
-- Traverse defaults direction from sugar; optional `inbound`/`outbound`.
-- Keywords are lower-case.
-- Stages are whitespace-separated (no `|` yet).
+- Pipeline maps over all entities in the set (no implicit `pick`).
+- Default print = entity list; `describe` adds summaries (+ module/loc in 0.8).
+- Traverse direction defaults + override (`traverse.md`).
+- Opt-in `traverse … resolution <state>` (EXP-RESOLUTION-0001).
+- Explicit `impact along calls` (EXP-CALLS-IMPACT-0001); default IMPACT stays IMPORTS.
+- Query `scope` stage rejected (EXP-SCOPE-0001); index scope remains authority.
+- Lower-case keywords; whitespace / newlines separate stages.
+- Dedup by id; deterministic order; empty = success.
+- Relations = last traverse hop only.
+- SEARCH case-insensitive needle vs WHERE case-sensitive.
 
-Still open:
+Still open (feed 0.9 evaluation — see `docs/roadmap/ffvs-0.9.md`):
 
-1. Should `traverse calls` default-filter to RESOLVED only?
-2. Describe depth vs full `inspect` parity?
-3. When to add `path` / `impact` stages?
-4. Entity disambiguation syntax when names collide inside a pipeline?
-5. Language stability policy beyond ADR-0019?
+1. PATH over CALLS / mixed relations?
+2. Combined IMPORT+CALL impact (explicit dual-axis)?
+3. Dual-seed composition ergonomics (Q22)?
+4. AND/OR / pipes / aggregates — still unevidenced for implementation?
+5. Further DESCRIBE fields without collapsing into INSPECT?

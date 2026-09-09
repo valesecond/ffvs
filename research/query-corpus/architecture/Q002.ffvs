@@ -1,0 +1,4 @@
+select classes
+where name contains "User"
+traverse extends
+describe

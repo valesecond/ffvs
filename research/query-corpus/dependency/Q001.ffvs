@@ -1,0 +1,4 @@
+select modules
+where path contains "src"
+traverse dependencies
+describe

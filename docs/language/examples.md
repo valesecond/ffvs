@@ -1,36 +1,21 @@
-# Language examples
-
-Executable in FFVS 0.6.0:
+# Language examples (QL v0.3)
 
 ```bash
-ffvs query 'select functions where name contains "resolve" describe'
-
 ffvs query 'select functions where name contains "resolve" traverse callers describe'
 
-ffvs query 'search "safeParse" describe'
+ffvs query 'search "add" kind function traverse callers resolution resolved describe'
 
-ffvs query 'search "safeParse" kind function traverse callers describe'
+ffvs query 'path "Controller.js" "Database.js" describe'
 
-ffvs query 'select modules where path contains "src/core" traverse imports describe'
+ffvs query 'select modules where name = "Controller.js" path to "Database.js" along imports'
 
-ffvs query 'select classes where name contains "User" traverse extends describe'
+ffvs query 'select modules where name = "Database.js" impact describe'
 
-ffvs query 'select modules where path contains "src/core" traverse dependencies describe'
+ffvs query 'search "target" kind function impact along calls describe'
 
-ffvs query 'select files where path contains "resolver" describe'
+ffvs query 'search "Database" kind module impact describe' --json
+
+ffvs query --file research/query-corpus/resolution/Q001.ffvs
 ```
 
-JSON:
-
-```bash
-ffvs query 'search "parse" describe' --json
-```
-
-File:
-
-```bash
-ffvs query --file analysis.ffvs
-```
-
-Semantics: [`semantics.md`](./semantics.md).  
-Grammar: [`grammar-draft.md`](./grammar-draft.md).
+See [`path.md`](./path.md), [`impact.md`](./impact.md), [`uncertainty.md`](./uncertainty.md), [`semantics.md`](./semantics.md).

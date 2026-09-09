@@ -4,9 +4,7 @@ import * as store from "../adapters/storage/ffvs-store.js";
 import { findNodesByKind, getNode, incoming, outgoing } from "../core/domain/graph.js";
 import { StateError, UsageError } from "../core/domain/errors.js";
 import {
-  ancestors,
   children as graphChildren,
-  findPath,
   incomingNeighbors,
   outgoingNeighbors,
   parents as graphParents,
@@ -21,6 +19,12 @@ import type {
 } from "../core/domain/types.js";
 import { selectFiles, selectNodes, type SelectPredicate } from "../core/query/select.js";
 import { searchEntities, type SearchOptions } from "../core/query/search.js";
+import {
+  computeImpact,
+  computePath,
+  isResolvedInternalImport,
+  resolveModuleAnchor,
+} from "../core/query/path-impact.js";
 import {
   type EntityRef,
   type ImpactResult,
@@ -241,51 +245,10 @@ function preferModule(nodes: GraphNode[]): GraphNode[] {
   return nodes;
 }
 
-function isResolvedInternalImport(edge: GraphEdge): boolean {
-  if (edge.kind !== "IMPORTS") {
-    return false;
-  }
-  if (edge.properties?.["resolution"] === "RESOLVED") {
-    return true;
-  }
-  // Backward compatibility with pre-1.6 graphs.
-  return (
-    edge.properties?.["resolution"] === undefined &&
-    edge.properties?.["external"] !== true &&
-    edge.properties?.["unresolved"] !== true &&
-    edge.to.startsWith("module:")
-  );
-}
-
 /**
  * Map a class/function/file entity to its module node for dependency-oriented queries.
  */
-export function resolveModuleAnchor(graph: SemanticGraph, entity: GraphNode): GraphNode {
-  if (entity.kind === "MODULE") {
-    return entity;
-  }
-  if (entity.kind === "FILE") {
-    const module = graph.nodes.find(
-      (node) =>
-        node.kind === "MODULE" &&
-        node.properties["path"] === entity.properties["path"] &&
-        node.properties["external"] !== true,
-    );
-    if (module) {
-      return module;
-    }
-  }
-
-  const moduleId = findOwningModule(graph, entity.id);
-  if (moduleId) {
-    const module = getNode(graph, moduleId);
-    if (module) {
-      return module;
-    }
-  }
-
-  return entity;
-}
+export { resolveModuleAnchor };
 
 export function inspectEntity(graph: SemanticGraph, query: string): EntityInspection {
   const entity = resolveEntity(graph, query);
@@ -294,7 +257,9 @@ export function inspectEntity(graph: SemanticGraph, query: string): EntityInspec
     entity.location?.file ??
     null;
 
-  const moduleId = file ? `module:${file}` : findOwningModule(graph, entity.id);
+  const anchored = resolveModuleAnchor(graph, entity);
+  const moduleId =
+    anchored.kind === "MODULE" ? anchored.id : file ? `module:${file}` : null;
   const methods = outgoing(graph, entity.id, "CONTAINS")
     .map((edge) => getNode(graph, edge.to))
     .filter((node): node is GraphNode => !!node && node.kind === "METHOD");
@@ -485,40 +450,26 @@ export function explorePath(
   toQuery: string,
   kinds: RelationKind[] = ["IMPORTS"],
 ): PathExploreResult {
-  const fromEntity = resolveModuleAnchor(graph, resolveEntity(graph, fromQuery));
-  const toEntity = resolveModuleAnchor(graph, resolveEntity(graph, toQuery));
-
-  // Restrict traversal to resolved internal imports only.
-  const filtered: SemanticGraph = {
-    version: graph.version,
-    nodes: graph.nodes,
-    edges: graph.edges.filter((edge) => edge.kind !== "IMPORTS" || isResolvedInternalImport(edge)),
-  };
-
-  const path = findPath(filtered, fromEntity.id, toEntity.id, { kinds });
-
-  const nodes = path.nodeIds
-    .map((id) => getNode(graph, id))
-    .filter((node): node is GraphNode => !!node)
-    .map(toEntityRef);
-
-  const relations: RelationRef[] = [];
-  for (const hop of path.hops) {
-    const from = getNode(graph, hop.from);
-    const to = getNode(graph, hop.to);
-    if (from && to) {
-      relations.push(toRelationRef(hop.edge, from, to));
-    }
-  }
-
+  const fromEntity = resolveEntity(graph, fromQuery);
+  const toEntity = resolveEntity(graph, toQuery);
+  const core = computePath(graph, fromEntity, toEntity, kinds);
   return {
     operation: "path",
-    from: toEntityRef(fromEntity),
-    to: toEntityRef(toEntity),
-    found: path.found,
-    relationKinds: kinds,
-    nodes,
-    relations,
+    from: toEntityRef(core.from),
+    to: toEntityRef(core.to),
+    found: core.found,
+    relationKinds: core.relationKinds,
+    nodes: core.nodes.map(toEntityRef),
+    relations: core.edges
+      .map((edge) => {
+        const from = getNode(graph, edge.from);
+        const to = getNode(graph, edge.to);
+        if (!from || !to) {
+          return null;
+        }
+        return toRelationRef(edge, from, to);
+      })
+      .filter((rel): rel is NonNullable<typeof rel> => rel !== null),
   };
 }
 
@@ -528,43 +479,16 @@ export function explorePath(
  */
 export function exploreImpact(graph: SemanticGraph, query: string): ImpactResult {
   const entity = resolveEntity(graph, query);
-  const anchor = resolveModuleAnchor(graph, entity);
-  const kinds: RelationKind[] = ["IMPORTS"];
-  const filtered: SemanticGraph = {
-    version: graph.version,
-    nodes: graph.nodes,
-    edges: graph.edges.filter((edge) => edge.kind !== "IMPORTS" || isResolvedInternalImport(edge)),
-  };
-  const closure = ancestors(filtered, anchor.id, { kinds });
-
+  const core = computeImpact(graph, entity);
   return {
     operation: "impact",
-    entity: toEntityRef(anchor),
-    relationKinds: kinds,
-    affected: closure.map((item) => ({
+    entity: toEntityRef(core.anchor),
+    relationKinds: core.relationKinds,
+    affected: core.affected.map((item) => ({
       ...toEntityRef(item.node),
       depth: item.depth,
     })),
   };
-}
-
-function findOwningModule(graph: SemanticGraph, entityId: string): string | null {
-  const declared = incoming(graph, entityId, "DECLARES")[0];
-  if (declared) {
-    return declared.from;
-  }
-  const contained = incoming(graph, entityId, "CONTAINS")[0];
-  if (contained?.from.startsWith("module:")) {
-    return contained.from;
-  }
-  const parent = incoming(graph, entityId, "CONTAINS")[0];
-  if (parent) {
-    const grand = incoming(graph, parent.from, "DECLARES")[0];
-    if (grand) {
-      return grand.from;
-    }
-  }
-  return null;
 }
 
 /** Outgoing CALLS from a function/method (or module for top-level calls). */

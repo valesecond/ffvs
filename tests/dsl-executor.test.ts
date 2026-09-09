@@ -51,7 +51,7 @@ describe("DSL executor", () => {
     );
     expect(ran.result.entities.some((e) => e.name === "resolve")).toBe(true);
     expect(ran.result.descriptions?.length).toBeGreaterThan(0);
-    expect(ran.json.languageVersion).toBe("0.1");
+    expect(ran.json.languageVersion).toBe("0.3");
   });
 
   it("select + where + traverse callers", async () => {
