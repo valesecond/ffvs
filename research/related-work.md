@@ -48,9 +48,13 @@ Ferramentas poderosas existem, mas perguntas cotidianas de compreensão:
 
 ainda exigem frequentemente **navegação manual fragmentada** entre arquivos. Phase 1.5 testa se verbos de grafo locais reduzem essa fragmentação.
 
+## EXP-0002 note (2026-09-09)
+
+On `debug` and `zod`, FFVS matched IDE-like **structure inspection** more than CodeQL/Joern-style dependency querying—because import edges were mostly unresolved. This positions near-term FFVS work closer to **faithful local graph construction** than to competing with mature query engines.
+
 ## Métricas candidatas para avaliação futura
 
-Ver `hypotheses.md` (H5) e `experiments.md`.
+Ver `hypotheses.md` (H5) e `experiments/EXP-0002/`.
 
 ## Fontes
 

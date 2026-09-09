@@ -15,6 +15,7 @@ once releases are cut.
 - Shared JSON views: `EntityRef`, `RelationRef`, neighborhood/path/impact payloads.
 - Fixtures: `layered`, `diamond`, `cycle`, `isolated`, `inheritance`.
 - Docs: `docs/query-model.md`, ADR-0008, `research/related-work.md`, hypothesis H5.
+- EXP-0002 real-world exploration report under `research/experiments/EXP-0002/`.
 
 ### Added (Phase 1)
 

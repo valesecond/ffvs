@@ -19,28 +19,26 @@ Registro de experimentos. Entradas devem ser adicionadas **somente** quando um e
 
 ## Experimentos
 
-Nenhum experimento concluído ainda.
-
 ### EXP-0001 — Baseline de indexação local (planejado)
 
 - Date: TBD
 - Status: planned
-- Hypothesis: H1 (parcial) — inventário + grafo de arquivos é construível com custo aceitável em repositórios pequenos/médios
-- Method: Medir tempo e tamanho de artefatos `.ffvs/` em fixtures e 1–2 repositórios open source
-- Dataset: fixtures do repositório + amostras a definir
-- Metrics: tempo de `ffvs index`, bytes de `index.json`/`graph.json`, contagem de nós/arestas
+- Hypothesis: H1 (parcial)
+- Method: Medir tempo e tamanho de artefatos `.ffvs/`
+- Dataset: fixtures + amostras
+- Metrics: tempo de index, bytes, nós/arestas
 - Results: —
-- Limitations: não mede qualidade semântica além de inventário
+- Limitations: —
 - Artifacts: —
 
-### EXP-0002 — Explore verbs vs file navigation (planejado)
+### EXP-0002 — Explore verbs vs file navigation / real-world exploration
 
-- Date: TBD
-- Status: planned
-- Hypothesis: H5 — semantic graph exploration reduces steps vs editor+grep for dependency/impact tasks
-- Method: Same tasks on `fixtures/layered` (+ optionally a mid-size OSS repo): (A) editor+grep only, (B) FFVS explore commands; compare steps/time/errors
-- Dataset: `fixtures/layered`, `fixtures/diamond`
-- Metrics: steps, time, files opened, correctness of answer
-- Results: —
-- Limitations: lab setting; small fixtures may overstate benefits
-- Artifacts: —
+- Date: 2026-09-09
+- Status: **completed** (exploratory catalog; timed A/B vs editor+grep deferred)
+- Hypothesis: H5
+- Method: Index two public repos (debug, zod) at pinned commits; pose developer questions; classify answerability / experience; measure IMPORTS health; script degree/cycle samples
+- Dataset: debug@`f405ade`, zod@`c5b9bcb` (temp clones); fixtures/layered as control
+- Metrics: YES/PARTIAL/NO counts; missing-capability frequency; internal vs external IMPORTS ratio
+- Results: STRUCTURE/DESCRIBE strong; TRAVERSE/PATH/IMPACT on OSS largely failed due to import resolution (zod: 2/1413 internal IMPORTS). Insufficient evidence for DSL; prioritize RESOLVE + FILTER. Full write-up under `research/experiments/EXP-0002/`.
+- Limitations: n=2 repos; author-posed questions; no timed control condition in this run
+- Artifacts: `research/experiments/EXP-0002/*`

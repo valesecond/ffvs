@@ -30,18 +30,27 @@ Hipóteses de trabalho. Status: **não avaliadas** até que experimentos sejam e
 
 **Hipótese:** A representation of software as a semantic graph may enable more expressive and composable exploration of software structure than file-oriented navigation alone.
 
+**Status (EXP-0002, 2026-09-09):** partially tested — **not confirmed**.
+
+**Evidence so far:**
+
+- Supportive for STRUCTURE/DESCRIBE (inventory, `inspect`, EXTENDS).
+- Weak/negative for DEPENDENCY/PATH/IMPACT on real repos until import resolution improves (zod: 2/1413 internal IMPORTS).
+- Composition pressure exists, but missing edges dominate missing syntax.
+
 **Falsificável se:** Em tarefas controladas de compreensão/impacto, desenvolvedores não reduzirem passos/tempo/erro frente a editor+grep (ou o grafo induzir confusão/imprecisão sistemáticas).
 
-### Métricas candidatas (ainda não medidas)
+### Métricas candidatas
 
-| Métrica                            | Ideia de medição                                   |
-| ---------------------------------- | -------------------------------------------------- |
-| Operações necessárias              | Contagem de comandos/passos até a resposta         |
-| Arquivos inspecionados manualmente | Quantos arquivos abertos na condição controle      |
-| Tempo até a informação             | Latência de tarefa                                 |
-| Precisão das relações              | Precision/recall vs oráculo em fixtures            |
-| Escalabilidade                     | Tempo/memória de index+traverse vs tamanho do repo |
-| Usabilidade / satisfação           | Escala subjetiva pós-tarefa                        |
+| Métrica | Ideia de medição |
+|---------|------------------|
+| Operações necessárias | Contagem de comandos/passos até a resposta |
+| Arquivos inspecionados manualmente | Quantos arquivos abertos na condição controle |
+| Tempo até a informação | Latência de tarefa |
+| Precisão das relações | Precision/recall vs oráculo em fixtures |
+| Escalabilidade | Tempo/memória de index+traverse vs tamanho do repo |
+| Usabilidade / satisfação | Escala subjetiva pós-tarefa |
+| Import resolution recall | % relative imports linked to internal modules (zod measured ≈ 2/1413) |
 
 ## Registro
 

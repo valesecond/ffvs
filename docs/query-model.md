@@ -125,8 +125,32 @@ Composition (pipes) remains a hypothesis (H4), not a design commitment.
 - Call-graph queries
 - Ranking / metrics queries (“most connected modules”) beyond raw edge counts in `inspect`
 
+## EXP-0002 update (real repositories)
+
+Full report: [`research/experiments/EXP-0002/`](../research/experiments/EXP-0002/).
+
+| Finding | Implication for query model |
+|---------|------------------------------|
+| STRUCTURE/DESCRIBE worked on `debug` + `zod` | SELECT/DESCRIBE primitives are real |
+| TRAVERSE/PATH/IMPACT failed on OSS imports | Edge fidelity ≫ DSL urgency |
+| SELECT without FILTER painful at zod scale | FILTER/SEARCH candidates |
+| CALL questions impossible | CALLS still deferred but demanded |
+| Composition intents appeared | Language later; fix RESOLVE first |
+
+### Revised priority of primitives
+
+```text
+1. RESOLVE imports (extless CJS, .js→.ts)   — prerequisite
+2. FILTER / SEARCH                          — scale + composition
+3. TRAVERSE / PATH / IMPACT                 — already present; need data
+4. RANK / CYCLE                             — architecture questions
+5. CALLS                                    — deeper impact
+6. DSL syntax                               — only after 1–3 stabilize
+```
+
 ## Next empirical steps
 
-1. Use these commands on a real mid-size repo and log repeated question shapes.
-2. Measure how often `impact`/`path` beat manual navigation (see research metrics).
-3. Only then draft a minimal query syntax for the top 3 repeated patterns.
+1. ~~Use these commands on a real mid-size repo~~ → done (EXP-0002).
+2. Fix import resolution; re-run EXP-0002 metrics (EXP-0002-followup).
+3. Optional timed A/B vs editor+grep once edges are trustworthy.
+4. Only then draft minimal query syntax for top repeated patterns.

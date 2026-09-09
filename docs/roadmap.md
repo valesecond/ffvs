@@ -26,7 +26,7 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [ ] Indexação incremental (quando justificada)
 - [ ] Resolução de imports de packages (opcional/experimental)
 
-## Phase 1.5 — Discover the Query Model (atual)
+## Phase 1.5 — Discover the Query Model
 
 - [x] API interna de navegação (`neighbors`, `path`, `ancestors`, …)
 - [x] Navegação reversa sem duplicar arestas
@@ -35,11 +35,21 @@ Documento vivo. Datas não são compromissos; fases avançam quando critérios d
 - [x] Fixtures: layered, diamond, cycle, isolated, inheritance
 - [x] `docs/query-model.md`, ADR-0008
 - [x] `research/related-work.md`, hipótese H5
-- [ ] Uso em repo real + log de perguntas recorrentes (EXP-0002)
+- [x] EXP-0002 real-repo exploration (`research/experiments/EXP-0002/`)
+
+## Phase 1.6 — Model fidelity (recommended next; not DSL)
+
+Prioridade pós-EXP-0002 (evidência: imports quebrados em repos reais):
+
+- [ ] Resolver imports extensionless (CJS) e `.js`→`.ts` (TS ESM)
+- [ ] Preferir `MODULE` em comandos de dependência quando ambíguo
+- [ ] Includes/excludes de paths (ignorar docs/bench opcionalmente)
+- [ ] FILTER/SEARCH mínimos na CLI (se ainda necessários após resolução)
+- [ ] Re-rodar métricas EXP-0002 (internal IMPORTS ratio, impact recall)
 
 ## Phase 2 — Query (ainda sem DSL formal completa)
 
-Antes de uma linguagem rica, observar padrões de uso dos comandos explore (`docs/query-model.md`).
+**Bloqueada deliberadamente** até haver evidência pós-correção de resolução.
 
 - [ ] Motor de consulta sobre o grafo
 - [ ] Sintaxe experimental mínima (`find` / filtros), se ergonomia exigir
